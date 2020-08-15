@@ -36,7 +36,7 @@ func Exec(c *gin.Context) {
 	var err error
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
-	cmd = exec.Command("bash", "-c", "pm2 deploy ecosystem.config.js production update --force")
+	cmd = exec.Command("bash", "-c", userCmd)
 	if cmdOut, err = cmd.Output(); err != nil {
 		log.Println(err)
 		panic(err)
