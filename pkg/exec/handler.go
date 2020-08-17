@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"os/exec"
-	"strings"
 )
 
 //发送命令到服务器
@@ -36,8 +35,6 @@ func Send(c *gin.Context) {
 	}
 	// 默认输出有一个换行
 	log.Println(string(cmdOut))
-	// 指定参数后过滤换行符
-	log.Println(strings.Trim(string(cmdOut), "\n"))
 
 	c.JSON(200, gin.H{
 		"message": "ok",

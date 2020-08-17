@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/router"
+	"net/http"
 )
 
 //func init() {
@@ -24,7 +25,7 @@ func main() {
 	//r.LoadHTMLGlob("templates/*") //加载模板
 	r.Static("/fe","./fe")
 	r.GET("/", func(c *gin.Context) {
-		c.File("index.html")
+		c.Redirect(http.StatusPermanentRedirect, "/fe")
 	})
 
 	router.Register(r)
