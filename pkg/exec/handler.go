@@ -12,7 +12,7 @@ import (
 )
 
 //发送命令到服务器
-func Exec(c *gin.Context) {
+func Send(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -24,14 +24,14 @@ func Exec(c *gin.Context) {
 	if !ok || userCmd == "" {
 		panic(errors.New("命令无效！"))
 	}
-	log.Println(">>>>>>>>>>", userCmd)
+	log.Println(">>>>>>>>>>输出命令", userCmd)
 	var cmdOut []byte
 	var err error
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	cmd = exec.Command("bash", "-c", userCmd)
 	if cmdOut, err = cmd.Output(); err != nil {
-		log.Println(err)
+		log.Println("输出错误：",err)
 		panic(err)
 	}
 	// 默认输出有一个换行
