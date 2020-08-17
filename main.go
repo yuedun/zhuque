@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/router"
@@ -23,11 +21,10 @@ import (
 func main() {
 	r := gin.Default()
 	//r.Use(middleware.Logger())//全局中间件
-	r.LoadHTMLGlob("templates/*") //加载模板
+	//r.LoadHTMLGlob("templates/*") //加载模板
+	r.Static("/fe","./fe")
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tpl", gin.H{
-			"title": "Hello World!",
-		})
+		c.File("index.html")
 	})
 
 	router.Register(r)

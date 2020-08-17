@@ -29,7 +29,6 @@ func Register(router *gin.Engine) {
 	//发送命令路由注册
 	execRouter := router.Group("/exec")
 	{
-		execRouter.GET("/", exec.Index)
 		execRouter.POST("/send", exec.Exec)
 	}
 }

@@ -12,13 +12,6 @@ import (
 )
 
 //发送命令到服务器
-func Index(c *gin.Context) {
-	c.HTML(http.StatusOK, "exec.tpl", gin.H{
-		"title": "ok",
-	})
-}
-
-//发送命令到服务器
 func Exec(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
