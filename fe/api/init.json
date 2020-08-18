@@ -17,32 +17,32 @@
       "child": [
         {
           "title": "用户管理",
-          "href": "page/menu.html",
-          "icon": "fa fa-window-maximize",
+          "href": "page/users.html",
+          "icon": "fa fa-users",
           "target": "_self"
         },
         {
           "title": "服务器管理",
-          "href": "page/setting.html",
+          "href": "page/server.html",
           "icon": "fa fa-gears",
           "target": "_self"
         },
         {
           "title": "项目管理",
-          "href": "page/table.html",
-          "icon": "fa fa-file-text",
+          "href": "page/projects.html",
+          "icon": "fa fa-navicon",
           "target": "_self"
         },
         {
           "title": "部署管理",
-          "href": "page/button.html",
-          "icon": "fa fa-tachometer",
+          "href": "page/deploy.html",
+          "icon": "fa fa-tasks",
           "target": "_self"
         },
         {
           "title": "部署测试页面",
-          "href": "page/form.html",
-          "icon": "fa fa-tachometer",
+          "href": "page/task.html",
+          "icon": "fa fa-adjust",
           "target": "_self"
         }
       ]

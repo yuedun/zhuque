@@ -1,4 +1,4 @@
-package user
+package server
 
 import (
 	"fmt"
@@ -6,8 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
+
+	"github.com/gin-gonic/gin"
 )
 
 //List
@@ -19,36 +20,31 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
-	var user User
-	userService := NewService(db.SQLLite)
-	list, err := userService.GetUserList(user)
+	var server Server
+	serverService := NewService(db.SQLLite)
+	list, err := serverService.GetServerList(server)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"data":    list,
+		"msg": "ok",
 	})
 }
 
-type loginData struct {
-	UserName string `json:"userName"`
-	Password string `json:"password"`
-}
-
-//GetUserInfo
-func GetUserInfo(c *gin.Context) {
+//GetServerInfo
+func GetServerInfo(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
-	username := c.Param("username")
-	email := c.Param("email")
+	name := c.Param("name")
+	ip := c.Param("ip")
 	userService := NewService(db.SQLLite)
-	userObj := User{
+	userObj := Server{
 		ID:       userID,
-		UserName: username,
-		Email:    email,
+		Name: name,
+		IP:   ip,
 	}
-	user, err := userService.GetUserInfo(userObj)
+	user, err := userService.GetServerInfo(userObj)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
@@ -58,10 +54,10 @@ func GetUserInfo(c *gin.Context) {
 	})
 }
 
-//GetUserInfoBySql
-func GetUserInfoBySql(c *gin.Context) {
+//GetServerInfoBySql
+func GetServerInfoBySql(c *gin.Context) {
 	userService := NewService(db.SQLLite)
-	user, err := userService.GetUserInfoBySQL()
+	user, err := userService.GetServerInfoBySQL()
 	if err != nil {
 		fmt.Println("err:", err)
 	}
@@ -70,8 +66,8 @@ func GetUserInfoBySql(c *gin.Context) {
 	})
 }
 
-//CreateUser
-func CreateUser(c *gin.Context) {
+//CreateServer
+func CreateServer(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -80,12 +76,12 @@ func CreateUser(c *gin.Context) {
 		}
 	}()
 	userService := NewService(db.SQLLite)
-	user := User{}
+	user := Server{}
 	if err := c.ShouldBind(&user); err != nil {
 		panic(err)
 	}
 	user.CreatedAt = time.Now()
-	err := userService.CreateUser(&user)
+	err := userService.CreateServer(&user)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
@@ -95,10 +91,10 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-//UpdateUser post json
-func UpdateUser(c *gin.Context) {
+//UpdateServer post json
+func UpdateServer(c *gin.Context) {
 	userService := NewService(db.SQLLite)
-	var user User
+	var user Server
 	userID, _ := strconv.Atoi(c.Param("id"))
 	//user.Addr = c.PostForm("addr")
 	if err := c.ShouldBind(&user); err != nil {
@@ -107,7 +103,7 @@ func UpdateUser(c *gin.Context) {
 			"message": "err",
 		})
 	} else {
-		err := userService.UpdateUser(userID, &user)
+		err := userService.UpdateServer(userID, &user)
 		if err != nil {
 			fmt.Println("err:", err)
 		}
@@ -118,11 +114,11 @@ func UpdateUser(c *gin.Context) {
 	}
 }
 
-//DeleteUser
-func DeleteUser(c *gin.Context) {
+//DeleteServer
+func DeleteServer(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 	userService := NewService(db.SQLLite)
-	err := userService.DeleteUser(userID)
+	err := userService.DeleteServer(userID)
 	if err != nil {
 		fmt.Println("err:", err)
 	}

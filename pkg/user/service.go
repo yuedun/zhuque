@@ -13,6 +13,7 @@ type (
 	*/
 	UserService interface {
 		GetUserInfo(userObj User) (user User, err error)
+		GetUserList(userObj User) (user []User, err error)
 		GetUserInfoBySQL() (user User, err error)
 		CreateUser(user *User) (err error)
 		UpdateUser(userID int, user *User) (err error)
@@ -39,8 +40,16 @@ func (u *userService) GetUserInfo(userObj User) (user User, err error) {
 	return user, nil
 }
 
+func (u *userService) GetUserList(userObj User) (users []User, err error) {
+	err = u.mysql.Where(userObj).Find(&users).Error
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}
+
 func (u *userService) GetUserInfoBySQL() (user User, err error) {
-	err = u.mysql.Raw("select * from user where id=?", user.Id).Scan(&user).Error
+	err = u.mysql.Raw("select * from user where id=?", user.ID).Scan(&user).Error
 	if err != nil {
 		return user, err
 	}
@@ -70,28 +79,4 @@ func (u *userService) DeleteUser(userID int) (err error) {
 		return err
 	}
 	return nil
-}
-
-/**
-面向接口开发的好处是，如果需要修改方法逻辑，可以在不修改原来逻辑的情况下新增接口实现，在调用的地方使用新的实现即可
-*/
-type newUserService struct {
-	userService
-	mysql *gorm.DB
-}
-
-/*NewUserService 初始化结构体*/
-func NewUserService(mysql *gorm.DB) UserService {
-	return &newUserService{
-		mysql: mysql,
-	}
-}
-
-func (u *newUserService) GetUserInfo(userObj User) (user User, err error) {
-	err = u.mysql.First(&user).Error
-	if err != nil {
-		return user, err
-	}
-	fmt.Println("新方法")
-	return user, nil
 }

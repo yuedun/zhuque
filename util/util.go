@@ -16,6 +16,7 @@ type Conf struct {
 	User   string `yaml:"user"`
 	Pwd    string `yaml:"pwd"`
 	Dbname string `yaml:"dbname"`
+	Dbpath string `yaml:"dbpath"`
 }
 
 func (c *Conf) GetConf(filename string) (config *Conf, err error) {
