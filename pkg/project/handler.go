@@ -1,8 +1,10 @@
 package project
 
 import (
-	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -35,34 +37,25 @@ func List(c *gin.Context) {
 
 //GetProjectInfo
 func GetProjectInfo(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Param("id"))
-	name := c.Param("name")
-	ip := c.Param("ip")
-	userService := NewService(db.SQLLite)
-	userObj := Project{
-		ID:     userID,
-		Name:   name,
-		Status: ip,
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	projectID, _ := strconv.Atoi(c.Param("id"))
+	projectService := NewService(db.SQLLite)
+	projectObj := Project{
+		ID: projectID,
 	}
-	user, err := userService.GetProjectInfo(userObj)
+	project, err := projectService.GetProjectInfo(projectObj)
 	if err != nil {
-		fmt.Println("err:", err)
+		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data":    user,
+		"data":    project,
 		"message": "ok",
-	})
-}
-
-//GetProjectInfoBySql
-func GetProjectInfoBySql(c *gin.Context) {
-	userService := NewService(db.SQLLite)
-	user, err := userService.GetProjectInfoBySQL()
-	if err != nil {
-		fmt.Println("err:", err)
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": user,
 	})
 }
 
@@ -75,52 +68,73 @@ func CreateProject(c *gin.Context) {
 			})
 		}
 	}()
-	userService := NewService(db.SQLLite)
-	user := Project{}
-	if err := c.ShouldBind(&user); err != nil {
+	project := Project{}
+	if err := c.ShouldBind(&project); err != nil {
 		panic(err)
 	}
-	user.CreatedAt = time.Now()
-	err := userService.CreateProject(&user)
+	projectService := NewService(db.SQLLite)
+	project.CreatedAt = time.Now()
+	err := projectService.CreateProject(&project)
 	if err != nil {
-		fmt.Println("err:", err)
+		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data":    user,
+		"data":    project,
 		"message": "ok",
 	})
 }
 
-//UpdateProject post json
+//UpdateProject
 func UpdateProject(c *gin.Context) {
-	userService := NewService(db.SQLLite)
-	var user Project
-	userID, _ := strconv.Atoi(c.Param("id"))
-	//user.Addr = c.PostForm("addr")
-	if err := c.ShouldBind(&user); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"data":    nil,
-			"message": "err",
-		})
-	} else {
-		err := userService.UpdateProject(userID, &user)
-		if err != nil {
-			fmt.Println("err:", err)
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"data":    user,
-			"message": "ok",
-		})
+	}()
+	projectID, _ := strconv.Atoi(c.Param("id"))
+	projectService := NewService(db.SQLLite)
+	var project Project
+	if err := c.ShouldBind(&project); err != nil {
+		panic(err)
 	}
+	// 1.创建项目目录，2.进入目录，3.写ecosystem.config.js文件
+	filePath:="./projects/" + project.Name
+	if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
+		log.Println(err)
+		panic(err)
+	}
+
+	var d1 = []byte(project.Config)
+	err := ioutil.WriteFile(filePath + "/ecosystem.config.js", d1, 0666) //写入文件(字节数组)
+	if err!=nil {
+		panic(err)
+	}
+	err = projectService.UpdateProject(projectID, &project)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    project,
+		"message": "ok",
+	})
 }
 
 //DeleteProject
 func DeleteProject(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Param("id"))
-	userService := NewService(db.SQLLite)
-	err := userService.DeleteProject(userID)
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	projectID, _ := strconv.Atoi(c.Param("id"))
+	projectService := NewService(db.SQLLite)
+	err := projectService.DeleteProject(projectID)
 	if err != nil {
-		fmt.Println("err:", err)
+		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",

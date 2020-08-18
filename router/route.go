@@ -46,10 +46,10 @@ func Register(router *gin.Engine) {
 	projectRouter.Use(middleware.Logger())
 	{
 		projectRouter.GET("/list", project.List)
-		projectRouter.GET("/server-by-sql/:id", project.GetProjectInfoBySql)
 		projectRouter.POST("/create", project.CreateProject)
+		projectRouter.GET("/get-by-id/:id", project.GetProjectInfo)
 		projectRouter.PUT("/update/:id", project.UpdateProject)
-		projectRouter.DELETE("/del/:id", project.DeleteProject)
+		projectRouter.POST("/del/:id", project.DeleteProject)
 	}
 
 	deployRouter := router.Group("/deploy")
