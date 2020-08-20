@@ -21,25 +21,25 @@
                     <form class="layui-form layui-form-pane" action="">
                         <div class="layui-form-item">
                             <div class="layui-inline">
-                                <label class="layui-form-label">用户姓名</label>
+                                <label class="layui-form-label">上线单</label>
                                 <div class="layui-input-inline">
                                     <input type="text" name="username" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
-                                <label class="layui-form-label">用户性别</label>
+                                <label class="layui-form-label">项目</label>
                                 <div class="layui-input-inline">
                                     <input type="text" name="sex" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
-                                <label class="layui-form-label">用户城市</label>
+                                <label class="layui-form-label">用户名</label>
                                 <div class="layui-input-inline">
                                     <input type="text" name="city" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
-                                <label class="layui-form-label">用户职业</label>
+                                <label class="layui-form-label">上线时间</label>
                                 <div class="layui-input-inline">
                                     <input type="text" name="classify" autocomplete="off" class="layui-input">
                                 </div>
@@ -135,7 +135,7 @@
                         maxmin: true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: '../page/table/add.html',
+                        content: '../page/deploy-add.html',
                     });
                     $(window).on("resize", function () {
                         layer.full(index);
@@ -163,7 +163,7 @@
                         maxmin: true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: '../page/table/edit.html',
+                        content: '../page/deploy-edit.html',
                     });
                     $(window).on("resize", function () {
                         layer.full(index);

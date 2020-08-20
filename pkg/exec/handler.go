@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -23,14 +24,14 @@ func Send(c *gin.Context) {
 	if !ok || userCmd == "" {
 		panic(errors.New("命令无效！"))
 	}
-	log.Println(">>>>>>>>>>输出命令", userCmd)
+	log.Println("用户输入命令：", userCmd)
 	var cmdOut []byte
 	var err error
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	cmd = exec.Command("bash", "-c", userCmd)
 	if cmdOut, err = cmd.Output(); err != nil {
-		log.Println("输出错误：",err)
+		log.Println("输出错误：", err)
 		panic(err)
 	}
 	// 默认输出有一个换行
@@ -38,6 +39,6 @@ func Send(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"message": "ok",
-		"data":    string(cmdOut),
+		"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
 	})
 }

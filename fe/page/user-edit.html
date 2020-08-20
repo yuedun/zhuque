@@ -44,34 +44,6 @@
                 </div>
             </div>
         </div>
-        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>任务配置</legend>
-        </fieldset>
-        <div class="layui-form-item">
-            <label class="layui-form-label">配置文件</label>
-            <div class="layui-input-block">
-                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
-module.exports = {
-    apps : [{
-        script: 'index.js',
-        watch: '.'
-    }],
-    
-    deploy : {
-        production : {
-            user : 'SSH_USERNAME',
-            host : 'SSH_HOSTMACHINE',
-            ref  : 'origin/master',
-            repo : 'GIT_REPOSITORY',
-            path : 'DESTINATION_PATH',
-            'pre-deploy-local': '',
-            'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-            'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
-        }
-    }
-};</textarea>
-            </div>
-        </div>
         <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
@@ -90,7 +62,7 @@ module.exports = {
                 var id = $('input[name=id]').val()
                 $.ajax({
                     type: 'GET',
-                    url: '/project/get-by-id/' + id,
+                    url: '/deploy/get-by-id/' + id,
                     success: function (res) {
                         $("input[name=gitRepo]").val(res.data.gitRepo);
                         $("input[name=branch]").val(res.data.branch);
@@ -109,7 +81,7 @@ module.exports = {
                 delete data.field.id;
                 $.ajax({
                     type: 'PUT',
-                    url: '/project/update/' + id,
+                    url: '/deploy/update/' + id,
                     contentType: 'application/json',
                     data: JSON.stringify(data.field),
                     success: function (res) {

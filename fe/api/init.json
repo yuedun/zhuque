@@ -1,7 +1,7 @@
 {
   "homeInfo": {
     "title": "首页",
-    "href": "page/welcome-1.html?t=1"
+    "href": "page/welcome.html?t=1"
   },
   "logoInfo": {
     "title": "朱雀",
@@ -40,7 +40,7 @@
           "target": "_self"
         },
         {
-          "title": "部署测试页面",
+          "title": "命令部署",
           "href": "page/task.html",
           "icon": "fa fa-adjust",
           "target": "_self"

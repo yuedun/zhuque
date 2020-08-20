@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -11,19 +14,19 @@ import (
 	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/router"
 	"github.com/yuedun/zhuque/util"
-	"net/http"
 )
 
 func init() {
 	var err error
 	var conf util.Conf
-	c,err:=conf.GetConf("./conf.yaml")
-	if err!=nil {
+	c, err := conf.GetConf("./conf.yaml")
+	if err != nil {
 		panic(err)
 	}
 	db.SQLLite, err = gorm.Open("sqlite3", c.Dbpath)
 	if err != nil {
-		panic("failed to connect database")
+		log.Println("failed to connect database")
+		panic(err)
 	}
 	db.SQLLite.AutoMigrate(&user.User{})
 	db.SQLLite.AutoMigrate(&server.Server{})
@@ -38,7 +41,7 @@ func main() {
 	r := gin.Default()
 	//r.Use(middleware.Logger())//全局中间件
 	//r.LoadHTMLGlob("templates/*") //加载模板
-	r.Static("/fe","./fe")
+	r.Static("/fe", "./fe")
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusPermanentRedirect, "/fe")
 	})

@@ -14,15 +14,39 @@
 <body>
     <div class="layuimini-container">
         <div class="layuimini-main">
+            <blockquote class="layui-elem-quote layui-text">
+                <pre>
+                    <code>
+# 初始化，会在指定目录拉取git仓库
+$ pm2 deploy &lt;configuration_file&gt; &lt;environment&gt; setup 
+# e.g., pm2 deploy ecosystem.config.js production setup
+
+# 更新版本
+$ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production update
+
+# 回滚到上一个版本
+$ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production revert 1
+
+# 在远程服务上执行命令
+$ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "pm2 reload all"
+
+# 把发布机上的文件传到对应应用服务器上
+$ scp projects/&lt;project_name&gt;/ecosystem.config.js admin@&lt;ip&gt;:/data/www/&lt;应用服务器目录&gt;/current
+ecosystem.config.js
+                    </code>
+                </pre>
+            </blockquote>
+
             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-                <legend>表单集合演示</legend>
+                <legend>发布命令</legend>
             </fieldset>
 
             <form class="layui-form" action="">
                 <div class="layui-form-item">
                     <label class="layui-form-label">发布命令</label>
                     <div class="layui-input-block">
-                        <input type="text" name="cmd" value="pm2 deploy projects/test-deploy/ecosystem.config.js production --force"
+                        <input type="text" name="cmd"
+                            value="pm2 deploy projects/test-deploy/ecosystem.config.js production --force"
                             lay-verify="cmd" autocomplete="off" placeholder="请输入发布命令" class="layui-input">
                     </div>
                 </div>
@@ -76,11 +100,23 @@
 
             //监听提交
             form.on('submit(demo1)', function (data) {
+                var index = layer.load();
                 $.post('/exec/send', data.field, function (res) {
-                    layer.alert(res.data, {
-                        title: '执行结果'
-                    })
+                    layer.open({
+                        type: 1
+                        , title: '发布结果' //不显示标题栏
+                        , closeBtn: 1
+                        , area: '800px;'
+                        , shade: 0.8
+                        , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        , btn: ['关闭']
+                        , btnAlign: 'c'
+                        , moveType: 1 //拖拽模式，0或者1
+                        , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
+                    });
+                    layer.close(index);
                 }).fail(function (err) {
+                    layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
                 return false;
