@@ -1,6 +1,0 @@
-host: localhost:3306
-user: root
-pwd: root
-dbname: website
-
-dbpath: ../zhuque.db
