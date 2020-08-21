@@ -30,9 +30,14 @@ func Send(c *gin.Context) {
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	cmd = exec.Command("bash", "-c", userCmd)
-	if cmdOut, err = cmd.Output(); err != nil {
+	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
-		panic(err)
+		log.Println("输出错误2：", string(cmdOut))
+		c.JSON(200, gin.H{
+			"message": err,
+			"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
+		})
+		return
 	}
 	// 默认输出有一个换行
 	log.Println(string(cmdOut))

@@ -21,18 +21,17 @@
 $ pm2 deploy &lt;configuration_file&gt; &lt;environment&gt; setup 
 # e.g., pm2 deploy ecosystem.config.js production setup
 
+# 把发布机上的文件传到对应应用服务器上
+$ scp projects/&lt;project_name&gt;/ecosystem.config.js admin@&lt;ip&gt;:/data/www/&lt;应用服务器目录&gt;/current
+
 # 更新版本
-$ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production update
+$ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production update --force
 
 # 回滚到上一个版本
 $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production revert 1
 
 # 在远程服务上执行命令
 $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "pm2 reload all"
-
-# 把发布机上的文件传到对应应用服务器上
-$ scp projects/&lt;project_name&gt;/ecosystem.config.js admin@&lt;ip&gt;:/data/www/&lt;应用服务器目录&gt;/current
-ecosystem.config.js
                     </code>
                 </pre>
             </blockquote>
