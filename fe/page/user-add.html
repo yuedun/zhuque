@@ -19,24 +19,23 @@
 <body>
     <div class="layui-form layuimini-form">
         <div class="layui-form-item">
-            <label class="layui-form-label required">项目名</label>
+            <label class="layui-form-label required">用户名</label>
             <div class="layui-input-block">
-                <input type="text" name="name" lay-verify="required" lay-reqtext="项目名不能为空" placeholder="请输入项目名" value=""
-                    class="layui-input">
-                <tip>填写自己管理账号的名称。</tip>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label required">环境</label>
-            <div class="layui-input-block">
-                <input type="text" name="env" lay-verify="required" lay-reqtext="环境不能为空" placeholder="请输入环境" value=""
+                <input type="text" name="name" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value=""
                     class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">空间</label>
+            <label class="layui-form-label required">邮箱</label>
             <div class="layui-input-block">
-                <input type="text" name="namespace" placeholder="请输入空间" value="" class="layui-input">
+                <input type="text" name="env" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" value=""
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色</label>
+            <div class="layui-input-block">
+                <input type="text" name="namespace" placeholder="请输入角色" value="" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -56,7 +55,7 @@
             form.on('submit(saveBtn)', function (data) {
                 $.ajax({
                     type: 'POST',
-                    url: '/project/create',
+                    url: '/user/create',
                     contentType: 'application/json',
                     data: JSON.stringify(data.field),
                     success: function (res) {

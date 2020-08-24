@@ -49,6 +49,7 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
                     miniAdmin.renderClear(options.clearUrl);
                     miniAdmin.renderHome(data.homeInfo);
                     miniAdmin.renderAnim(options.pageAnim);
+                    miniAdmin.storeUerInfo(data.userInfo);
                     miniAdmin.listen();
                     miniMenu.render({
                         menuList: data.menuInfo,
@@ -96,6 +97,16 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
             $('#layuiminiHomeTabId').html('<span class="layuimini-tab-active"></span><span class="disable-close">' + data.title + '</span><i class="layui-icon layui-unselect layui-tab-close">ဆ</i>');
             $('#layuiminiHomeTabId').attr('lay-id', data.href);
             $('#layuiminiHomeTabIframe').html('<iframe width="100%" height="100%" frameborder="no" border="0" marginwidth="0" marginheight="0"  src="' + data.href + '"></iframe>');
+        },
+
+        /**
+         * 初始化用户信息
+         * @param data
+         */
+        storeUerInfo: function (data) {
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('userID', data.userID);
+            $('.username').html(sessionStorage.getItem('username'));
         },
 
         /**

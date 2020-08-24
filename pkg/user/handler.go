@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/yuedun/zhuque/util"
+
 	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
 )
@@ -84,6 +86,8 @@ func CreateUser(c *gin.Context) {
 	if err := c.ShouldBind(&user); err != nil {
 		panic(err)
 	}
+	user.Password = util.GetMD5(user.UserName)
+	user.Status = 1
 	user.CreatedAt = time.Now()
 	err := userService.CreateUser(&user)
 	if err != nil {

@@ -185,6 +185,13 @@
                     data: JSON.stringify(data),
                     success: function (res) {
                         layer.msg('登录成功', function () {
+                            document.cookie =
+                                "jwt=" +
+                                escape(res.token) +
+                                ";expires=" +
+                                new Date(res.expire).toGMTString() +
+                                ";path=/";
+                            localStorage.setItem("username", data.username);
                             window.location = '/fe';
                         });
                     },

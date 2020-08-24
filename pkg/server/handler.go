@@ -28,8 +28,8 @@ func List(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
-		"data":    list,
-		"msg": "ok",
+		"data": list,
+		"msg":  "ok",
 	})
 }
 
@@ -40,7 +40,7 @@ func GetServerInfo(c *gin.Context) {
 	ip := c.Param("ip")
 	userService := NewService(db.SQLLite)
 	userObj := Server{
-		ID:       userID,
+		ID:   userID,
 		Name: name,
 		IP:   ip,
 	}

@@ -8,6 +8,10 @@
     "image": "images/logo.png",
     "href": ""
   },
+  "userInfo": {
+    "username": "tet",
+    "userID": 123
+  },
   "menuInfo": [
     {
       "title": "常规管理",
@@ -16,9 +20,27 @@
       "target": "_self",
       "child": [
         {
-          "title": "用户管理",
-          "href": "page/users.html",
-          "icon": "fa fa-users",
+          "title": "项目管理",
+          "href": "page/projects.html",
+          "icon": "fa fa-navicon",
+          "target": "_self"
+        },
+        {
+          "title": "快捷发布",
+          "href": "page/task2.html",
+          "icon": "fa fa-bolt",
+          "target": "_self"
+        },
+        {
+          "title": "命令部署",
+          "href": "page/task.html",
+          "icon": "fa fa-adjust",
+          "target": "_self"
+        },
+        {
+          "title": "发布记录",
+          "href": "page/deploy.html",
+          "icon": "fa fa-tasks",
           "target": "_self"
         },
         {
@@ -28,21 +50,9 @@
           "target": "_self"
         },
         {
-          "title": "项目管理",
-          "href": "page/projects.html",
-          "icon": "fa fa-navicon",
-          "target": "_self"
-        },
-        {
-          "title": "部署管理",
-          "href": "page/deploy.html",
-          "icon": "fa fa-tasks",
-          "target": "_self"
-        },
-        {
-          "title": "命令部署",
-          "href": "page/task.html",
-          "icon": "fa fa-adjust",
+          "title": "用户管理",
+          "href": "page/users.html",
+          "icon": "fa fa-users",
           "target": "_self"
         }
       ]

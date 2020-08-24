@@ -18,13 +18,11 @@ func Register(router *gin.Engine) {
 	//user路由注册,可以给各个group加中间件
 	userRouter.Use(middleware.Logger())
 	{
-		userRouter.GET("/list", user.List)
-		//userRouter.POST("/login", user.Login)
 		userRouter.POST("/login", middleware.Jwt().LoginHandler)
 		userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
 		userRouter.GET("/logout", middleware.Jwt().LogoutHandler)
-		userRouter.GET("/info/:id", middleware.Auth(), user.GetUserInfo) //单独给某个路由添加中间件
-		userRouter.GET("/users-by-sql/:id", user.GetUserInfoBySql)
+		userRouter.GET("/info/:id", middleware.Jwt().MiddlewareFunc(), user.GetUserInfo) //单独给某个路由添加中间件
+		userRouter.GET("/list", user.List)
 		userRouter.POST("/create", user.CreateUser)
 		userRouter.PUT("/update/:id", user.UpdateUser)
 		userRouter.DELETE("/del/:id", user.DeleteUser)
@@ -46,6 +44,7 @@ func Register(router *gin.Engine) {
 	projectRouter.Use(middleware.Logger())
 	{
 		projectRouter.GET("/list", project.List)
+		projectRouter.GET("/name-list", project.NameList)
 		projectRouter.POST("/create", project.CreateProject)
 		projectRouter.GET("/get-by-id/:id", project.GetProjectInfo)
 		projectRouter.PUT("/update/:id", project.UpdateProject)
@@ -66,5 +65,6 @@ func Register(router *gin.Engine) {
 	execRouter := router.Group("/exec")
 	{
 		execRouter.POST("/send", exec.Send)
+		execRouter.POST("/server", exec.Server)
 	}
 }

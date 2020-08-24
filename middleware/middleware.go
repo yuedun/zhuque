@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"log"
-	"net/http"
 	"time"
+
+	"github.com/yuedun/zhuque/util"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/yuedun/zhuque/db"
@@ -37,31 +38,6 @@ func Logger() gin.HandlerFunc {
 	}
 }
 
-// 权限校验
-func Auth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token, err := c.Cookie("token")
-		if err != nil {
-			c.Abort() //不继续执行
-			c.JSON(http.StatusForbidden, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-		log.Println(">>>", token)
-		if token == "" {
-			log.Print("权限验证未通过")
-			c.Abort() //不继续执行
-			c.JSON(http.StatusForbidden, gin.H{
-				"message": "权限验证未通过",
-			})
-			return
-		} else {
-			c.Next() //如果通过中间件需要调用Next，使其继续执行下一个func
-		}
-	}
-}
-
 type User struct {
 	UserName  string
 	LoginTime time.Time
@@ -77,8 +53,8 @@ func Jwt() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
-		Timeout:     time.Hour * 24 * 3,
-		MaxRefresh:  time.Hour * 24 * 3,
+		Timeout:     time.Hour * 24 * 10, //10天
+		MaxRefresh:  time.Hour * 24 * 10,
 		IdentityKey: identityKey,
 		// 登录验证成功后存储用户信息
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -120,7 +96,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 				return nil, jwt.ErrFailedAuthentication
 			}
 
-			if (user.UserName == "admin" && user.Password == password) {
+			if user.UserName == username && user.Password == util.GetMD5(password) {
 				// 返回的数据用在上面定义的PayloadFunc函数中
 				return &User{
 					UserName:  username,
@@ -132,10 +108,10 @@ func Jwt() *jwt.GinJWTMiddleware {
 		},
 		// 登录以后通过token来获取用户标识，检测是否通过认证
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*User); ok && v.UserName == "test" {
+			if v, ok := data.(*User); ok && v.UserName != "" {
 				return true
 			}
-
+			log.Println("token 验证失败！")
 			return false
 		},
 		// 获取不到token或解析token失败时如何返回信息
@@ -154,7 +130,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 		// - "query:<name>"
 		// - "cookie:<name>"
 		// - "param:<name>"
-		TokenLookup: "header: Authorization, query: token, cookie: jwt",
+		TokenLookup: "cookie:jwt",
 		// TokenLookup: "query:token",
 		// TokenLookup: "cookie:token",
 

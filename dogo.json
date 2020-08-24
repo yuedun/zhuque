@@ -1,7 +1,10 @@
 {
     "WorkingDir": "D:\\goproject\\zhuque",
     "SourceDir": [
-        "D:\\goproject\\zhuque"
+        "D:\\goproject\\zhuque\\pkg",
+        "D:\\goproject\\zhuque\\router",
+        "D:\\goproject\\zhuque\\middleware",
+        "D:\\goproject\\zhuque\\util"
     ],
     "SourceExt": [".go"],
     "BuildCmd": "go build",

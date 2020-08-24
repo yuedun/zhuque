@@ -35,34 +35,34 @@ func List(c *gin.Context) {
 
 //GetTaskInfo
 func GetTaskInfo(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Param("id"))
+	taskID, _ := strconv.Atoi(c.Param("id"))
 	name := c.Param("name")
 	ip := c.Param("ip")
-	userService := NewService(db.SQLLite)
-	userObj := Task{
-		ID:       userID,
+	taskService := NewService(db.SQLLite)
+	taskObj := Task{
+		ID:       taskID,
 		TaskName: name,
 		Status:   ip,
 	}
-	user, err := userService.GetTaskInfo(userObj)
+	task, err := taskService.GetTaskInfo(taskObj)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data":    user,
+		"data":    task,
 		"message": "ok",
 	})
 }
 
 //GetTaskInfoBySql
 func GetTaskInfoBySql(c *gin.Context) {
-	userService := NewService(db.SQLLite)
-	user, err := userService.GetTaskInfoBySQL()
+	taskService := NewService(db.SQLLite)
+	task, err := taskService.GetTaskInfoBySQL()
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"message": task,
 	})
 }
 
@@ -75,40 +75,40 @@ func CreateTask(c *gin.Context) {
 			})
 		}
 	}()
-	userService := NewService(db.SQLLite)
-	user := Task{}
-	if err := c.ShouldBind(&user); err != nil {
+	taskService := NewService(db.SQLLite)
+	task := Task{}
+	if err := c.ShouldBind(&task); err != nil {
 		panic(err)
 	}
-	user.CreatedAt = time.Now()
-	err := userService.CreateTask(&user)
+	task.CreatedAt = time.Now()
+	err := taskService.CreateTask(&task)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data":    user,
+		"data":    task,
 		"message": "ok",
 	})
 }
 
 //UpdateTask post json
 func UpdateTask(c *gin.Context) {
-	userService := NewService(db.SQLLite)
-	var user Task
-	userID, _ := strconv.Atoi(c.Param("id"))
-	//user.Addr = c.PostForm("addr")
-	if err := c.ShouldBind(&user); err != nil {
+	taskService := NewService(db.SQLLite)
+	var task Task
+	taskID, _ := strconv.Atoi(c.Param("id"))
+	//task.Addr = c.PostForm("addr")
+	if err := c.ShouldBind(&task); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":    nil,
 			"message": "err",
 		})
 	} else {
-		err := userService.UpdateTask(userID, &user)
+		err := taskService.UpdateTask(taskID, &task)
 		if err != nil {
 			fmt.Println("err:", err)
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"data":    user,
+			"data":    task,
 			"message": "ok",
 		})
 	}
@@ -116,9 +116,9 @@ func UpdateTask(c *gin.Context) {
 
 //DeleteTask
 func DeleteTask(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Param("id"))
-	userService := NewService(db.SQLLite)
-	err := userService.DeleteTask(userID)
+	taskID, _ := strconv.Atoi(c.Param("id"))
+	taskService := NewService(db.SQLLite)
+	err := taskService.DeleteTask(taskID)
 	if err != nil {
 		fmt.Println("err:", err)
 	}

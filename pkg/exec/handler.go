@@ -2,6 +2,7 @@ package exec
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -24,6 +25,44 @@ func Send(c *gin.Context) {
 	if !ok || userCmd == "" {
 		panic(errors.New("命令无效！"))
 	}
+	log.Println("用户输入命令：", userCmd)
+	var cmdOut []byte
+	var err error
+	var cmd *exec.Cmd
+	// 执行单个shell命令时, 直接运行即可
+	cmd = exec.Command("bash", "-c", userCmd)
+	if cmdOut, err = cmd.CombinedOutput(); err != nil {
+		log.Println("输出错误：", err)
+		log.Println("输出错误2：", string(cmdOut))
+		c.JSON(200, gin.H{
+			"message": err,
+			"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
+		})
+		return
+	}
+	// 默认输出有一个换行
+	log.Println(string(cmdOut))
+
+	c.JSON(200, gin.H{
+		"message": "ok",
+		"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
+	})
+}
+
+//发送命令到服务器
+func Server(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	userCmd, ok := c.GetPostForm("cmd")
+	if !ok || userCmd == "" {
+		panic(errors.New("命令无效！"))
+	}
+	userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", userCmd)
 	log.Println("用户输入命令：", userCmd)
 	var cmdOut []byte
 	var err error
