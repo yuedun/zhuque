@@ -58,6 +58,8 @@
             //监听提交
             form.on('submit(demo1)', function (data) {
                 var index = layer.load();
+                data.field.username = sessionStorage.getItem('username');
+                data.field.userID = sessionStorage.getItem('userID');
                 $.post('/exec/server', data.field, function (res) {
                     layer.open({
                         type: 1
