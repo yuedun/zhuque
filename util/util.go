@@ -7,24 +7,28 @@ import (
 	"io/ioutil"
 	"log"
 
-	yaml "gopkg.in/yaml.v3"
+	"github.com/go-yaml/yaml"
 )
 
+var Conf *Config
+
 //profile variables
-type Conf struct {
+type Config struct {
 	Host   string `yaml:"host"`
 	User   string `yaml:"user"`
 	Pwd    string `yaml:"pwd"`
 	Dbname string `yaml:"dbname"`
 	Dbpath string `yaml:"dbpath"`
+	Env    string `yaml:"env"`
 }
 
-func (c *Conf) GetConf(filename string) (config *Conf, err error) {
+func GetConf(filename string) (*Config, error) {
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
+	var c = new(Config)
 	err = yaml.Unmarshal(yamlFile, c)
 	if err != nil {
 		log.Println(err)

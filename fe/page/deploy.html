@@ -59,9 +59,9 @@
                     <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
                 </div>
             </script>
-
+            
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
+            
         </div>
     </div>
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
@@ -91,12 +91,14 @@
                         field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.ordertime, 'yyyy年MM月dd日 HH:mm:ss')}}</div>"
                     },
                     {
-                        field: 'releaseResult', title: '发布状态', templet: function (d) {
+                        field: 'releaseState', title: '发布状态', templet: function (d) {
                             var html = '';
-                            if (d.releaseResult == 1) {
+                            if (d.releaseState == 1) {
                                 html = '<span class="layui-badge layui-bg-green">成功</span>';
-                            } else {
+                            } else if(d.releaseState == 0){
                                 html = '<span class="layui-badge">失败</span>';
+                            } else {
+                                html = '<span class="layui-badge layui-bg-blue">待发布</span>';
                             }
                             return html;
                         }

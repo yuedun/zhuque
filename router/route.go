@@ -56,6 +56,7 @@ func Register(router *gin.Engine) {
 	projectRouter.Use(middleware.Logger())
 	{
 		deployRouter.GET("/list", task.List)
+		deployRouter.GET("/wait-list", task.WaitList)
 		deployRouter.GET("/server-by-sql/:id", task.GetTaskInfoBySql)
 		deployRouter.POST("/create", task.CreateTask)
 		deployRouter.PUT("/update/:id", task.UpdateTask)
@@ -66,5 +67,6 @@ func Register(router *gin.Engine) {
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)
+		execRouter.POST("/release/:id", exec.Release)
 	}
 }

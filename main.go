@@ -16,14 +16,16 @@ import (
 	"github.com/yuedun/zhuque/util"
 )
 
+var Conf *util.Config
+
 func init() {
 	var err error
-	var conf util.Conf
-	c, err := conf.GetConf("./conf.yaml")
+	Conf, err = util.GetConf("./conf.yaml")
+	util.Conf = Conf
 	if err != nil {
 		panic(err)
 	}
-	db.SQLLite, err = gorm.Open("sqlite3", c.Dbpath)
+	db.SQLLite, err = gorm.Open("sqlite3", Conf.Dbpath)
 	if err != nil {
 		log.Println("failed to connect database")
 		panic(err)
@@ -38,6 +40,14 @@ func init() {
 }
 
 func main() {
+	switch Conf.Env {
+	case "prod":
+		gin.SetMode(gin.ReleaseMode)
+	case "test":
+		gin.SetMode(gin.TestMode)
+	default:
+		gin.SetMode(gin.DebugMode)
+	}
 	r := gin.Default()
 	//r.Use(middleware.Logger())//全局中间件
 	//r.LoadHTMLGlob("templates/*") //加载模板

@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/task"
+	"github.com/yuedun/zhuque/util"
 
 	"os/exec"
 )
@@ -52,6 +54,7 @@ func Send(c *gin.Context) {
 }
 
 // Server 快捷发布，只需要选择项目即可发布
+// TODO 发布流程：1.创建发布单 2.发布。如果测试环境创建后直接调用发布函数，如果生产环境，创建审核后方可发布
 func Server(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -72,38 +75,61 @@ func Server(c *gin.Context) {
 	if !ok || username == "" {
 		panic(errors.New("用户名无效！"))
 	}
+	taskName, ok := c.GetPostForm("taskName")
+	if !ok || username == "" {
+		panic(errors.New("用户名无效！"))
+	}
 	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", cmdParam)
 	log.Println("用户输入命令：", userCmd)
-	var cmdOut []byte
-	var err error
-	var cmd *exec.Cmd
-	// 执行单个shell命令时, 直接运行即可
-	cmd = exec.Command("bash", "-c", userCmd)
+
+	// 1.创建发布单
 	taskServer := task.NewService(db.SQLLite)
 	task := task.Task{
-		TaskName: "",
-		Project:  cmdParam,
-		UserID:   userID,
-		Username: username,
+		TaskName:     taskName,
+		Project:      cmdParam,
+		UserID:       userID,
+		Username:     username,
+		ReleaseState: 2,
+		Cmd:          userCmd,
+	}
+	err := taskServer.CreateTask(&task)
+	if err != nil {
+		panic(err)
 	}
 
-	if cmdOut, err = cmd.CombinedOutput(); err != nil {
-		log.Println("输出错误：", err)
-		log.Println("输出错误2：", string(cmdOut))
-		task.ReleaseResult = 0       //失败
-		taskServer.CreateTask(&task) //保存失败发布记录
+	// 如果是测服直接发布
+	var cmdOut string
+	if util.Conf.Env == "prod" {
 		c.JSON(200, gin.H{
-			"message": err,
-			"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
+			"code":    2, //code=1是直接发布，code=2是审核发布
+			"message": "ok",
+			"data":    "10分钟后可发布",
 		})
-		return
+	} else {
+		err, cmdOut = taskServer.ReleaseTask(task.ID)
+		c.JSON(200, gin.H{
+			"code":    1, //code=1是直接发布，code=2是审核发布
+			"message": err,
+			"data":    cmdOut,
+		})
 	}
-	// 默认输出有一个换行
-	log.Println(string(cmdOut))
-	task.ReleaseResult = 1       //失败
-	taskServer.CreateTask(&task) //保存成功发布记录
+}
+
+// Release 发布操作
+func Release(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	taskID, _ := strconv.Atoi(c.Param("id"))
+	taskServer := task.NewService(db.SQLLite)
+	// TODO需要验证是否可发布
+	err, cmdOut := taskServer.ReleaseTask(taskID)
 	c.JSON(200, gin.H{
-		"message": "ok",
-		"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
+		"message": err,
+		"data":    cmdOut,
 	})
 }

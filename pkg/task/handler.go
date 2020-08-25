@@ -33,6 +33,28 @@ func List(c *gin.Context) {
 	})
 }
 
+//WaitList 等待发布任务
+func WaitList(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	task := Task{ReleaseState: 2}
+	serverService := NewService(db.SQLLite)
+	list, err := serverService.GetTaskList(task)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"data": list,
+		"msg":  "ok",
+	})
+}
+
 //GetTaskInfo
 func GetTaskInfo(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
@@ -96,7 +118,6 @@ func UpdateTask(c *gin.Context) {
 	taskService := NewService(db.SQLLite)
 	var task Task
 	taskID, _ := strconv.Atoi(c.Param("id"))
-	//task.Addr = c.PostForm("addr")
 	if err := c.ShouldBind(&task); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data":    nil,
