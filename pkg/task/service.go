@@ -16,7 +16,7 @@ type (
 	*/
 	TaskService interface {
 		GetTaskInfo(search Task) (task Task, err error)
-		GetTaskList(search Task) (list []Task, err error)
+		GetTaskList(offet, limit int, search Task) (list []Task, err error)
 		GetTaskInfoBySQL() (task Task, err error)
 		CreateTask(task *Task) (err error)
 		UpdateTask(ID int, task *Task) (err error)
@@ -45,8 +45,8 @@ func (u *taskService) GetTaskInfo(search Task) (task Task, err error) {
 	return task, nil
 }
 
-func (u *taskService) GetTaskList(search Task) (list []Task, err error) {
-	err = u.db.Where(search).Order("id desc").Find(&list).Error //排序
+func (u *taskService) GetTaskList(offset, limit int, search Task) (list []Task, err error) {
+	err = u.db.Where(search).Offset(offset).Limit(limit).Order("id desc").Find(&list).Error //排序
 	if err != nil {
 		return list, err
 	}

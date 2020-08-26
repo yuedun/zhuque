@@ -21,21 +21,26 @@
         <div class="layui-form-item">
             <label class="layui-form-label required">用户名</label>
             <div class="layui-input-block">
-                <input type="text" name="name" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value=""
+                <input type="text" name="username" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value=""
                     class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label required">邮箱</label>
             <div class="layui-input-block">
-                <input type="text" name="env" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" value=""
+                <input type="text" name="email" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" value=""
                     class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">角色</label>
             <div class="layui-input-block">
-                <input type="text" name="namespace" placeholder="请输入角色" value="" class="layui-input">
+                <select name="role">
+                    <option value=""></option>
+                    <option value="1">超管</option>
+                    <option value="2">管理员</option>
+                    <option value="3">开发</option>
+                </select>
             </div>
         </div>
         <div class="layui-form-item">
@@ -53,6 +58,7 @@
 
             //监听提交
             form.on('submit(saveBtn)', function (data) {
+                data.field.role = parseInt(data.field.role);
                 $.ajax({
                     type: 'POST',
                     url: '/user/create',

@@ -22,9 +22,12 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	offset := (page - 1) * limit
 	var task Task
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetTaskList(task)
+	list, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
 	}
@@ -44,9 +47,12 @@ func WaitList(c *gin.Context) {
 			})
 		}
 	}()
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	offset := (page - 1) * limit
 	task := Task{ReleaseState: 2}
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetTaskList(task)
+	list, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
 	}

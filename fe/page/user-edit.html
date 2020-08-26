@@ -19,29 +19,29 @@
 <body>
     <div class="layui-form layuimini-form">
         <input type="hidden" name="id">
-        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>基本配置</legend>
-        </fieldset>
         <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">项目名称</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">环境</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="env" lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
+            <label class="layui-form-label required">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value=""
+                    class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">空间</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
+            <label class="layui-form-label required">邮箱</label>
+            <div class="layui-input-block">
+                <input type="text" name="email" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" value=""
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色</label>
+            <div class="layui-input-block">
+                <select name="role">
+                    <option value=""></option>
+                    <option value="1">超管</option>
+                    <option value="2">管理员</option>
+                    <option value="3">开发</option>
+                </select>
             </div>
         </div>
         <div class="layui-form-item">
@@ -52,36 +52,20 @@
     </div>
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <script>
-        layui.use(['form', 'transfer', 'layer', 'util'], function () {
+        layui.use(['form', 'layer'], function () {
             var form = layui.form,
                 layer = layui.layer,
                 $ = layui.$;
 
-            //初始化数据
-            (function init() {
-                var id = $('input[name=id]').val()
-                $.ajax({
-                    type: 'GET',
-                    url: '/deploy/get-by-id/' + id,
-                    success: function (res) {
-                        $("input[name=gitRepo]").val(res.data.gitRepo);
-                        $("input[name=branch]").val(res.data.branch);
-                        //数据库中有值替换
-                        if (res.data.config) {
-                            $('textarea[name=config]').val(res.data.config);
-                        }
-                    },
-                });
-            })()
-
             //监听提交
             form.on('submit(saveBtn)', function (data) {
-                data.field.config = $('textarea[name=config]').val();
+                data.field.role = $('select[name=role]').val();
+                data.field.role = parseInt(data.field.role);
                 var id = data.field.id;
                 delete data.field.id;
                 $.ajax({
                     type: 'PUT',
-                    url: '/deploy/update/' + id,
+                    url: '/user/update/' + id,
                     contentType: 'application/json',
                     data: JSON.stringify(data.field),
                     success: function (res) {

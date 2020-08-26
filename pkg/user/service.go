@@ -13,7 +13,7 @@ type (
 	*/
 	UserService interface {
 		GetUserInfo(userObj User) (user User, err error)
-		GetUserList(userObj User) (user []User, err error)
+		GetUserList(offset, limit int, userObj User) (user []User, err error)
 		GetUserInfoBySQL() (user User, err error)
 		CreateUser(user *User) (err error)
 		UpdateUser(userID int, user *User) (err error)
@@ -40,8 +40,8 @@ func (u *userService) GetUserInfo(userObj User) (user User, err error) {
 	return user, nil
 }
 
-func (u *userService) GetUserList(userObj User) (users []User, err error) {
-	err = u.mysql.Where(userObj).Find(&users).Error
+func (u *userService) GetUserList(offset, limit int, userObj User) (users []User, err error) {
+	err = u.mysql.Where(userObj).Offset(offset).Limit(limit).Find(&users).Error
 	if err != nil {
 		return users, err
 	}

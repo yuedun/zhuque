@@ -141,7 +141,6 @@
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
                 if (obj.event === 'edit') {
-
                     var index = layer.open({
                         title: '编辑用户',
                         type: 2,
@@ -150,16 +149,32 @@
                         shadeClose: true,
                         area: ['100%', '100%'],
                         content: '../page/user-edit.html',
+                        success: function (layero, index) {
+                            var body = layer.getChildFrame('body', index); //获取弹出层 body对象，从表格到弹出层传递数据
+                            body.find("input[name=id]").val(data.id);
+                            body.find("input[name=username]").val(data.username);
+                            body.find("input[name=email]").val(data.email);
+                            body.find("select[name=role]").val(data.role);
+                        },
                     });
                     $(window).on("resize", function () {
                         layer.full(index);
                     });
                     return false;
                 } else if (obj.event === 'delete') {
-                    layer.confirm('真的删除行么', function (index) {
-                        obj.del();
-                        layer.close(index);
-                    });
+                    if (obj.event === 'delete') {
+                        layer.confirm('真的删除行么', function (index) {
+                            $.ajax({
+                                url: '/user/del/' + data.id,
+                                type: 'DELETE',
+                                data: {},
+                                success: function (res) {
+                                    obj.del();
+                                    layer.close(index);
+                                }
+                            });
+                        });
+                    }
                 }
             });
 
