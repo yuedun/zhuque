@@ -59,12 +59,10 @@ func WaitList(c *gin.Context) {
 func GetTaskInfo(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	name := c.Param("name")
-	ip := c.Param("ip")
 	taskService := NewService(db.SQLLite)
 	taskObj := Task{
 		ID:       taskID,
 		TaskName: name,
-		Status:   ip,
 	}
 	task, err := taskService.GetTaskInfo(taskObj)
 	if err != nil {
@@ -115,24 +113,28 @@ func CreateTask(c *gin.Context) {
 
 //UpdateTask post json
 func UpdateTask(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskService := NewService(db.SQLLite)
 	var task Task
-	taskID, _ := strconv.Atoi(c.Param("id"))
 	if err := c.ShouldBind(&task); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"data":    nil,
-			"message": "err",
-		})
-	} else {
-		err := taskService.UpdateTask(taskID, &task)
-		if err != nil {
-			fmt.Println("err:", err)
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"data":    task,
-			"message": "ok",
-		})
+		panic(err)
 	}
+	task.ID = taskID
+	err := taskService.UpdateTask(taskID, &task)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    task,
+		"message": "ok",
+	})
 }
 
 //DeleteTask
@@ -144,6 +146,30 @@ func DeleteTask(c *gin.Context) {
 		fmt.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+	})
+}
+
+// Approve 发布审批 发邮件，钉钉等消息
+func Approve(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	taskService := NewService(db.SQLLite)
+	var task Task
+	if err := c.ShouldBind(&task); err != nil {
+		panic(err)
+	}
+	err := taskService.Approve(&task)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    task,
 		"message": "ok",
 	})
 }

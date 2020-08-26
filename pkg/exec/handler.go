@@ -100,6 +100,17 @@ func Server(c *gin.Context) {
 	// 如果是测服直接发布
 	var cmdOut string
 	if util.Conf.Env == "prod" {
+		// 发送消息通知
+		log.Printf("发布单【%s】将在10分钟后发布", task.TaskName)
+		bodyObj := make(map[string]interface{})
+		bodyObj["msgtype"] = "text"
+		bodyObj["text"] = map[string]interface{}{
+			"content": fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName),
+		}
+		_, err := util.DingTalk(util.Conf.DingTalk, bodyObj)
+		if err != nil {
+			panic(err)
+		}
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",

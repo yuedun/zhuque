@@ -50,12 +50,16 @@
 
             {{#  
                 var releaseDate = function(){
-                    return (moment(d.updatedAt).add(10, 'm') < moment());
+                    return (moment(d.updatedAt).add(10, 'm') < moment())|| d.nowRelease;
                 }; 
             }}
-            <!-- 这里同样支持 laytpl 语法，如： -->
+            <!-- 这里同样支持 laytpl 语法，是否可发布 -->
             {{#  if(releaseDate()){ }}
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">发布</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-release" lay-event="release">发布</a>
+            {{#  } }}
+            <!-- 是否可审批，可操作立即发布和阻止发布d.approve -->
+            {{#  if(true){ }}
+            <a class="layui-btn layui-btn-warm layui-btn-xs data-count-approve" lay-event="approve">审批</a>
             {{#  } }}
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
             </script>
@@ -125,7 +129,7 @@
 
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
-                if (obj.event === 'edit') {
+                if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
                         var index2 = layer.load();
                         $.post('/exec/release/' + obj.data.id, function (res) {
@@ -148,6 +152,41 @@
                             layer.msg(err.responseJSON.message, { icon: 5 });
                         })
                         layer.close(index);
+                    });
+                } else if (obj.event === 'approve') {
+                    layer.open({
+                        type: 1
+                        , title: '审批意见'
+                        , content: '<div style="padding: 20px 80px;"><input type="text" class="layui-input" id="message"></div>'
+                        , btn: ['立即发布', '请勿发布', '取消']
+                        , btnAlign: 'c' //按钮居中
+                        , shade: 0 //不显示遮罩
+                        , yes: function (index) {
+                            layer.close(index);
+                        }
+                        , btn2: function (index) {
+                            layer.close(index);
+                            var message = $('#message').val();
+                            $.ajax({
+                                type: 'PUT',
+                                url: '/deploy/approve',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ id: data.id, releaseState: 0, approveMsg: message }),
+                                success: function (res) {
+                                    var index = layer.alert('保存成功！', {
+                                        title: '最终的提交信息'
+                                    }, function () {
+                                        // 关闭弹出层
+                                        layer.close(index);
+                                    });
+
+                                    return false;
+                                },
+                            });
+                        }
+                        , btn3: function (index) {
+                            layer.close(index);
+                        }
                     });
                 }
             });

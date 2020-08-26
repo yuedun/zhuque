@@ -61,6 +61,7 @@ func Register(router *gin.Engine) {
 		deployRouter.POST("/create", task.CreateTask)
 		deployRouter.PUT("/update/:id", task.UpdateTask)
 		deployRouter.DELETE("/del/:id", task.DeleteTask)
+		deployRouter.POST("/approve", task.Approve)
 	}
 	//发送命令路由注册
 	execRouter := router.Group("/exec")

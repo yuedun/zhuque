@@ -1,25 +1,29 @@
 package util
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 
-	"github.com/go-yaml/yaml"
+	yaml "gopkg.in/yaml.v3"
 )
 
 var Conf *Config
 
 //profile variables
 type Config struct {
-	Host   string `yaml:"host"`
-	User   string `yaml:"user"`
-	Pwd    string `yaml:"pwd"`
-	Dbname string `yaml:"dbname"`
-	Dbpath string `yaml:"dbpath"`
-	Env    string `yaml:"env"`
+	Host     string `yaml:"host"`
+	User     string `yaml:"user"`
+	Pwd      string `yaml:"pwd"`
+	Dbname   string `yaml:"dbname"`
+	Dbpath   string `yaml:"dbpath"`
+	Env      string `yaml:"env"`
+	DingTalk string `yaml:"dingTalk"`
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -58,4 +62,30 @@ func GeneratePassword(mobile string) string {
 	p := b[7:]
 	password := "hello" + string(p)
 	return GetMD5(password)
+}
+
+/**
+ * DingTalk 发送钉钉消息
+ */
+func DingTalk(dingTalkUrl string, bodyObj interface{}) (dingRes DingTalkRes, err error) {
+	client := &http.Client{}
+	bytestr, _ := json.Marshal(&bodyObj)
+	resp, err := client.Post(dingTalkUrl,
+		"application/json", bytes.NewBuffer(bytestr))
+	if err != nil {
+		return dingRes, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return dingRes, err
+	}
+	json.Unmarshal(body, &dingRes)
+	return dingRes, nil
+}
+
+// 钉钉消息返回
+type DingTalkRes struct {
+	Errcode int
+	Errmsg  string
 }
