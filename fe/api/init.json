@@ -9,8 +9,9 @@
     "href": ""
   },
   "userInfo": {
-    "username": "tet",
-    "userID": 123
+    "username": "admin",
+    "userID": 123,
+    "role": 1
   },
   "menuInfo": [
     {

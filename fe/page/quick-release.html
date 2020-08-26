@@ -52,13 +52,16 @@
                 var releaseDate = function(){
                     return (moment(d.updatedAt).add(10, 'm') < moment())|| d.nowRelease;
                 }; 
+                var approve = function(){
+                    return sessionStorage.getItem('role') == 1;
+                }
             }}
             <!-- 这里同样支持 laytpl 语法，是否可发布 -->
             {{#  if(releaseDate()){ }}
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-release" lay-event="release">发布</a>
             {{#  } }}
             <!-- 是否可审批，可操作立即发布和阻止发布d.approve -->
-            {{#  if(true){ }}
+            {{#  if(approve()){ }}
             <a class="layui-btn layui-btn-warm layui-btn-xs data-count-approve" lay-event="approve">审批</a>
             {{#  } }}
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
@@ -163,12 +166,29 @@
                         , shade: 0 //不显示遮罩
                         , yes: function (index) {
                             layer.close(index);
+                            var message = $('#message').val();
+                            $.ajax({
+                                type: 'POST',
+                                url: '/deploy/approve',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ id: data.id, nowRelease: true, approveMsg: message }),
+                                success: function (res) {
+                                    var index = layer.alert('保存成功！', {
+                                        title: '最终的提交信息'
+                                    }, function () {
+                                        // 关闭弹出层
+                                        layer.close(index);
+                                    });
+
+                                    return false;
+                                },
+                            });
                         }
                         , btn2: function (index) {
                             layer.close(index);
                             var message = $('#message').val();
                             $.ajax({
-                                type: 'PUT',
+                                type: 'POST',
                                 url: '/deploy/approve',
                                 contentType: 'application/json',
                                 data: JSON.stringify({ id: data.id, releaseState: 0, approveMsg: message }),

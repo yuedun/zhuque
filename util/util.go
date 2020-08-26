@@ -67,7 +67,7 @@ func GeneratePassword(mobile string) string {
 /**
  * DingTalk 发送钉钉消息
  */
-func DingTalk(dingTalkUrl string, bodyObj interface{}) (dingRes DingTalkRes, err error) {
+func SendDingTalk(dingTalkUrl string, bodyObj interface{}) (dingRes DingTalkRes, err error) {
 	client := &http.Client{}
 	bytestr, _ := json.Marshal(&bodyObj)
 	resp, err := client.Post(dingTalkUrl,

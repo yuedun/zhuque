@@ -107,7 +107,7 @@ func Server(c *gin.Context) {
 		bodyObj["text"] = map[string]interface{}{
 			"content": fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName),
 		}
-		_, err := util.DingTalk(util.Conf.DingTalk, bodyObj)
+		_, err := util.SendDingTalk(util.Conf.DingTalk, bodyObj)
 		if err != nil {
 			panic(err)
 		}

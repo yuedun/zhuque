@@ -2,11 +2,13 @@ package task
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/yuedun/zhuque/db"
+	"github.com/yuedun/zhuque/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -160,16 +162,31 @@ func Approve(c *gin.Context) {
 		}
 	}()
 	taskService := NewService(db.SQLLite)
-	var task Task
-	if err := c.ShouldBind(&task); err != nil {
+	var params map[string]interface{}
+	if err := c.ShouldBind(&params); err != nil {
 		panic(err)
 	}
-	err := taskService.Approve(&task)
+	log.Println(">>>>>>>>>>>>", params)
+	task, err := taskService.Approve(params)
 	if err != nil {
 		panic(err)
 	}
+	content := ""
+	if params["nowRelease"] == true {
+		content = fmt.Sprintf("【朱雀】发布单【%s】可立即发布", task.TaskName)
+	}
+	releaseSta := params["releaseState"].(float64)
+	if int(releaseSta) == 0 {
+		content = fmt.Sprintf("【朱雀】发布单【%s】当前不可发布，原因：%s", task.TaskName, task.ApproveMsg)
+	}
+	bodyObj := make(map[string]interface{})
+	bodyObj["msgtype"] = "text"
+	bodyObj["text"] = map[string]interface{}{
+		"content": content,
+	}
+	util.SendDingTalk(util.Conf.DingTalk, bodyObj)
 	c.JSON(http.StatusOK, gin.H{
-		"data":    task,
+		"data":    "",
 		"message": "ok",
 	})
 }

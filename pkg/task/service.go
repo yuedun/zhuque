@@ -22,7 +22,7 @@ type (
 		UpdateTask(ID int, task *Task) (err error)
 		DeleteTask(ID int) (err error)
 		ReleaseTask(ID int) (error, string)
-		Approve(task *Task) error
+		Approve(params map[string]interface{}) (Task, error)
 	}
 )
 
@@ -114,10 +114,13 @@ func (u *taskService) ReleaseTask(ID int) (error, string) {
 	return nil, strings.ReplaceAll(string(cmdOut), "\n", "<br>")
 }
 
-func (u *taskService) Approve(task *Task) (err error) {
-	err = u.db.Model(task).UpdateColumns(Task{ReleaseState: task.ReleaseState, ApproveMsg: task.ApproveMsg}).Error
+func (u *taskService) Approve(params map[string]interface{}) (task Task, err error) {
+	id64 := params["id"].(float64)
+	id := int(id64)
+	task.ID = id
+	err = u.db.Model(&Task{ID: id}).UpdateColumns(params).Find(&task).Error
 	if err != nil {
-		return err
+		return task, err
 	}
-	return nil
+	return task, nil
 }
