@@ -57,5 +57,9 @@ func main() {
 	})
 
 	router.Register(r)
-	r.Run(":8090") // listen and serve on 0.0.0.0:8090
+	port := Conf.Port
+	if port == "" {
+		port = "8090"
+	}
+	r.Run(":" + port) // listen and serve on 0.0.0.0:8090
 }

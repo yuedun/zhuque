@@ -4,6 +4,15 @@
 理论上朱雀发布系统可以发布其他语言应用程序，但其与nodejs更加相得益彰。
 原因是朱雀发布系统依赖于PM2，PM2大家都知道，与nodejs几乎是绝配，所以有nodejs的地方很大可能有PM2，所以使用朱雀发布系统就显得更加简单了，无需专门安装PM2。
 
+数据库使用sqlite，无需单独安装和配置。
+
+## 部署流程
+1. 在服务器指定位置下载源码。
+2. 安装go环境。go可以交叉编译，但是由于sqlite的缘故，windows环境下并不能顺利的编译linux版本，所以最好还是在linux环境下编译。
+3. 配置`conf.yaml`文件，参照`conf-sample.yaml`文件。
+4. 项目目录中编译`go build`，第一次会安装依赖会慢一些。
+5. `./zhuque`启动服务。
+
 参考文档：
 
 [官方原文](https://pm2.keymetrics.io/docs/usage/deployment/)

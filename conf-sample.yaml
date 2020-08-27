@@ -1,6 +1,4 @@
-host: localhost:3306
-user: root
-pwd: root
-dbname: website
-
-dbpath: ../zhuque.db
+port: 8090 #服务端口，默认8090
+dbpath: ../zhuque.db # sqlite数据库文件位置
+env: prod # 执行环境 debug test prod
+dingTalk: https://oapi.dingtalk.com/robot/send?access_token=xxx # 钉钉webhook
