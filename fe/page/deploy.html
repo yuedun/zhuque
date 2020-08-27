@@ -23,25 +23,25 @@
                             <div class="layui-inline">
                                 <label class="layui-form-label">上线单</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" name="username" autocomplete="off" class="layui-input">
+                                    <input type="text" name="taskName" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
                                 <label class="layui-form-label">项目</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                    <input type="text" name="projectName" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
                                 <label class="layui-form-label">用户名</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" name="city" autocomplete="off" class="layui-input">
+                                    <input type="text" name="username" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
                                 <label class="layui-form-label">上线时间</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" name="classify" autocomplete="off" class="layui-input">
+                                    <input type="text" name="createdAt" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
                             <div class="layui-inline">
@@ -88,7 +88,7 @@
                     { field: 'username', title: '用户名' },
                     { field: 'env', title: '环境', sort: true },
                     {
-                        field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.ordertime, 'yyyy年MM月dd日 HH:mm:ss')}}</div>"
+                        field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.updatedAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
                     },
                     {
                         field: 'releaseState', title: '发布状态', templet: function (d) {
@@ -112,20 +112,21 @@
 
             // 监听搜索操作
             form.on('submit(data-search-btn)', function (data) {
-                var result = JSON.stringify(data.field);
-                layer.alert(result, {
-                    title: '最终的搜索信息'
+                $.ajax({
+                    type: 'GET',
+                    url: '/deploy/list',
+                    success: function (res) {
+                        //执行搜索重载
+                        table.reload('currentTableId', {
+                            page: {
+                                curr: 1
+                            }
+                            , where: {
+                                searchParams: data.field
+                            }
+                        }, 'data');
+                    },
                 });
-
-                //执行搜索重载
-                table.reload('currentTableId', {
-                    page: {
-                        curr: 1
-                    }
-                    , where: {
-                        searchParams: result
-                    }
-                }, 'data');
 
                 return false;
             });

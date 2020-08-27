@@ -25,7 +25,13 @@ func List(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset := (page - 1) * limit
+	taskName := c.Query("searchParams[taskName]")
+	projectName := c.Query("searchParams[projectName]")
+	username := c.Query("searchParams[username]")
 	var task Task
+	task.TaskName = taskName
+	task.Project = projectName
+	task.Username = username
 	serverService := NewService(db.SQLLite)
 	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {

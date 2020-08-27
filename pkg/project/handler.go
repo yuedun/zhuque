@@ -25,7 +25,9 @@ func List(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset := (page - 1) * limit
+	projectName := c.Query("searchParams[projectName]")
 	var project Project
+	project.Name = projectName
 	projectService := NewService(db.SQLLite)
 	list, count, err := projectService.GetProjectList(offset, limit, project)
 	if err != nil {

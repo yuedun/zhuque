@@ -24,7 +24,11 @@ func List(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset := (page - 1) * limit
+	username := c.Query("searchParams[username]")
+	email := c.Query("searchParams[email]")
 	var user User
+	user.UserName = username
+	user.Email = email
 	userService := NewService(db.SQLLite)
 	list, count, err := userService.GetUserList(offset, limit, user)
 	if err != nil {
