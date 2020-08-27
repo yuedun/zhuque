@@ -26,14 +26,15 @@ func List(c *gin.Context) {
 	offset := (page - 1) * limit
 	var user User
 	userService := NewService(db.SQLLite)
-	list, err := userService.GetUserList(offset, limit, user)
+	list, count, err := userService.GetUserList(offset, limit, user)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 

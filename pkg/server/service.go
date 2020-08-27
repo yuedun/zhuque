@@ -13,7 +13,7 @@ type (
 	*/
 	ServerService interface {
 		GetServerInfo(search Server) (server Server, err error)
-		GetServerList(search Server) (list []Server, err error)
+		GetServerList(offset, limit int, search Server) (list []Server, count int, err error)
 		GetServerInfoBySQL() (server Server, err error)
 		CreateServer(server *Server) (err error)
 		UpdateServer(serverID int, server *Server) (err error)
@@ -40,12 +40,12 @@ func (u *svrService) GetServerInfo(search Server) (user Server, err error) {
 	return user, nil
 }
 
-func (u *svrService) GetServerList(search Server) (list []Server, err error) {
-	err = u.mysql.Where(search).Find(&list).Error
+func (u *svrService) GetServerList(offset, limit int, search Server) (list []Server, count int, err error) {
+	err = u.mysql.Where(search).Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
-		return list, err
+		return list, count, err
 	}
-	return list, nil
+	return list, count, nil
 }
 
 func (u *svrService) GetServerInfoBySQL() (server Server, err error) {

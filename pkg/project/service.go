@@ -13,7 +13,7 @@ type (
 	*/
 	ProjectService interface {
 		GetProjectInfo(search Project) (project Project, err error)
-		GetProjectList(search Project) (list []Project, err error)
+		GetProjectList(offset, limit int, search Project) (list []Project, count int, err error)
 		GetProjectInfoBySQL() (project Project, err error)
 		CreateProject(project *Project) (err error)
 		UpdateProject(serverID int, project *Project) (err error)
@@ -40,12 +40,12 @@ func (u *projectService) GetProjectInfo(search Project) (user Project, err error
 	return user, nil
 }
 
-func (u *projectService) GetProjectList(search Project) (list []Project, err error) {
-	err = u.mysql.Where(search).Find(&list).Error
+func (u *projectService) GetProjectList(offset, limit int, search Project) (list []Project, count int, err error) {
+	err = u.mysql.Where(search).Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
-		return list, err
+		return list, count, err
 	}
-	return list, nil
+	return list, count, nil
 }
 
 func (u *projectService) GetProjectInfoBySQL() (project Project, err error) {

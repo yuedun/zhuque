@@ -22,20 +22,24 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	offset := (page - 1) * limit
 	var project Project
-	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetProjectList(project)
+	projectService := NewService(db.SQLLite)
+	list, count, err := projectService.GetProjectList(offset, limit, project)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 
-//NameList
+//NameList 获取项目名称列表
 func NameList(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -45,8 +49,9 @@ func NameList(c *gin.Context) {
 		}
 	}()
 	var project Project
-	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetProjectList(project)
+	projectService := NewService(db.SQLLite)
+	// 100个项目应该足够多了，先这样吧！
+	list, count, err := projectService.GetProjectList(0, 100, project)
 	if err != nil {
 		panic(err)
 	}
@@ -55,9 +60,10 @@ func NameList(c *gin.Context) {
 		nameList = append(nameList, val.Name)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": nameList,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  nameList,
+		"msg":   "ok",
 	})
 }
 

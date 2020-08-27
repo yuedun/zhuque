@@ -63,6 +63,6 @@ func TestHttp2(t *testing.T) {
 		"content": "【朱雀】我就是我, 是不一样的烟火",
 	}
 	Conf, _ := util.GetConf("../conf.yaml")
-	res, _ := util.DingTalk(Conf.DingTalk, bodyObj)
+	res, _ := util.SendDingTalk(Conf.DingTalk, bodyObj)
 	t.Log(res)
 }

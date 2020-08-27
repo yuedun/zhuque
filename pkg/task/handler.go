@@ -27,14 +27,15 @@ func List(c *gin.Context) {
 	offset := (page - 1) * limit
 	var task Task
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetTaskList(offset, limit, task)
+	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 
@@ -52,14 +53,15 @@ func WaitList(c *gin.Context) {
 	offset := (page - 1) * limit
 	task := Task{ReleaseState: 2}
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetTaskList(offset, limit, task)
+	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 

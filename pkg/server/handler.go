@@ -20,16 +20,20 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	offset := (page - 1) * limit
 	var server Server
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetServerList(server)
+	list, count, err := serverService.GetServerList(offset, limit, server)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 
