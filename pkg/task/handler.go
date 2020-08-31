@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/yuedun/zhuque/db"
+	"github.com/yuedun/zhuque/pkg/message"
 	"github.com/yuedun/zhuque/util"
 
 	"github.com/gin-gonic/gin"
@@ -198,7 +199,8 @@ func Approve(c *gin.Context) {
 	bodyObj["text"] = map[string]interface{}{
 		"content": content,
 	}
-	util.SendDingTalk(util.Conf.DingTalk, bodyObj)
+	messageService := message.NewMessage()
+	messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
 	c.JSON(http.StatusOK, gin.H{
 		"data":    "",
 		"message": "ok",

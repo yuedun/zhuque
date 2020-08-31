@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
+	"github.com/yuedun/zhuque/pkg/message"
 	"github.com/yuedun/zhuque/pkg/task"
 	"github.com/yuedun/zhuque/util"
 
@@ -113,7 +114,8 @@ func Server(c *gin.Context) {
 		bodyObj["text"] = map[string]interface{}{
 			"content": fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName),
 		}
-		_, err := util.SendDingTalk(util.Conf.DingTalk, bodyObj)
+		messageService := message.NewMessage()
+		_, err := messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
 		if err != nil {
 			panic(err)
 		}
