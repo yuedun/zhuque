@@ -41,7 +41,7 @@ func (u *projectService) GetProjectInfo(search Project) (user Project, err error
 }
 
 func (u *projectService) GetProjectList(offset, limit int, search Project) (list []Project, count int, err error) {
-	err = u.mysql.Where(search).Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+	err = u.mysql.Where("name LIKE ?", search.Name+"%").Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return list, count, err
 	}

@@ -47,58 +47,17 @@
         <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                <button class="layui-btn" lay-submit lay-filter="cancleBtn">取消</button>
             </div>
         </div>
     </div>
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <script>
-        layui.use(['form', 'transfer', 'layer', 'util'], function () {
+        layui.use(['form', 'layer'], function () {
             var form = layui.form,
                 layer = layui.layer,
                 $ = layui.$;
 
-            //初始化数据
-            (function init() {
-                var id = $('input[name=id]').val()
-                $.ajax({
-                    type: 'GET',
-                    url: '/project/get-by-id/' + id,
-                    success: function (res) {
-                        $("input[name=gitRepo]").val(res.data.gitRepo);
-                        $("input[name=branch]").val(res.data.branch);
-                        //数据库中有值替换
-                        if (res.data.config) {
-                            $('textarea[name=config]').val(res.data.config);
-                        }
-                    },
-                });
-            })()
-
-            //监听提交
-            form.on('submit(saveBtn)', function (data) {
-                data.field.config = $('textarea[name=config]').val();
-                var id = data.field.id;
-                delete data.field.id;
-                $.ajax({
-                    type: 'PUT',
-                    url: '/project/update/' + id,
-                    contentType: 'application/json',
-                    data: JSON.stringify(data.field),
-                    success: function (res) {
-                        var index = layer.alert('保存成功！', {
-                            title: '最终的提交信息'
-                        }, function () {
-                            // 关闭弹出层
-                            layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.location.reload();
-                        });
-
-                        return false;
-                    },
-                });
-            });
 
         });
     </script>

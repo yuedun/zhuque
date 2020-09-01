@@ -46,6 +46,7 @@
         <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                <button class="layui-btn" lay-submit lay-filter="cancleBtn">取消</button>
             </div>
         </div>
     </div>
@@ -78,6 +79,12 @@
                         return false;
                     },
                 });
+            });
+
+            // 监听取消
+            form.on('submit(cancleBtn)', function (data) {
+                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(iframeIndex);
             });
         });
     </script>
