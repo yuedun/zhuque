@@ -14,10 +14,13 @@ var Conf *Config
 
 //profile variables
 type Config struct {
-	Port     string `yaml:"port"`     //服务端口
-	Dbpath   string `yaml:"dbpath"`   //sqlite数据库文件位置
-	Env      string `yaml:"env"`      //执行环境
-	DingTalk string `yaml:"dingTalk"` //钉钉webhook
+	Port         string `yaml:"port"`     //服务端口
+	Dbpath       string `yaml:"dbpath"`   //sqlite数据库文件位置
+	Env          string `yaml:"env"`      //执行环境
+	DingTalk     string `yaml:"dingTalk"` //钉钉webhook
+	EmailService string `yaml:"emailService"`
+	Token        string `yaml:"token"`
+	EmailTo      string `yaml:emailTo`
 }
 
 func GetConf(filename string) (*Config, error) {
