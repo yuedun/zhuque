@@ -21,7 +21,7 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
 
         /**
          * 后台框架初始化
-         * @param options.iniUrl   后台初始化接口地址
+         * @param options.iniUrl   后台初始化接口地址 调用该接口需要登录状态
          * @param options.clearUrl   后台清理缓存接口
          * @param options.urlHashLocation URL地址hash定位
          * @param options.bgColorDefault 默认皮肤

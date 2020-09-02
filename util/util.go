@@ -21,6 +21,7 @@ type Config struct {
 	EmailService string `yaml:"emailService"`
 	Token        string `yaml:"token"`
 	EmailTo      string `yaml:emailTo`
+	TestUser     string `yaml:"testUser"`
 }
 
 func GetConf(filename string) (*Config, error) {

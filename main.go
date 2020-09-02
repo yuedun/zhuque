@@ -40,14 +40,6 @@ func init() {
 }
 
 func main() {
-	switch Conf.Env {
-	case "prod":
-		gin.SetMode(gin.ReleaseMode)
-	case "test":
-		gin.SetMode(gin.TestMode)
-	default:
-		gin.SetMode(gin.DebugMode)
-	}
 	r := gin.Default()
 	//r.Use(middleware.Logger())//全局中间件
 	//r.LoadHTMLGlob("templates/*") //加载模板

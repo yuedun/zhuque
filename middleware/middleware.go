@@ -39,6 +39,7 @@ func Logger() gin.HandlerFunc {
 }
 
 type User struct {
+	UserID    int
 	UserName  string
 	LoginTime time.Time
 }
@@ -60,6 +61,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
+					"user_id":   v.UserID,
 					identityKey: v.UserName,
 				}
 			}
@@ -86,9 +88,10 @@ func Jwt() *jwt.GinJWTMiddleware {
 			}
 			user, err := userService.GetUserInfo(userObj)
 			if err != nil {
-				log.Println(err)
-				if username == "test" && password == "test" {
+				log.Println("登录查询数据", err, util.Conf.TestUser)
+				if username == util.Conf.TestUser && password == util.Conf.TestUser {
 					return &User{
+						UserID:    0,
 						UserName:  username,
 						LoginTime: time.Now(),
 					}, nil
@@ -99,6 +102,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 			if user.UserName == username && user.Password == util.GetMD5(password) {
 				// 返回的数据用在上面定义的PayloadFunc函数中
 				return &User{
+					UserID:    user.ID,
 					UserName:  username,
 					LoginTime: time.Now(),
 				}, nil
