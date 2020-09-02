@@ -17,13 +17,6 @@ import (
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
-
-		// 设置 example 变量
-		c.Set("example", "12345")
-
-		// 设置cookie
-		c.SetCookie("user_name", "yuedun", 3600, "/", "localhost", true, true)
-
 		// 请求前
 
 		c.Next()
@@ -120,6 +113,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 		},
 		// 获取不到token或解析token失败时如何返回信息
 		Unauthorized: func(c *gin.Context, code int, message string) {
+			log.Println("用户未登录，获取不到token")
 			c.JSON(code, gin.H{
 				"code":    code,
 				"message": message,

@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -156,6 +157,7 @@ func Init(c *gin.Context) {
 	claims := jwt.ExtractClaims(c)
 	userID64 := claims["user_id"].(float64)
 	userID := int(userID64)
+	log.Println("登录用户userid:", userID)
 	userService := NewService(db.SQLLite)
 	user := User{ID: userID}
 	userObj, err := userService.GetUserInfo(user)
@@ -220,6 +222,12 @@ func Init(c *gin.Context) {
 							"title":  "用户管理",
 							"href":   "page/users.html",
 							"icon":   "fa fa-users",
+							"target": "_self",
+						},
+						{
+							"title":  "菜单管理",
+							"href":   "page/menu.html",
+							"icon":   "fa fa-list-alt",
 							"target": "_self",
 						},
 					},
