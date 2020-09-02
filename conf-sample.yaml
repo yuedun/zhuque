@@ -1,3 +1,4 @@
+testUser: test #默认测试用户
 port: 8090 #服务端口，默认8090
 dbpath: ../zhuque.db # sqlite数据库文件位置
 env: prod # 执行环境 debug test prod

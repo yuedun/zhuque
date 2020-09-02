@@ -19,11 +19,19 @@
 <body>
     <div class="layui-form layuimini-form">
         <div class="layui-form-item">
+            <label class="layui-form-label required">空间</label>
+            <div class="layui-input-block">
+                <input type="text" name="namespace" lay-verify="required" lay-reqtext="空间名不能为空" placeholder="请输入空间"
+                    value="" class="layui-input">
+                <tip>一个相同的项目名称，同一个空间下有多个项目。比如：朱雀系统，玄武系统。</tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label required">项目名</label>
             <div class="layui-input-block">
                 <input type="text" name="name" lay-verify="required" lay-reqtext="项目名不能为空" placeholder="请输入项目名" value=""
                     class="layui-input">
-                <tip>填写自己管理账号的名称。</tip>
+                <tip>不同机器使用不同的项目名，可以针对项目发布，也可以针对空间发布。比如：朱雀-1，朱雀-2，玄武-1，玄武-2</tip>
             </div>
         </div>
         <div class="layui-form-item">
@@ -34,15 +42,9 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">空间</label>
-            <div class="layui-input-block">
-                <input type="text" name="namespace" placeholder="请输入空间" value="" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
-                <button class="layui-btn" lay-submit lay-filter="cancleBtn">取消</button>
+                <button class="layui-btn" id="cancleBtn">取消</button>
             </div>
         </div>
     </div>
@@ -77,9 +79,10 @@
             });
 
             // 监听取消
-            form.on('submit(cancleBtn)', function (data) {
+            $('#cancleBtn').on("click", function () {
                 var iframeIndex = parent.layer.getFrameIndex(window.name);
                 parent.layer.close(iframeIndex);
+                return false;
             });
         });
     </script>
