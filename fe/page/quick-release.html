@@ -38,14 +38,16 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">只需重启</label>
                     <div class="layui-input-inline">
-                        <input type="checkbox" name="restart" lay-skin="switch" lay-filter="switchTest" lay-text="ON|OFF">
+                        <input type="checkbox" name="restart" lay-skin="switch" lay-filter="switchTest"
+                            lay-text="ON|OFF">
                     </div>
                     <div class="layui-form-mid layui-word-aux">省去前端编译过程，直接拉代码重启，实现1秒发布。</div>
                 </div>
 
                 <div class="layui-form-item">
                     <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button class="layui-btn" lay-submit="" lay-filter="release">立即提交</button>
+                        <span class="time-use" style="display: none;">0s</span>
                     </div>
                 </div>
             </form>
@@ -220,12 +222,19 @@
             });
 
             //监听提交
-            form.on('submit(demo1)', function (data) {
+            form.on('submit(release)', function (data) {
                 var index = layer.load();
+                $('.time-use').show();
+                var timeCount = 1;
+                var t = setInterval(function () {
+                    timeCount++
+                    $('.time-use').text(timeCount + 's')
+                }, 1000)
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
                 $.post('/exec/server', data.field, function (res) {
                     layer.close(index);//关闭加载状态
+                    clearTimeout(t);
                     if (res.code == 1) {
                         layer.open({
                             type: 1
