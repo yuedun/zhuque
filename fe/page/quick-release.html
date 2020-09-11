@@ -29,7 +29,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">选择服务</label>
                     <div class="layui-input-inline">
-                        <select name="cmd" lay-verify="required" lay-search="" id="proList">
+                        <select name="cmd" lay-verify="required" lay-search id="proList" multiple>
                             <option value="">直接选择或搜索选择</option>
                         </select>
                     </div>
@@ -41,7 +41,7 @@
                         <input type="checkbox" name="restart" lay-skin="switch" lay-filter="switchTest"
                             lay-text="ON|OFF">
                     </div>
-                    <div class="layui-form-mid layui-word-aux">省去前端编译过程，直接拉代码重启，实现1秒发布。</div>
+                    <div class="layui-form-mid layui-word-aux">省去前端编译过程，直接拉代码重启，实现1秒发布。（针对nodejs项目）</div>
                 </div>
 
                 <div class="layui-form-item">
@@ -91,9 +91,17 @@
 
             !function init(params) {
                 $.get('/project/name-list', function (res) {
-                    $.each(res.data, function (index, value) {
-                        $("#proList").append("<option value='" + value + "'>" + value + "</option>");
-                    })
+                    for (const value in res.data) {
+                        if (res.data.hasOwnProperty(value)) {
+                            const element = res.data[value];
+                            var opt = "<optgroup label='" + value + "'>" + value;
+                            element.forEach(item => {
+                                opt += "<option value='" + item + "'>" + item + "</option>";
+                            });
+                            opt += "</optgroup>";
+                            $("#proList").append(opt);
+                        }
+                    }
                     form.render('select');
                 }).fail(function (err) {
                     layer.msg(err.responseJSON.message, { icon: 5 });

@@ -14,6 +14,7 @@ type (
 	ProjectService interface {
 		GetProjectInfo(search Project) (project Project, err error)
 		GetProjectList(offset, limit int, search Project) (list []Project, count int, err error)
+		GetProjectNameList(offset, limit int, search Project) (list []Project, count int, err error)
 		GetProjectInfoBySQL() (project Project, err error)
 		CreateProject(project *Project) (err error)
 		UpdateProject(serverID int, project *Project) (err error)
@@ -42,6 +43,15 @@ func (u *projectService) GetProjectInfo(search Project) (user Project, err error
 
 func (u *projectService) GetProjectList(offset, limit int, search Project) (list []Project, count int, err error) {
 	err = u.mysql.Where("name LIKE ?", search.Name+"%").Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+	if err != nil {
+		return list, count, err
+	}
+	return list, count, nil
+}
+
+// GetProjectNameList 只查询项目空间，项目名
+func (u *projectService) GetProjectNameList(offset, limit int, search Project) (list []Project, count int, err error) {
+	err = u.mysql.Select([]string{"id", "namespace", "name"}).Find(&list).Error
 	if err != nil {
 		return list, count, err
 	}

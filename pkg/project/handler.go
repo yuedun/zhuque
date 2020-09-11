@@ -53,14 +53,22 @@ func NameList(c *gin.Context) {
 	var project Project
 	projectService := NewService(db.SQLLite)
 	// 100个项目应该足够多了，先这样吧！
-	list, count, err := projectService.GetProjectList(0, 100, project)
+	list, count, err := projectService.GetProjectNameList(0, 100, project)
 	if err != nil {
 		panic(err)
 	}
-	var nameList []string
+	log.Println(list)
+	var nameList = make(map[string][]string)
 	for _, val := range list {
-		nameList = append(nameList, val.Name)
+		// map中存在key在向该key添加数据，否则创建新key
+		if v, ok := nameList[val.Namespace]; ok == true {
+			v = append(v, val.Name)
+			nameList[val.Namespace] = v
+		} else {
+			nameList[val.Namespace] = []string{val.Name}
+		}
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code":  0,
 		"count": count,
