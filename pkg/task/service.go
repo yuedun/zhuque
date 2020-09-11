@@ -5,6 +5,7 @@ import (
 	"log"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -21,7 +22,8 @@ type (
 		CreateTask(task *Task) (err error)
 		UpdateTask(ID int, task *Task) (err error)
 		DeleteTask(ID int) (err error)
-		ReleaseTask(ID int) (error, string)
+		ReleaseTask(ID int) (string, error)
+		ReleaseTaskV2(ID int) (string, error)
 		Approve(params map[string]interface{}) (Task, error)
 	}
 )
@@ -86,32 +88,86 @@ func (u *taskService) DeleteTask(ID int) (err error) {
 	return nil
 }
 
-func (u *taskService) ReleaseTask(ID int) (error, string) {
+func (u *taskService) ReleaseTask(ID int) (string, error) {
 	var err error
 	search := Task{ID: ID}
 	task, err := u.GetTaskInfo(search)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	var cmdOut []byte
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
-	cmd = exec.Command("bash", "-c", task.Cmd)
+	// 从数据库中取出project和cmd组合。project有多个
+	taskCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", task.Project)
+	cmd = exec.Command("bash", "-c", taskCmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
 		log.Println("输出错误2：", string(cmdOut))
 		//保存失败发布记录
 		if err = u.db.Model(&task).UpdateColumn("releaseState", 0).Error; err != nil {
-			return err, "更新数据失败"
+			return "更新数据失败", err
 		}
-		return err, strings.ReplaceAll(string(cmdOut), "\n", "<br>")
+		return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), err
 	}
 	// 默认输出有一个换行
 	log.Println(string(cmdOut))
 	if err = u.db.Model(&task).UpdateColumn("releaseState", 1).Error; err != nil {
-		return err, ""
+		return "", err
 	}
-	return nil, strings.ReplaceAll(string(cmdOut), "\n", "<br>")
+	return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), nil
+}
+
+func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
+	var err error
+	search := Task{ID: ID}
+	task, err := u.GetTaskInfo(search)
+	if err != nil {
+		return "", err
+	}
+	projectList := strings.Split(task.Project, ",")
+	projectLen := len(projectList)
+	ch := make(chan string, projectLen)
+	for _, projectName := range projectList {
+		log.Println("projectName", projectName)
+		go excuteCmd(projectName, ch)
+	}
+	resultAll := ""
+	i := 0
+Loop:
+	for {
+		select {
+		case result := <-ch:
+			i++
+			resultAll += result
+			log.Println("projectLen------------------------------", i)
+		case <-time.After(time.Second * 300):
+			log.Println("timeout!!")
+		}
+		if projectLen == i {
+			break Loop
+		}
+	}
+	log.Println("end for")
+	if err = u.db.Model(&task).UpdateColumn("releaseState", 1).Error; err != nil {
+		return "更新数据库失败", err
+	}
+	return resultAll, nil
+}
+
+// excuteCmd 用于异步并行执行
+// @projectName 项目名 @result 命令执行结果
+func excuteCmd(projectName string, result chan string) {
+	var cmdOut []byte
+	var cmd *exec.Cmd
+	var err error
+	taskCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+	cmd = exec.Command("bash", "-c", taskCmd)
+	if cmdOut, err = cmd.CombinedOutput(); err != nil {
+		log.Println(projectName+"输出错误：", err)
+		log.Println(projectName+"输出错误2：", string(cmdOut))
+	}
+	result <- strings.ReplaceAll(string(cmdOut), "\n", "<br>") //写入命令执行结果
 }
 
 func (u *taskService) Approve(params map[string]interface{}) (task Task, err error) {

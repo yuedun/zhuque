@@ -201,6 +201,12 @@ func Init(c *gin.Context) {
 							"target": "_self",
 						},
 						{
+							"title":  "快捷发布-生产",
+							"href":   "page/quick-release-v2.html",
+							"icon":   "fa fa-bolt",
+							"target": "_self",
+						},
+						{
 							"title":  "命令部署",
 							"href":   "page/task.html",
 							"icon":   "fa fa-adjust",
