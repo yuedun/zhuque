@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/yuedun/zhuque/db"
+	"github.com/yuedun/zhuque/pkg/message"
 	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/util"
 )
@@ -63,6 +64,7 @@ func TestHttp2(t *testing.T) {
 		"content": "【朱雀】我就是我, 是不一样的烟火",
 	}
 	Conf, _ := util.GetConf("../conf.yaml")
-	res, _ := util.SendDingTalk(Conf.DingTalk, bodyObj)
+	messageService := message.NewMessage()
+	res, _ := messageService.SendDingTalk(Conf.DingTalk, bodyObj)
 	t.Log(res)
 }

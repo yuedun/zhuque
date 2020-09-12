@@ -10,9 +10,7 @@ import (
 	"github.com/yuedun/zhuque/pkg/user"
 )
 
-/**
- * 路由注册
- */
+// Register 路由注册
 func Register(router *gin.Engine) {
 	userRouter := router.Group("/user")
 	//user路由注册,可以给各个group加中间件
@@ -46,6 +44,7 @@ func Register(router *gin.Engine) {
 	{
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)
+		projectRouter.GET("/name-list-v2", project.NameListV2)
 		projectRouter.POST("/create", project.CreateProject)
 		projectRouter.GET("/get-by-id/:id", project.GetProjectInfo)
 		projectRouter.PUT("/update/:id", project.UpdateProject)
@@ -69,6 +68,7 @@ func Register(router *gin.Engine) {
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)
+		execRouter.POST("/server-v2", exec.ServerV2)
 		execRouter.POST("/release/:id", exec.Release)
 	}
 }

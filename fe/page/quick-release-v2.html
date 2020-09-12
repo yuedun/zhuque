@@ -28,10 +28,8 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">选择服务</label>
-                    <div class="layui-input-inline">
-                        <select name="cmd" lay-verify="required" lay-search="" id="proList">
-                            <option value="">直接选择或搜索选择</option>
-                        </select>
+                    <div class="layui-input-block">
+                        <div id="test4" class="demo-transfer"></div>
                     </div>
                 </div>
 
@@ -83,30 +81,34 @@
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
     <script>
-        layui.use(['form', 'table', 'jquery'], function () {
+        layui.use(['form', 'table', 'jquery', 'transfer'], function () {
             var form = layui.form
                 , layer = layui.layer
                 , table = layui.table
+                , transfer = layui.transfer
                 , $ = layui.jquery;
 
             !function init(params) {
-                $.get('/project/name-list', function (res) {
-                    for (const value in res.data) {
-                        if (res.data.hasOwnProperty(value)) {
-                            const element = res.data[value];
-                            var opt = "<optgroup label='" + value + "'>" + value;
-                            element.forEach(item => {
-                                opt += "<option value='" + item + "'>" + item + "</option>";
-                            });
-                            opt += "</optgroup>";
-                            $("#proList").append(opt);
-                        }
-                    }
+                $.get('/project/name-list-v2', function (res) {
+                    //显示搜索框
+                    transfer.render({
+                        elem: '#test4'
+                        , data: res.data
+                        , title: ['项目', '发布项目']
+                        , showSearch: true
+                        , id: 'projects'
+                    })
                     form.render('select');
                 }).fail(function (err) {
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
             }()
+
+            $('.testtran').on('click', function () {
+                var getData = transfer.getData('projects'); //获取右侧数据
+                layer.alert(JSON.stringify(getData));
+                return false
+            })
 
             table.render({
                 elem: '#currentTableId',
@@ -148,6 +150,7 @@
                 skin: 'line'
             });
 
+            // 列表中发布操作
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
                 if (obj.event === 'release') {
@@ -240,7 +243,14 @@
                 }, 1000)
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
-                $.post('/exec/server', data.field, function (res) {
+                var projects = transfer.getData('projects'); //获取右侧数据
+                var cmds = [];
+                projects.forEach(item => {
+                    cmds.push(item.value);
+                });
+                data.field.projects = cmds;
+                console.log(data.field)
+                $.post('/exec/server-v2', data.field, function (res) {
                     layer.close(index);//关闭加载状态
                     clearTimeout(t);
                     if (res.code == 1) {
@@ -257,10 +267,12 @@
                             , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
                         });
                     } else {
+                        clearTimeout(t);
                         layer.msg(res.data, { icon: 6 });
                         table.reload('currentTableId');
                     }
                 }).fail(function (err) {
+                    clearTimeout(t);
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
