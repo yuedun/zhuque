@@ -8,8 +8,6 @@ type Project struct {
 	Status    int       `json:"status" gorm:"default:1"`
 	Env       string    `json:"env"`
 	Namespace string    `json:"namespace"`
-	GitRepo   string    `json:"gitRepo"`
-	Branch    string    `json:"branch"`
 	Config    string    `json:"config"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

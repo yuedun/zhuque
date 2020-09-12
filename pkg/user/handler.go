@@ -189,27 +189,15 @@ func Init(c *gin.Context) {
 					"target": "_self",
 					"child": []map[string]interface{}{
 						{
-							"title":  "项目管理",
-							"href":   "page/projects.html",
-							"icon":   "fa fa-navicon",
-							"target": "_self",
-						},
-						{
 							"title":  "快捷发布",
 							"href":   "page/quick-release.html",
 							"icon":   "fa fa-bolt",
 							"target": "_self",
 						},
 						{
-							"title":  "快捷发布-生产",
+							"title":  "快捷发布-多项目",
 							"href":   "page/quick-release-v2.html",
 							"icon":   "fa fa-bolt",
-							"target": "_self",
-						},
-						{
-							"title":  "命令部署",
-							"href":   "page/task.html",
-							"icon":   "fa fa-adjust",
 							"target": "_self",
 						},
 						{
@@ -219,9 +207,15 @@ func Init(c *gin.Context) {
 							"target": "_self",
 						},
 						{
-							"title":  "服务器管理",
-							"href":   "page/server.html",
-							"icon":   "fa fa-gears",
+							"title":  "命令部署",
+							"href":   "page/task.html",
+							"icon":   "fa fa-adjust",
+							"target": "_self",
+						},
+						{
+							"title":  "项目管理",
+							"href":   "page/projects.html",
+							"icon":   "fa fa-navicon",
 							"target": "_self",
 						},
 						{
