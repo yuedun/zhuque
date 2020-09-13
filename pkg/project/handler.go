@@ -63,14 +63,14 @@ func NameList(c *gin.Context) {
 	log.Println(list)
 
 	// 分组数据
-	nameList := make(map[string][]string)
+	nameList := make(map[string][]Project)
 	for _, val := range list {
 		// map中存在key在向该key添加数据，否则创建新key
 		if v, ok := nameList[val.Namespace]; ok == true {
-			v = append(v, val.Name)
+			v = append(v, val)
 			nameList[val.Namespace] = v
 		} else {
-			nameList[val.Namespace] = []string{val.Name}
+			nameList[val.Namespace] = []Project{val}
 		}
 	}
 

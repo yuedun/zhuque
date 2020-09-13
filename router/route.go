@@ -25,6 +25,8 @@ func Register(router *gin.Engine) {
 		userRouter.PUT("/update/:id", user.UpdateUser)
 		userRouter.DELETE("/del/:id", user.DeleteUser)
 		userRouter.GET("/init", middleware.Jwt().MiddlewareFunc(), user.Init)
+		userRouter.GET("/user-projects/:userID", middleware.Jwt().MiddlewareFunc(), user.UserProjectList)
+		userRouter.POST("/create-user-project", middleware.Jwt().MiddlewareFunc(), user.CreateUserProject)
 	}
 
 	servRouter := router.Group("/server")

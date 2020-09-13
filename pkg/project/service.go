@@ -51,8 +51,10 @@ func (u *projectService) GetProjectList(offset, limit int, search Project) (list
 
 // GetProjectNameList 查询登录用户可以发布的项目。只查询项目空间，项目名字段
 func (u *projectService) GetProjectNameList(userID int) (list []Project, err error) {
-	err = u.mysql.Select([]string{"id", "namespace", "name"}).Find(&list).Error
-	// u.mysql.Table("user").Select("project.name, project.namespace").Joins("left join project on user.id")
+	err = u.mysql.Table("user_project AS up").
+		Select("p.id, p.name AS name, p.namespace AS namespace").
+		Joins("INNER JOIN project AS p ON p.id = up.project_id").
+		Where("up.user_id = ?", userID).Find(&list).Error
 	if err != nil {
 		return list, err
 	}

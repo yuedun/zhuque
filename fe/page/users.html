@@ -51,6 +51,7 @@
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
             <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="project">分配项目</a>
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
@@ -162,22 +163,39 @@
                     });
                     return false;
                 } else if (obj.event === 'delete') {
-                    if (obj.event === 'delete') {
-                        layer.confirm('真的删除行么', function (index) {
-                            $.ajax({
-                                url: '/user/del/' + data.id,
-                                type: 'DELETE',
-                                data: {},
-                                success: function (res) {
-                                    obj.del();
-                                    layer.close(index);
-                                }
-                            });
+                    layer.confirm('真的删除行么', function (index) {
+                        $.ajax({
+                            url: '/user/del/' + data.id,
+                            type: 'DELETE',
+                            data: {},
+                            success: function (res) {
+                                obj.del();
+                                layer.close(index);
+                            }
                         });
-                    }
+                    });
+                } else if (obj.event === 'project') {
+                    var index = layer.open({
+                        title: '分配项目',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: '../page/user-project-edit.html',
+                        success: function (layero, index) {
+                            var body = layer.getChildFrame('body', index); //获取弹出层 body对象，从表格到弹出层传递数据
+                            body.find("input[name=userID]").val(data.id);
+                            body.find("input[name=username]").val(data.username);
+                            body.find("select[name=role]").val(data.role);
+                        },
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                    return false;
                 }
             });
-
         });
     </script>
 
