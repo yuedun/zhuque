@@ -14,7 +14,7 @@ import (
 	"github.com/yuedun/zhuque/db"
 )
 
-//List
+// List 用户列表
 func List(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -189,27 +189,15 @@ func Init(c *gin.Context) {
 					"target": "_self",
 					"child": []map[string]interface{}{
 						{
-							"title":  "项目管理",
-							"href":   "page/projects.html",
-							"icon":   "fa fa-navicon",
-							"target": "_self",
-						},
-						{
 							"title":  "快捷发布",
 							"href":   "page/quick-release.html",
 							"icon":   "fa fa-bolt",
 							"target": "_self",
 						},
 						{
-							"title":  "快捷发布-生产",
+							"title":  "快捷发布-多项目",
 							"href":   "page/quick-release-v2.html",
 							"icon":   "fa fa-bolt",
-							"target": "_self",
-						},
-						{
-							"title":  "命令部署",
-							"href":   "page/task.html",
-							"icon":   "fa fa-adjust",
 							"target": "_self",
 						},
 						{
@@ -219,9 +207,15 @@ func Init(c *gin.Context) {
 							"target": "_self",
 						},
 						{
-							"title":  "服务器管理",
-							"href":   "page/server.html",
-							"icon":   "fa fa-gears",
+							"title":  "命令部署",
+							"href":   "page/task.html",
+							"icon":   "fa fa-adjust",
+							"target": "_self",
+						},
+						{
+							"title":  "项目管理",
+							"href":   "page/projects.html",
+							"icon":   "fa fa-navicon",
 							"target": "_self",
 						},
 						{
@@ -240,4 +234,65 @@ func Init(c *gin.Context) {
 				},
 			},
 		})
+}
+
+// CreateUserProject 创建用户项目关系
+func CreateUserProject(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	claims := jwt.ExtractClaims(c)
+	createUserID64 := claims["user_id"].(float64)
+	createUserID := int(createUserID64)
+	log.Println("登录用户userid:", createUserID)
+
+	userID64, _ := strconv.Atoi(c.PostForm("userID"))
+	projectID64, _ := strconv.Atoi(c.PostForm("projectID"))
+	log.Println(userID64, projectID64)
+
+	userService := NewService(db.SQLLite)
+	userProject := UserProject{}
+	userProject.UserID = userID64
+	userProject.ProjectID = projectID64
+	userProject.CreateUser = createUserID
+	err := userService.CreateUserProject(&userProject)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    userProject,
+		"message": "ok",
+	})
+}
+
+// UserProjectList 用户项目关系列表
+func UserProjectList(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	userID, _ := strconv.Atoi(c.Param("userID"))
+	offset := (page - 1) * limit
+	var user User
+	user.ID = userID
+	userService := NewService(db.SQLLite)
+	list, count, err := userService.GetUserProjects(offset, limit, user)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
+	})
 }

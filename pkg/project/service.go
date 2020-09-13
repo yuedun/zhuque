@@ -14,7 +14,7 @@ type (
 	ProjectService interface {
 		GetProjectInfo(search Project) (project Project, err error)
 		GetProjectList(offset, limit int, search Project) (list []Project, count int, err error)
-		GetProjectNameList(offset, limit int, search Project) (list []Project, count int, err error)
+		GetProjectNameList(userID int) (list []Project, err error)
 		GetProjectInfoBySQL() (project Project, err error)
 		CreateProject(project *Project) (err error)
 		UpdateProject(serverID int, project *Project) (err error)
@@ -49,13 +49,16 @@ func (u *projectService) GetProjectList(offset, limit int, search Project) (list
 	return list, count, nil
 }
 
-// GetProjectNameList 只查询项目空间，项目名
-func (u *projectService) GetProjectNameList(offset, limit int, search Project) (list []Project, count int, err error) {
-	err = u.mysql.Select([]string{"id", "namespace", "name"}).Find(&list).Error
+// GetProjectNameList 查询登录用户可以发布的项目。只查询项目空间，项目名字段
+func (u *projectService) GetProjectNameList(userID int) (list []Project, err error) {
+	err = u.mysql.Table("user_project AS up").
+		Select("p.id, p.name AS name, p.namespace AS namespace").
+		Joins("INNER JOIN project AS p ON p.id = up.project_id").
+		Where("up.user_id = ?", userID).Find(&list).Error
 	if err != nil {
-		return list, count, err
+		return list, err
 	}
-	return list, count, nil
+	return list, nil
 }
 
 func (u *projectService) GetProjectInfoBySQL() (project Project, err error) {

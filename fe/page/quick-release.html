@@ -17,7 +17,6 @@
             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                 <legend>发布服务</legend>
             </fieldset>
-
             <form class="layui-form" action="">
                 <div class="layui-form-item">
                     <label class="layui-form-label required">发布单</label>
@@ -34,7 +33,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="layui-form-item">
                     <label class="layui-form-label">只需重启</label>
                     <div class="layui-input-inline">
@@ -43,7 +41,6 @@
                     </div>
                     <div class="layui-form-mid layui-word-aux">省去前端编译过程，直接拉代码重启，实现1秒发布。（针对nodejs项目）</div>
                 </div>
-
                 <div class="layui-form-item">
                     <div class="layui-input-block">
                         <button class="layui-btn" lay-submit="" lay-filter="release">立即提交</button>
@@ -51,30 +48,30 @@
                     </div>
                 </div>
             </form>
+            <!-- 待发布列表 -->
             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                 <legend>待发布</legend>
             </fieldset>
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
             <script type="text/html" id="currentTableBar">
-
-            {{#  
-                var releaseDate = function(){
-                    return (moment(d.updatedAt).add(10, 'm') < moment())|| d.nowRelease;
-                }; 
-                var approve = function(){
-                    return sessionStorage.getItem('role') == 1;
-                }
-            }}
-            <!-- 这里同样支持 laytpl 语法，是否可发布 -->
-            {{#  if(releaseDate()){ }}
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-release" lay-event="release">发布</a>
-            {{#  } }}
-            <!-- 是否可审批，可操作立即发布和阻止发布d.approve -->
-            {{#  if(approve()){ }}
-            <a class="layui-btn layui-btn-warm layui-btn-xs data-count-approve" lay-event="approve">审批</a>
-            {{#  } }}
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+                {{#  
+                    var releaseDate = function(){
+                        return (moment(d.updatedAt).add(10, 'm') < moment())|| d.nowRelease;
+                    }; 
+                    var approve = function(){
+                        return sessionStorage.getItem('role') == 1;
+                    }
+                }}
+                <!-- 这里同样支持 laytpl 语法，是否可发布 -->
+                {{#  if(releaseDate()){ }}
+                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-release" lay-event="release">发布</a>
+                {{#  } }}
+                <!-- 是否可审批，可操作立即发布和阻止发布d.approve -->
+                {{#  if(approve()){ }}
+                <a class="layui-btn layui-btn-warm layui-btn-xs data-count-approve" lay-event="approve">审批</a>
+                {{#  } }}
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
             </script>
         </div>
     </div>
@@ -96,7 +93,7 @@
                             const element = res.data[value];
                             var opt = "<optgroup label='" + value + "'>" + value;
                             element.forEach(item => {
-                                opt += "<option value='" + item + "'>" + item + "</option>";
+                                opt += "<option value='" + item.name + "'>" + item.name + "</option>";
                             });
                             opt += "</optgroup>";
                             $("#proList").append(opt);

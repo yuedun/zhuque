@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/yuedun/zhuque/db"
 
 	"github.com/gin-gonic/gin"
@@ -50,32 +51,33 @@ func NameList(c *gin.Context) {
 			})
 		}
 	}()
-	var project Project
+	claims := jwt.ExtractClaims(c)
+	log.Println("登录用户userid:", claims["user_id"])
+	userID64 := claims["user_id"].(float64)
+	userID := int(userID64)
 	projectService := NewService(db.SQLLite)
-	// 100个项目应该足够多了，先这样吧！
-	list, count, err := projectService.GetProjectNameList(0, 100, project)
+	list, err := projectService.GetProjectNameList(userID)
 	if err != nil {
 		panic(err)
 	}
 	log.Println(list)
 
 	// 分组数据
-	nameList := make(map[string][]string)
+	nameList := make(map[string][]Project)
 	for _, val := range list {
 		// map中存在key在向该key添加数据，否则创建新key
 		if v, ok := nameList[val.Namespace]; ok == true {
-			v = append(v, val.Name)
+			v = append(v, val)
 			nameList[val.Namespace] = v
 		} else {
-			nameList[val.Namespace] = []string{val.Name}
+			nameList[val.Namespace] = []Project{val}
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code":  0,
-		"count": count,
-		"data":  nameList,
-		"msg":   "ok",
+		"code": 0,
+		"data": nameList,
+		"msg":  "ok",
 	})
 }
 
@@ -88,10 +90,12 @@ func NameListV2(c *gin.Context) {
 			})
 		}
 	}()
-	var project Project
+	claims := jwt.ExtractClaims(c)
+	log.Println("登录用户userid:", claims["user_id"])
+	userID64 := claims["user_id"].(float64)
+	userID := int(userID64)
 	projectService := NewService(db.SQLLite)
-	// 100个项目应该足够多了，先这样吧！
-	list, count, err := projectService.GetProjectNameList(0, 100, project)
+	list, err := projectService.GetProjectNameList(userID)
 	if err != nil {
 		panic(err)
 	}
@@ -105,23 +109,10 @@ func NameListV2(c *gin.Context) {
 		nameList = append(nameList, m)
 	}
 
-	// 分组数据
-	// nameList := make(map[string][]string)
-	// for _, val := range list {
-	// 	// map中存在key在向该key添加数据，否则创建新key
-	// 	if v, ok := nameList[val.Namespace]; ok == true {
-	// 		v = append(v, val.Name)
-	// 		nameList[val.Namespace] = v
-	// 	} else {
-	// 		nameList[val.Namespace] = []string{val.Name}
-	// 	}
-	// }
-
 	c.JSON(http.StatusOK, gin.H{
-		"code":  0,
-		"count": count,
-		"data":  nameList,
-		"msg":   "ok",
+		"code": 0,
+		"data": nameList,
+		"msg":  "ok",
 	})
 }
 

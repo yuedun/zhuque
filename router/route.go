@@ -25,11 +25,14 @@ func Register(router *gin.Engine) {
 		userRouter.PUT("/update/:id", user.UpdateUser)
 		userRouter.DELETE("/del/:id", user.DeleteUser)
 		userRouter.GET("/init", middleware.Jwt().MiddlewareFunc(), user.Init)
+		userRouter.GET("/user-projects/:userID", middleware.Jwt().MiddlewareFunc(), user.UserProjectList)
+		userRouter.POST("/create-user-project", middleware.Jwt().MiddlewareFunc(), user.CreateUserProject)
 	}
 
 	servRouter := router.Group("/server")
 	//user路由注册,可以给各个group加中间件
 	servRouter.Use(middleware.Logger())
+	servRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		servRouter.GET("/list", server.List)
 		servRouter.GET("/server-by-sql/:id", server.GetServerInfoBySql)
@@ -41,6 +44,7 @@ func Register(router *gin.Engine) {
 	projectRouter := router.Group("/project")
 	//user路由注册,可以给各个group加中间件
 	projectRouter.Use(middleware.Logger())
+	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)
@@ -54,6 +58,7 @@ func Register(router *gin.Engine) {
 	deployRouter := router.Group("/deploy")
 	//user路由注册,可以给各个group加中间件
 	projectRouter.Use(middleware.Logger())
+	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		deployRouter.GET("/list", task.List)
 		deployRouter.GET("/wait-list", task.WaitList)
@@ -65,6 +70,7 @@ func Register(router *gin.Engine) {
 	}
 	//发送命令路由注册
 	execRouter := router.Group("/exec")
+	execRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)

@@ -14,8 +14,10 @@ type (
 	UserService interface {
 		GetUserInfo(userObj User) (user User, err error)
 		GetUserList(offset, limit int, userObj User) (user []User, count int, err error)
+		GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error)
 		GetUserInfoBySQL() (user User, err error)
 		CreateUser(user *User) (err error)
+		CreateUserProject(userProject *UserProject) (err error)
 		UpdateUser(userID int, user *User) (err error)
 		DeleteUser(userID int) (err error)
 	}
@@ -48,6 +50,19 @@ func (u *userService) GetUserList(offset, limit int, userObj User) (users []User
 	return users, count, nil
 }
 
+func (u *userService) GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error) {
+	err = u.mysql.Table("user_project AS up").
+		Select("up.id AS id, p.name AS name, p.namespace AS namespace, u.user_name AS username, u2.user_name AS createUser").
+		Joins("INNER JOIN user AS u ON u.id = up.user_id").
+		Joins("INNER JOIN project AS p ON p.id = up.project_id").
+		Joins("INNER JOIN user AS u2 ON up.create_user = u2.id").
+		Where("u.id = ?", userObj.ID).Find(&userProjects).Error
+	if err != nil {
+		return userProjects, count, err
+	}
+	return userProjects, count, nil
+}
+
 func (u *userService) GetUserInfoBySQL() (user User, err error) {
 	err = u.mysql.Raw("select * from user where id=?", user.ID).Scan(&user).Error
 	if err != nil {
@@ -59,6 +74,15 @@ func (u *userService) GetUserInfoBySQL() (user User, err error) {
 func (u *userService) CreateUser(user *User) (err error) {
 	err = u.mysql.Create(user).Error
 	fmt.Println(user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userService) CreateUserProject(userProject *UserProject) (err error) {
+	err = u.mysql.Create(userProject).Error
+	fmt.Println(userProject)
 	if err != nil {
 		return err
 	}

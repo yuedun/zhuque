@@ -31,6 +31,7 @@ func init() {
 		panic(err)
 	}
 	db.SQLLite.AutoMigrate(&user.User{})
+	db.SQLLite.AutoMigrate(&user.UserProject{})
 	db.SQLLite.AutoMigrate(&server.Server{})
 	db.SQLLite.AutoMigrate(&project.Project{})
 	db.SQLLite.AutoMigrate(&task.Task{})
