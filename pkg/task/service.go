@@ -130,7 +130,7 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	ch := make(chan string, projectLen)
 	for _, projectName := range projectList {
 		log.Println("projectName", projectName)
-		go excuteCmd(projectName, ch)
+		go excuteCmd(projectName, task.Cmd, ch)
 	}
 	resultAll := ""
 	i := 0
@@ -156,12 +156,13 @@ Loop:
 }
 
 // excuteCmd 用于异步并行执行
-// @projectName 项目名 @result 命令执行结果
-func excuteCmd(projectName string, result chan string) {
+// @projectName 项目名 @cmd 执行命令 @result 命令执行结果
+func excuteCmd(projectName string, taskCmd string, result chan string) {
 	var cmdOut []byte
 	var cmd *exec.Cmd
 	var err error
-	taskCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+	taskCmd = fmt.Sprintf(taskCmd, projectName)
+	log.Println("执行命令", taskCmd)
 	cmd = exec.Command("bash", "-c", taskCmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println(projectName+"输出错误：", err)
