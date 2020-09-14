@@ -70,7 +70,7 @@
             $ = layui.$;
 
             !function init(params) {
-                $.get('/project/name-list', function (res) {
+                $.get('/project/name-list-all', function (res) {
                     for (const value in res.data) {
                         if (res.data.hasOwnProperty(value)) {
                             const element = res.data[value];
@@ -102,8 +102,8 @@
                         { field: 'id', title: 'ID' },
                         { field: 'name', title: '项目名' },
                         { field: 'namespace', title: '空间' },
-                        { field: 'username', title: '空间' },
-                        { field: 'createuser', title: '创建者' },
+                        { field: 'username', title: '用户' },
+                        { field: 'createUser', title: '创建者' },
                         {
                             field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.updatedAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
                         },
@@ -139,6 +139,23 @@
                 var iframeIndex = parent.layer.getFrameIndex(window.name);
                 parent.layer.close(iframeIndex);
                 return false;
+            });
+
+            table.on('tool(currentTableFilter)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'delete') {
+                    layer.confirm('真的删除行么', function (index) {
+                        $.ajax({
+                            url: '/user/user-project/del/' + data.id,
+                            type: 'delete',
+                            data: {},
+                            success: function (res) {
+                                obj.del();
+                                layer.close(index);
+                            }
+                        });
+                    });
+                }
             });
         });
     </script>

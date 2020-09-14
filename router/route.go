@@ -27,6 +27,7 @@ func Register(router *gin.Engine) {
 		userRouter.GET("/init", middleware.Jwt().MiddlewareFunc(), user.Init)
 		userRouter.GET("/user-projects/:userID", middleware.Jwt().MiddlewareFunc(), user.UserProjectList)
 		userRouter.POST("/create-user-project", middleware.Jwt().MiddlewareFunc(), user.CreateUserProject)
+		userRouter.DELETE("/user-project/del/:id", user.DeleteUserProject)
 	}
 
 	servRouter := router.Group("/server")
@@ -49,6 +50,7 @@ func Register(router *gin.Engine) {
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)
 		projectRouter.GET("/name-list-v2", project.NameListV2)
+		projectRouter.GET("/name-list-all", project.NameListAll)
 		projectRouter.POST("/create", project.CreateProject)
 		projectRouter.GET("/get-by-id/:id", project.GetProjectInfo)
 		projectRouter.PUT("/update/:id", project.UpdateProject)

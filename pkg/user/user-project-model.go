@@ -14,8 +14,8 @@ func (UserProject) TableName() string {
 
 type UserProjectVO struct {
 	ID         int    `json:"id"`
-	Name       string `json:"name"`
-	Namespace  string `json:"namespace"`
-	Username   string `json:"username"`
-	Createuser string `json:"createuser"`
+	Name       string `json:"name"`       //项目名
+	Namespace  string `json:"namespace"`  //空间
+	Username   string `json:"username"`   //关联用户
+	CreateUser string `json:"createUser"` //创建者
 }
