@@ -17,5 +17,5 @@ type UserProjectVO struct {
 	Name       string `json:"name"`
 	Namespace  string `json:"namespace"`
 	Username   string `json:"username"`
-	CreateUser string `json:"createUser"`
+	Createuser string `json:"createuser"`
 }
