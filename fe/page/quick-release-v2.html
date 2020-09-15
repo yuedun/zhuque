@@ -156,7 +156,7 @@
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
                         var index2 = layer.load();
-                        $.post('/exec/release/' + obj.data.id, function (res) {
+                        $.post('/exec/release-v2/' + obj.data.id, function (res) {
                             layer.close(index2);//关闭加载状态
                             layer.open({
                                 type: 1
