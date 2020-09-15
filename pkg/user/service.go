@@ -20,6 +20,7 @@ type (
 		CreateUserProject(userProject *UserProject) (err error)
 		UpdateUser(userID int, user *User) (err error)
 		DeleteUser(userID int) (err error)
+		DeleteUserProject(upID int) (err error)
 	}
 )
 
@@ -51,8 +52,9 @@ func (u *userService) GetUserList(offset, limit int, userObj User) (users []User
 }
 
 func (u *userService) GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error) {
+	// 字段别名需要设置成下划线命名法，不能设置为驼峰
 	err = u.mysql.Table("user_project AS up").
-		Select("up.id AS id, p.name AS name, p.namespace AS namespace, u.user_name AS username, u2.user_name AS createUser").
+		Select("up.id AS id, p.name AS name, p.namespace AS namespace, u.user_name AS username, u2.user_name AS create_user").
 		Joins("INNER JOIN user AS u ON u.id = up.user_id").
 		Joins("INNER JOIN project AS p ON p.id = up.project_id").
 		Joins("INNER JOIN user AS u2 ON up.create_user = u2.id").
@@ -99,6 +101,14 @@ func (u *userService) UpdateUser(userID int, user *User) (err error) {
 
 func (u *userService) DeleteUser(userID int) (err error) {
 	u.mysql.Where("id = ?", userID).Delete(User{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userService) DeleteUserProject(upID int) (err error) {
+	u.mysql.Where("id = ?", upID).Delete(UserProject{})
 	if err != nil {
 		return err
 	}

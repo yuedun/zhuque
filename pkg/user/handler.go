@@ -296,3 +296,16 @@ func UserProjectList(c *gin.Context) {
 		"msg":   "ok",
 	})
 }
+
+//DeleteUserProject 删除用户项目关系
+func DeleteUserProject(c *gin.Context) {
+	upID, _ := strconv.Atoi(c.Param("id"))
+	userService := NewService(db.SQLLite)
+	err := userService.DeleteUserProject(upID)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+	})
+}

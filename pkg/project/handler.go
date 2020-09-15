@@ -42,7 +42,7 @@ func List(c *gin.Context) {
 	})
 }
 
-//NameList 获取项目名称列表
+//NameList 获取用户关联项目名称列表
 func NameList(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -81,7 +81,7 @@ func NameList(c *gin.Context) {
 	})
 }
 
-//NameList 获取项目名称列表
+//NameList 获取用户关联项目名称列表 穿梭框
 func NameListV2(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -107,6 +107,39 @@ func NameListV2(c *gin.Context) {
 		m["title"] = "[" + val.Namespace + "]" + val.Name
 		m["value"] = val.Name
 		nameList = append(nameList, m)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"data": nameList,
+		"msg":  "ok",
+	})
+}
+
+//NameListAll 获取所有项目名称列表
+func NameListAll(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	projectService := NewService(db.SQLLite)
+	list, err := projectService.GetAllProjectNameList()
+	if err != nil {
+		panic(err)
+	}
+	// 分组数据
+	nameList := make(map[string][]Project)
+	for _, val := range list {
+		// map中存在key在向该key添加数据，否则创建新key
+		if v, ok := nameList[val.Namespace]; ok == true {
+			v = append(v, val)
+			nameList[val.Namespace] = v
+		} else {
+			nameList[val.Namespace] = []Project{val}
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
