@@ -76,5 +76,6 @@ func Register(router *gin.Engine) {
 		execRouter.POST("/server", exec.Server)
 		execRouter.POST("/server-v2", exec.ServerV2)
 		execRouter.POST("/release/:id", exec.Release)
+		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
 	}
 }

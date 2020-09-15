@@ -231,3 +231,22 @@ func Release(c *gin.Context) {
 		"data":    cmdOut,
 	})
 }
+
+// ReleaseV2 发布操作
+func ReleaseV2(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	taskID, _ := strconv.Atoi(c.Param("id"))
+	taskServer := task.NewService(db.SQLLite)
+	// TODO需要验证是否可发布
+	err, cmdOut := taskServer.ReleaseTaskV2(taskID)
+	c.JSON(200, gin.H{
+		"message": err,
+		"data":    cmdOut,
+	})
+}
