@@ -98,9 +98,9 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	var cmdOut []byte
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
-	// 从数据库中取出project和cmd组合。project有多个
-	taskCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", task.Project)
-	cmd = exec.Command("bash", "-c", taskCmd)
+	// 从数据库中取出project和cmd组合。
+	log.Println("执行命令", task.Cmd)
+	cmd = exec.Command("bash", "-c", task.Cmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
 		log.Println("输出错误2：", string(cmdOut))
