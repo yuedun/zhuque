@@ -20,7 +20,7 @@ type Config struct {
 	DingTalk     string `yaml:"dingTalk"` //钉钉webhook
 	EmailService string `yaml:"emailService"`
 	Token        string `yaml:"token"`
-	EmailTo      string `yaml:emailTo`
+	EmailTo      string `yaml:"emailTo"`
 	TestUser     string `yaml:"testUser"`
 }
 
