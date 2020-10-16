@@ -10,7 +10,6 @@ import (
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/pkg/project"
-	"github.com/yuedun/zhuque/pkg/server"
 	"github.com/yuedun/zhuque/pkg/task"
 	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/router"
@@ -33,7 +32,6 @@ func init() {
 	}
 	db.SQLLite.AutoMigrate(&user.User{})
 	db.SQLLite.AutoMigrate(&user.UserProject{})
-	db.SQLLite.AutoMigrate(&server.Server{})
 	db.SQLLite.AutoMigrate(&project.Project{})
 	db.SQLLite.AutoMigrate(&task.Task{})
 	db.SQLLite.AutoMigrate(&permission.Permission{})
@@ -44,7 +42,6 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	// r.Use(middleware.Logger()) //全局中间件
 	// r.LoadHTMLGlob("templates/*") //加载模板
 	r.Static("/fe", "./fe")
 	r.GET("/", func(c *gin.Context) {

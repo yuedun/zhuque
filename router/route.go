@@ -12,22 +12,23 @@ import (
 
 // Register 路由注册
 func Register(router *gin.Engine) {
-	// router.Use(middleware.Logger()) //全局中间件
+	router.Use(middleware.Logger()) //全局中间件
 	userRouter := router.Group("/user")
-	userRouter.Use(middleware.Logger())
+	// userRouter.Use(middleware.Logger())
 	//user路由注册,可以给各个group加中间件
+	userRouter.POST("/login", middleware.Jwt().LoginHandler)
+	userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
+	userRouter.GET("/logout", middleware.Jwt().LogoutHandler)
+	userRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
-		userRouter.POST("/login", middleware.Jwt().LoginHandler)
-		userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
-		userRouter.GET("/logout", middleware.Jwt().LogoutHandler)
 		userRouter.GET("/info/:id", middleware.Jwt().MiddlewareFunc(), user.GetUserInfo) //单独给某个路由添加中间件
 		userRouter.GET("/list", user.List)
 		userRouter.POST("/create", user.CreateUser)
 		userRouter.PUT("/update/:id", user.UpdateUser)
 		userRouter.DELETE("/del/:id", user.DeleteUser)
-		userRouter.GET("/init", middleware.Jwt().MiddlewareFunc(), user.Init)
-		userRouter.GET("/user-projects/:userID", middleware.Jwt().MiddlewareFunc(), user.UserProjectList)
-		userRouter.POST("/create-user-project", middleware.Jwt().MiddlewareFunc(), user.CreateUserProject)
+		userRouter.GET("/init", user.Init)
+		userRouter.GET("/user-projects/:userID", user.UserProjectList)
+		userRouter.POST("/create-user-project", user.CreateUserProject)
 		userRouter.DELETE("/user-project/del/:id", user.DeleteUserProject)
 	}
 
