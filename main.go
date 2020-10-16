@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/db"
+	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/pkg/project"
 	"github.com/yuedun/zhuque/pkg/server"
 	"github.com/yuedun/zhuque/pkg/task"
@@ -35,6 +36,7 @@ func init() {
 	db.SQLLite.AutoMigrate(&server.Server{})
 	db.SQLLite.AutoMigrate(&project.Project{})
 	db.SQLLite.AutoMigrate(&task.Task{})
+	db.SQLLite.AutoMigrate(&permission.Permission{})
 	db.SQLLite.LogMode(true)
 	//Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 	//defer Db.Close()
@@ -42,8 +44,8 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	//r.Use(middleware.Logger())//全局中间件
-	//r.LoadHTMLGlob("templates/*") //加载模板
+	// r.Use(middleware.Logger()) //全局中间件
+	// r.LoadHTMLGlob("templates/*") //加载模板
 	r.Static("/fe", "./fe")
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusPermanentRedirect, "/fe")

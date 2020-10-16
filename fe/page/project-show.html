@@ -24,28 +24,63 @@
         </fieldset>
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">服务名</label>
+                <label class="layui-form-label">项目名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" disabled>
                 </div>
             </div>
             <div class="layui-inline">
-                <label class="layui-form-label">IP</label>
+                <label class="layui-form-label">环境</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="ip" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="env" lay-verify="required" autocomplete="off" class="layui-input" disabled>
                 </div>
             </div>
         </div>
         <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">空间</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+        </div>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>任务配置</legend>
+        </fieldset>
+        <div class="layui-form-item">
+            <label class="layui-form-label">配置文件</label>
             <div class="layui-input-block">
-                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20" disabled>
+module.exports = {
+    apps : [{
+        script: 'index.js',
+        watch: '.'
+    }],
+    
+    deploy : {
+        production : {
+            user : 'SSH_USERNAME',
+            host : 'SSH_HOSTMACHINE',
+            ref  : 'origin/master',
+            repo : 'GIT_REPOSITORY',
+            path : 'DESTINATION_PATH',
+            'pre-deploy-local': '',
+            'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
+            'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
+        }
+    }
+};</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
                 <button class="layui-btn" id="cancleBtn">取消</button>
             </div>
         </div>
     </div>
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <script>
-        layui.use(['form', 'transfer', 'layer', 'util'], function () {
+        layui.use(['form', 'layer'], function () {
             var form = layui.form,
                 layer = layui.layer,
                 $ = layui.$;
@@ -55,7 +90,7 @@
                 var id = $('input[name=id]').val()
                 $.ajax({
                     type: 'GET',
-                    url: '/server/get-by-id/' + id,
+                    url: '/project/get-by-id/' + id,
                     success: function (res) {
                         $("input[name=gitRepo]").val(res.data.gitRepo);
                         $("input[name=branch]").val(res.data.branch);
@@ -66,32 +101,6 @@
                     },
                 });
             })()
-
-            //监听提交
-            form.on('submit(saveBtn)', function (data) {
-                data.field.config = $('textarea[name=config]').val();
-                var id = data.field.id;
-                delete data.field.id;
-                $.ajax({
-                    type: 'PUT',
-                    url: '/server/update/' + id,
-                    contentType: 'application/json',
-                    data: JSON.stringify(data.field),
-                    success: function (res) {
-                        var index = layer.alert('保存成功！', {
-                            title: '最终的提交信息'
-                        }, function () {
-                            // 关闭弹出层
-                            layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.location.reload();
-                        });
-
-                        return false;
-                    },
-                });
-            });
 
             // 监听取消
             $('#cancleBtn').on("click", function () {

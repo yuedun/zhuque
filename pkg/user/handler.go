@@ -70,18 +70,6 @@ func GetUserInfo(c *gin.Context) {
 	})
 }
 
-//GetUserInfoBySql
-func GetUserInfoBySql(c *gin.Context) {
-	userService := NewService(db.SQLLite)
-	user, err := userService.GetUserInfoBySQL()
-	if err != nil {
-		fmt.Println("err:", err)
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": user,
-	})
-}
-
 //CreateUser
 func CreateUser(c *gin.Context) {
 	defer func() {

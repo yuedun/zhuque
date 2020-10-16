@@ -89,6 +89,7 @@
 
                 var userID = $("input[name=userID]").val();
                 table.render({
+                    id: "table_user_project",
                     elem: '#currentTableId',
                     url: '/user/user-projects/' + userID,
                     toolbar: '#todo',// toolbarDemo
@@ -119,19 +120,19 @@
             //监听提交
             form.on('submit(saveBtn)', function (data) {
                 data.field.role = parseInt(data.field.role);
-                $.post('/user/create-user-project', data.field, function (res) {
+                $.post('/user/create-user-project', data.field, function (res, status) {
                     var index = layer.alert('保存成功！', {
                         title: '最终的提交信息'
                     }, function () {
                         // 关闭弹出层
                         layer.close(index);
-                        var iframeIndex = parent.layer.getFrameIndex(window.name);
-                        parent.layer.close(iframeIndex);
-                        parent.location.reload();
-                    });
-
+                        table.reload("table_user_project")
+                    })
                     return false;
+                }).error(function (err) {
+                    layer.msg(err.responseJSON.message, { icon: 5 });
                 });
+                ;
             });
 
             // 监听取消

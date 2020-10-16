@@ -6,6 +6,13 @@
 
 数据库使用sqlite，无需单独安装和配置。
 
+# 使用框架文档
+http://layuimini.99php.cn/docs/index.html
+http://layuimini.99php.cn/onepage/v2/index.html
+https://www.layui.com/doc/
+http://gorm.book.jasperxu.com/
+https://github.com/gin-gonic/gin#using-middleware
+
 ## 部署流程
 1. 在服务器指定位置下载源码。
 2. 安装go环境。go可以交叉编译，但是由于sqlite的缘故，windows环境下并不能顺利的编译linux版本，所以最好还是在linux环境下编译。

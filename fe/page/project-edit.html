@@ -98,8 +98,13 @@ module.exports = {
                         //数据库中有值替换
                         if (res.data.config) {
                             $('textarea[name=config]').val(res.data.config);
+                        } else {
+                            layer.msg('获取配置失败！');
                         }
                     },
+                    error: function (err) {
+                        layer.msg('获取配置失败！');
+                    }
                 });
             })()
 

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -15,7 +16,6 @@ type (
 		GetUserInfo(userObj User) (user User, err error)
 		GetUserList(offset, limit int, userObj User) (user []User, count int, err error)
 		GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error)
-		GetUserInfoBySQL() (user User, err error)
 		CreateUser(user *User) (err error)
 		CreateUserProject(userProject *UserProject) (err error)
 		UpdateUser(userID int, user *User) (err error)
@@ -65,14 +65,6 @@ func (u *userService) GetUserProjects(offset, limit int, userObj User) (userProj
 	return userProjects, count, nil
 }
 
-func (u *userService) GetUserInfoBySQL() (user User, err error) {
-	err = u.mysql.Raw("select * from user where id=?", user.ID).Scan(&user).Error
-	if err != nil {
-		return user, err
-	}
-	return user, nil
-}
-
 func (u *userService) CreateUser(user *User) (err error) {
 	err = u.mysql.Create(user).Error
 	fmt.Println(user)
@@ -82,9 +74,16 @@ func (u *userService) CreateUser(user *User) (err error) {
 	return nil
 }
 
+// CreateUserProject 先查询是否存在，再创建
 func (u *userService) CreateUserProject(userProject *UserProject) (err error) {
+	err = u.mysql.Model("user_project").Where("user_id=? and project_id = ?", userProject.UserID, userProject.ProjectID).Find(&userProject).Error
+	if err != nil {
+		return err
+	}
+	if userProject.UserID != 0 && userProject.ProjectID != 0 {
+		return errors.New("用户已存在该项目！")
+	}
 	err = u.mysql.Create(userProject).Error
-	fmt.Println(userProject)
 	if err != nil {
 		return err
 	}
