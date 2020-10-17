@@ -4,7 +4,7 @@ import "time"
 
 type Permission struct {
 	AuthorityID   int       `json:"authorityId"`
-	AuthorityName string    `json:"AuthorityName"`
+	AuthorityName string    `json:"authorityName"`
 	OrderNumber   int       `json:"orderNumber"`
 	MenuURL       string    `json:"menuUrl"`
 	MenuIcon      string    `json:"menuIcon"`

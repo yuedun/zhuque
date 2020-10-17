@@ -213,6 +213,12 @@ func Init(c *gin.Context) {
 							"target": "_self",
 						},
 						{
+							"title":  "角色管理",
+							"href":   "page/role.html",
+							"icon":   "fa fa-user-circle-o",
+							"target": "_self",
+						},
+						{
 							"title":  "菜单管理",
 							"href":   "page/menu.html",
 							"icon":   "fa fa-list-alt",

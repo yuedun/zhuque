@@ -26,14 +26,15 @@ func List(c *gin.Context) {
 	// offset := (page - 1) * limit
 	// var permission Permission
 	serverService := NewService(db.SQLLite)
-	list, err := serverService.GetPermissionList(userId)
+	list, count, err := serverService.GetPermissionList(userId)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"data": list,
-		"msg":  "ok",
+		"code":  0,
+		"count": count,
+		"data":  list,
+		"msg":   "ok",
 	})
 }
 

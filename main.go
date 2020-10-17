@@ -10,6 +10,7 @@ import (
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/pkg/project"
+	"github.com/yuedun/zhuque/pkg/role"
 	"github.com/yuedun/zhuque/pkg/task"
 	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/router"
@@ -35,6 +36,8 @@ func init() {
 	db.SQLLite.AutoMigrate(&project.Project{})
 	db.SQLLite.AutoMigrate(&task.Task{})
 	db.SQLLite.AutoMigrate(&permission.Permission{})
+	db.SQLLite.AutoMigrate(&role.Role{})
+	db.SQLLite.AutoMigrate(&role.RolePermission{})
 	db.SQLLite.LogMode(true)
 	//Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 	//defer Db.Close()

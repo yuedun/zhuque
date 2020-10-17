@@ -7,11 +7,12 @@
 数据库使用sqlite，无需单独安装和配置。
 
 # 使用框架文档
-http://layuimini.99php.cn/docs/index.html
-http://layuimini.99php.cn/onepage/v2/index.html
-https://www.layui.com/doc/
-http://gorm.book.jasperxu.com/
-https://github.com/gin-gonic/gin#using-middleware
+[前端框架](http://layuimini.99php.cn/docs/index.html)
+[前端框架](http://layuimini.99php.cn/onepage/v2/index.html)
+[前端框架](https://www.layui.com/doc/)
+[图标库](https://fontawesome.dashgame.com/)
+[后端框架gorm](http://gorm.book.jasperxu.com/)
+[后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
 ## 部署流程
 1. 在服务器指定位置下载源码。
@@ -19,6 +20,9 @@ https://github.com/gin-gonic/gin#using-middleware
 3. 配置`conf.yaml`文件，参照`conf-sample.yaml`文件。
 4. 项目目录中编译`go build`，第一次会安装依赖会慢一些。
 5. `./zhuque`启动服务。
+
+## 权限架构
+该系统权限使用了基于角色的访问控制方法（RBAC）。是目前公认的解决大型企业的统一资源访问控制的有效方法。 其显著的两大特征是：1.减小授权管理的复杂性，降低管理开销。2.灵活地支持企业的安全策略，并对企业的变化有很大的伸缩性。
 
 参考文档：
 

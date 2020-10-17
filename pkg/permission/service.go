@@ -13,7 +13,7 @@ type (
 	*/
 	PermissionService interface {
 		GetPermissionInfo(search Permission) (permission Permission, err error)
-		GetPermissionList(userId int) (list []Permission, err error)
+		GetPermissionList(userId int) (list []Permission, count int, err error)
 		CreatePermission(permission *Permission) (err error)
 		UpdatePermission(ID int, permission *Permission) (err error)
 		DeletePermission(ID int) (err error)
@@ -39,12 +39,12 @@ func (u *permissionService) GetPermissionInfo(search Permission) (permission Per
 	return permission, nil
 }
 
-func (u *permissionService) GetPermissionList(userId int) (list []Permission, err error) {
-	err = u.db.Model("permission").Order("order_number asc").Find(&list).Offset(-1).Limit(-1).Error
+func (u *permissionService) GetPermissionList(userID int) (list []Permission, count int, err error) {
+	err = u.db.Model("permission").Order("order_number asc").Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
-		return list, err
+		return list, count, err
 	}
-	return list, nil
+	return list, count, nil
 }
 
 func (u *permissionService) CreatePermission(permission *Permission) (err error) {

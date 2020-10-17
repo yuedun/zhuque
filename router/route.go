@@ -6,6 +6,7 @@ import (
 	"github.com/yuedun/zhuque/pkg/exec"
 	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/pkg/project"
+	"github.com/yuedun/zhuque/pkg/role"
 	"github.com/yuedun/zhuque/pkg/task"
 	"github.com/yuedun/zhuque/pkg/user"
 )
@@ -72,11 +73,20 @@ func Register(router *gin.Engine) {
 	}
 	//权限管理
 	permissionRouter := router.Group("/permission")
-	// permissionRouter.Use(middleware.Jwt().MiddlewareFunc())
+	permissionRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		permissionRouter.GET("/list", permission.List)
 		permissionRouter.POST("/create", permission.CreatePermission)
 		permissionRouter.PUT("/update", permission.UpdatePermission)
 		permissionRouter.DELETE("/:id", permission.DeletePermission)
+	}
+	//角色管理
+	roleRouter := router.Group("/role")
+	roleRouter.Use(middleware.Jwt().MiddlewareFunc())
+	{
+		roleRouter.GET("/list", role.List)
+		roleRouter.POST("/create", role.CreateRole)
+		roleRouter.PUT("/update/:id", role.UpdateRole)
+		roleRouter.DELETE("/:id", role.DeleteRole)
 	}
 }
