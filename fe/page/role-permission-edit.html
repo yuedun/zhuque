@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+            <blockquote class="layui-elem-quote">
+                Layui的树形组件。<br>
+                <a href="https://www.layui.com/doc/modules/tree.html" target="_blank" class="layui-btn ">tree</a>
+            </blockquote>
+            <div>
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
+                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="setChecked">勾选指定节点</button>
+                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button>
+                </div>
+                <div id="tree"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+
+    <script>
+        layui.use(['tree', 'util'], function () {
+            var $ = layui.jquery;
+            var tree = layui.tree;
+            var util = layui.util;
+
+            //模拟数据
+            var data = [{
+                title: '一级1',
+                id: 1,
+                field: 'name1',
+                checked: true,
+                spread: true,
+                children: [{
+                    title: '二级1-1 可允许跳转',
+                    id: 3,
+                    field: 'name11',
+                    href: 'https://www.layui.com/'
+                },
+                {
+                    title: '二级1-2',
+                    id: 4,
+                    spread: true
+                },
+                {
+                    title: '二级1-3',
+                    id: 20,
+                    field: ''
+                }]
+            },
+            {
+                title: '一级2',
+                id: 2,
+                field: '',
+                spread: true,
+                children: [{
+                    title: '二级2-1',
+                    id: 5,
+                    field: '',
+                    spread: true
+                },
+                {
+                    title: '二级2-2',
+                    id: 6,
+                    field: ''
+                }]
+            },
+            {
+                title: '一级3',
+                id: 16,
+                field: '',
+                children: [{
+                    title: '二级3-1',
+                    id: 17,
+                    field: '',
+                    fixed: true
+                },
+                {
+                    title: '二级3-2',
+                    id: 27,
+                    field: ''
+                }]
+            }];
+
+            //初始化数据
+            (function init() {
+                var id = $('input[name=id]').val()
+                $.ajax({
+                    type: 'GET',
+                    url: '/permission/get-by-userID/' + id,
+                    success: function (res) {
+                        //渲染
+                        tree.render({
+                            elem: '#tree'
+                            , data: data
+                            , showCheckbox: true  //是否显示复选框
+                            , id: 'demoId1'
+                            , isJump: true //是否允许点击节点时弹出新窗口跳转
+                        });
+                    },
+                    error: function (err) {
+                        layer.msg('获取配置失败！');
+                    }
+                });
+            })()
+
+            //按钮事件
+            util.event('lay-demo', {
+                getChecked: function (othis) {
+                    var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+
+                    layer.alert(JSON.stringify(checkedData), { shade: 0 });
+                    console.log(checkedData);
+                }
+                , setChecked: function () {
+                    tree.setChecked('demoId1', [12, 16]); //勾选指定节点
+                }
+                , reload: function () {
+                    //重载实例
+                    tree.reload('demoId1', {
+
+                    });
+
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -37,7 +37,7 @@ func init() {
 	db.SQLLite.AutoMigrate(&task.Task{})
 	db.SQLLite.AutoMigrate(&permission.Permission{})
 	db.SQLLite.AutoMigrate(&role.Role{})
-	db.SQLLite.AutoMigrate(&role.RolePermission{})
+	// db.SQLLite.AutoMigrate(&role.RolePermission{})
 	db.SQLLite.LogMode(true)
 	//Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 	//defer Db.Close()

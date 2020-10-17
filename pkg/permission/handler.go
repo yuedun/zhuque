@@ -44,7 +44,7 @@ func GetPermissionInfo(c *gin.Context) {
 	// name := c.Param("name")
 	permissionService := NewService(db.SQLLite)
 	permissionObj := Permission{
-		AuthorityID: permissionID,
+		ID: permissionID,
 	}
 	permission, err := permissionService.GetPermissionInfo(permissionObj)
 	if err != nil {
@@ -96,7 +96,7 @@ func UpdatePermission(c *gin.Context) {
 	if err := c.ShouldBind(&permission); err != nil {
 		panic(err)
 	}
-	permission.AuthorityID = permissionID
+	permission.UpdatedAt = time.Now()
 	err := permissionService.UpdatePermission(permissionID, &permission)
 	if err != nil {
 		panic(err)
@@ -117,5 +117,19 @@ func DeletePermission(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
+	})
+}
+
+//GetByUserID
+func GetByRole(c *gin.Context) {
+	roleID, _ := strconv.Atoi(c.Param("roleid"))
+	permissionService := NewService(db.SQLLite)
+	list, err := permissionService.GetByRole(roleID)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+		"data":    list,
 	})
 }

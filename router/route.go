@@ -77,8 +77,9 @@ func Register(router *gin.Engine) {
 	{
 		permissionRouter.GET("/list", permission.List)
 		permissionRouter.POST("/create", permission.CreatePermission)
-		permissionRouter.PUT("/update", permission.UpdatePermission)
+		permissionRouter.PUT("/update/:id", permission.UpdatePermission)
 		permissionRouter.DELETE("/:id", permission.DeletePermission)
+		permissionRouter.GET("/get-by-role/:roleid", permission.GetByRole)
 	}
 	//角色管理
 	roleRouter := router.Group("/role")
@@ -86,6 +87,7 @@ func Register(router *gin.Engine) {
 	{
 		roleRouter.GET("/list", role.List)
 		roleRouter.POST("/create", role.CreateRole)
+		roleRouter.POST("/set-permission", role.SetPermission)
 		roleRouter.PUT("/update/:id", role.UpdateRole)
 		roleRouter.DELETE("/:id", role.DeleteRole)
 	}

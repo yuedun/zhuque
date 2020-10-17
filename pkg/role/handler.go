@@ -79,6 +79,30 @@ func CreateRole(c *gin.Context) {
 	})
 }
 
+//SetPermission
+func SetPermission(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	roleService := NewService(db.SQLLite)
+	role := Role{}
+	if err := c.ShouldBind(&role); err != nil {
+		panic(err)
+	}
+	err := roleService.UpdateRole(role.ID, &role)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    role,
+		"message": "ok",
+	})
+}
+
 //UpdateRole post json
 func UpdateRole(c *gin.Context) {
 	defer func() {

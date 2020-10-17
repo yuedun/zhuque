@@ -2,8 +2,11 @@ package permission
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/jinzhu/gorm"
+	"github.com/yuedun/zhuque/pkg/role"
 )
 
 type (
@@ -17,6 +20,7 @@ type (
 		CreatePermission(permission *Permission) (err error)
 		UpdatePermission(ID int, permission *Permission) (err error)
 		DeletePermission(ID int) (err error)
+		GetByRole(roleID int) (list []Permission, err error)
 	}
 )
 
@@ -57,7 +61,7 @@ func (u *permissionService) CreatePermission(permission *Permission) (err error)
 }
 
 func (u *permissionService) UpdatePermission(ID int, permission *Permission) (err error) {
-	err = u.db.Model(permission).UpdateColumn("releaseState", permission.AuthorityID).Error
+	err = u.db.Model(permission).Where("authority_id = ?", ID).Updates(permission).Error
 	if err != nil {
 		return err
 	}
@@ -70,4 +74,25 @@ func (u *permissionService) DeletePermission(ID int) (err error) {
 		return err
 	}
 	return nil
+}
+
+// 获取角色拥有的权限
+func (u *permissionService) GetByRole(roleID int) (list []Permission, err error) {
+	role := new(role.Role)
+	err = u.db.Model("role").Where("id = ?", roleID).Find(role).Error
+	permissions := strings.Split(role.Permissions, ",")
+	log.Println(">>>>>>>>>>permissions", permissions)
+	for _, pID := range permissions {
+		permis := Permission{}
+		log.Println(">>>>>>>>>>pid", pID)
+		err = u.db.Model("permission").Select("id, authority_name").Where("id = ?", pID).Find(&permis).Error
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, permis)
+	}
+	if err != nil {
+		return list, err
+	}
+	return list, nil
 }
