@@ -229,6 +229,24 @@
                             layer.close(index);
                         }
                     });
+                } else if (obj.event === 'delete') {
+                    //询问框
+                    layer.confirm('确定删除该发布单吗？', {
+                        btn: ['确定', '取消'] //按钮
+                    }, function () {
+                        $.ajax({
+                            type: 'delete',
+                            url: '/deploy/del/' + data.id,
+                            contentType: 'application/json',
+                            // data: JSON.stringify({ id: data.id, releaseState: 0, approveMsg: message }),
+                            success: function (res) {
+                                layer.msg('删除成功！');
+                                table.reload('currentTableId');
+                            },
+                        });
+                    }, function () {
+                        //取消
+                    });
                 }
             });
 
