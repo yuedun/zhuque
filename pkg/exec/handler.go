@@ -213,7 +213,7 @@ func ServerV2(c *gin.Context) {
 	}
 }
 
-// Release 发布操作
+// Release 发布操作，提交后的延时发布
 func Release(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -225,14 +225,17 @@ func Release(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskServer := task.NewService(db.SQLLite)
 	// TODO需要验证是否可发布
-	err, cmdOut := taskServer.ReleaseTask(taskID)
+	cmdOut, err := taskServer.ReleaseTask(taskID)
+	if err != nil {
+		panic(err)
+	}
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    cmdOut,
 	})
 }
 
-// ReleaseV2 发布操作
+// ReleaseV2 发布操作，提交后的延时发布
 func ReleaseV2(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -244,7 +247,10 @@ func ReleaseV2(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskServer := task.NewService(db.SQLLite)
 	// TODO需要验证是否可发布
-	err, cmdOut := taskServer.ReleaseTaskV2(taskID)
+	cmdOut, err := taskServer.ReleaseTaskV2(taskID)
+	if err != nil {
+		panic(err)
+	}
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    cmdOut,

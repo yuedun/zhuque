@@ -45,10 +45,10 @@ type EmailRes struct {
 /**
  * DingTalk 发送钉钉消息
  */
-func (msg *message) SendDingTalk(dingTalkUrl string, bodyObj interface{}) (dingRes DingTalkRes, err error) {
+func (msg *message) SendDingTalk(dingTalkURL string, bodyObj interface{}) (dingRes DingTalkRes, err error) {
 	client := &http.Client{}
 	bytestr, _ := json.Marshal(&bodyObj)
-	resp, err := client.Post(dingTalkUrl,
+	resp, err := client.Post(dingTalkURL,
 		"application/json", bytes.NewBuffer(bytestr))
 	if err != nil {
 		return dingRes, err
@@ -66,7 +66,7 @@ func (msg *message) SendDingTalk(dingTalkUrl string, bodyObj interface{}) (dingR
 func (msg *message) SendEmail(sendMsg string, to string) (emailRes EmailRes, err error) {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
-	w.WriteField("subject", "【朱雀】发布通知")
+	w.WriteField("subject", "【朱雀】"+sendMsg)
 	w.WriteField("to", to)
 	strs := []string{
 		sendMsg,
