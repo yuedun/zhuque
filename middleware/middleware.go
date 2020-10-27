@@ -24,11 +24,9 @@ func Logger() gin.HandlerFunc {
 
 		// 请求后
 		latency := time.Since(t)
-		log.Print("耗时：", c.FullPath(), latency)
-
 		// 获取发送的 status
 		status := c.Writer.Status()
-		log.Println("状态：", c.FullPath(), status)
+		log.Printf("耗时：%s %s 状态：%d", c.FullPath(), latency, status)
 	}
 }
 

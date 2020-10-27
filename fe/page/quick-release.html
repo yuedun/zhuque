@@ -150,8 +150,15 @@
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
                         var index2 = layer.load();
+                        $('.time-use').show();
+                        var timeCount = 1;
+                        var t2 = setInterval(function () {
+                            timeCount++
+                            $('.time-use').text(timeCount + 's')
+                        }, 1000)
                         $.post('/exec/release/' + obj.data.id, function (res) {
                             layer.close(index2);//关闭加载状态
+                            clearInterval(t2);
                             layer.open({
                                 type: 1
                                 , title: '发布结果' //不显示标题栏
@@ -193,6 +200,7 @@
                                     }, function () {
                                         // 关闭弹出层
                                         layer.close(index);
+                                        table.reload('currentTableId');
                                     });
 
                                     return false;
@@ -213,8 +221,8 @@
                                     }, function () {
                                         // 关闭弹出层
                                         layer.close(index);
+                                        table.reload('currentTableId');
                                     });
-
                                     return false;
                                 },
                             });
@@ -244,7 +252,7 @@
                 }
             });
 
-            //监听提交
+            //监听提交发布
             form.on('submit(release)', function (data) {
                 var index = layer.load();
                 $('.time-use').show();
@@ -257,7 +265,7 @@
                 data.field.userID = sessionStorage.getItem('userID');
                 $.post('/exec/server', data.field, function (res) {
                     layer.close(index);//关闭加载状态
-                    clearTimeout(t);
+                    clearInterval(t);
                     if (res.code == 1) {
                         layer.open({
                             type: 1
