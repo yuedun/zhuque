@@ -31,6 +31,7 @@ func Register(router *gin.Engine) {
 		userRouter.GET("/user-projects/:userID", user.UserProjectList)
 		userRouter.POST("/create-user-project", user.CreateUserProject)
 		userRouter.DELETE("/user-project/del/:id", user.DeleteUserProject)
+		userRouter.POST("/change-password", user.ChangePassword)
 	}
 
 	projectRouter := router.Group("/project")
