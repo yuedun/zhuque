@@ -17,7 +17,7 @@ type Message interface {
 	//SendDingTalk 发送钉钉消息
 	SendDingTalk(dingTalkURL string, bodyObj interface{}) (dingRes DingTalkRes, err error)
 	// SendEmail 发送邮件
-	SendEmail(sendMsg string, to string) (emailRes EmailRes, err error)
+	SendEmail(title, content string, to string) (emailRes EmailRes, err error)
 }
 
 /*
@@ -63,13 +63,13 @@ func (msg *message) SendDingTalk(dingTalkURL string, bodyObj interface{}) (dingR
 }
 
 //先就这样吧
-func (msg *message) SendEmail(sendMsg string, to string) (emailRes EmailRes, err error) {
+func (msg *message) SendEmail(title, content string, to string) (emailRes EmailRes, err error) {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
-	w.WriteField("subject", "【朱雀】"+sendMsg)
+	w.WriteField("subject", "【朱雀】"+title)
 	w.WriteField("to", to)
 	strs := []string{
-		sendMsg,
+		content,
 	}
 	w.WriteField("content", strings.Join(strs, "\r\n"))
 	w.Close()

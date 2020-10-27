@@ -107,17 +107,17 @@ func Server(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		sendMsg := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName)
-		log.Printf(sendMsg)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布。", task.TaskName)
+		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
 		bodyObj["text"] = map[string]interface{}{
-			"content": sendMsg,
+			"content": content,
 		}
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmail(sendMsg, util.Conf.EmailTo)
+		go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
@@ -187,17 +187,17 @@ func ServerV2(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		sendMsg := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName)
-		log.Printf(sendMsg)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布", task.TaskName)
+		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
 		bodyObj["text"] = map[string]interface{}{
-			"content": sendMsg,
+			"content": content,
 		}
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmail(sendMsg, util.Conf.EmailTo)
+		go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
