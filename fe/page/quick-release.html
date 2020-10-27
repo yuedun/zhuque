@@ -195,14 +195,10 @@
                                 contentType: 'application/json',
                                 data: JSON.stringify({ id: data.id, nowRelease: true, approveMsg: message }),
                                 success: function (res) {
-                                    var index = layer.alert('保存成功！', {
-                                        title: '最终的提交信息'
-                                    }, function () {
-                                        // 关闭弹出层
-                                        layer.close(index);
-                                        table.reload('currentTableId');
-                                    });
-
+                                    // 关闭弹出层
+                                    layer.close(index);
+                                    layer.msg('审批完成！')
+                                    table.reload('currentTableId');
                                     return false;
                                 },
                             });
@@ -216,13 +212,10 @@
                                 contentType: 'application/json',
                                 data: JSON.stringify({ id: data.id, releaseState: 0, approveMsg: message }),
                                 success: function (res) {
-                                    var index = layer.alert('保存成功！', {
-                                        title: '最终的提交信息'
-                                    }, function () {
-                                        // 关闭弹出层
-                                        layer.close(index);
-                                        table.reload('currentTableId');
-                                    });
+                                    // 关闭弹出层
+                                    layer.close(index);
+                                    layer.msg('审批完成！')
+                                    table.reload('currentTableId');
                                     return false;
                                 },
                             });

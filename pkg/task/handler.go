@@ -190,9 +190,12 @@ func Approve(c *gin.Context) {
 	if params["nowRelease"] == true {
 		content = fmt.Sprintf("【朱雀】发布单【%s】可立即发布", task.TaskName)
 	}
-	releaseSta := params["releaseState"].(float64)
-	if int(releaseSta) == 0 {
-		content = fmt.Sprintf("【朱雀】发布单【%s】当前不可发布，原因：%s", task.TaskName, task.ApproveMsg)
+	releaseSta, ok := params["releaseState"]
+	if ok {
+		rstate := releaseSta.(float64)
+		if int(rstate) == 0 {
+			content = fmt.Sprintf("【朱雀】发布单【%s】当前不可发布，原因：%s", task.TaskName, task.ApproveMsg)
+		}
 	}
 	bodyObj := make(map[string]interface{})
 	bodyObj["msgtype"] = "text"
