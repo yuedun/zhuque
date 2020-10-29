@@ -109,18 +109,18 @@ In the current folder a `ecosystem.json` file will be created.
     "name"      : "WEB",
     "script"    : "web.js"
   }],
-  // Deployment part
+  // 部署部分
   // Here you describe each environment
   "deploy" : {
     "production" : {
       "user" : "node",
-      // Multi host is possible, just by passing IPs/hostname as an array
+      // 服务器集群
       "host" : ["212.83.163.1", "212.83.163.2", "212.83.163.3"],
-      // Branch
+      // 分支
       "ref"  : "origin/master",
-      // Git repository to clone
+      // Git 地址
       "repo" : "git@github.com:repo.git",
-      // Path of the application on target servers
+      // 应用在服务器上的地址
       "path" : "/var/www/production",
       // Can be used to give options in the format used in the configura-
       // tion file.  This is useful for specifying options for which there
