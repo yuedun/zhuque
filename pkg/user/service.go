@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -75,17 +76,16 @@ func (u *userService) CreateUser(user *User) (err error) {
 }
 
 // CreateUserProject 先查询是否存在，再创建
-func (u *userService) CreateUserProject(userProject *UserProject) (err error) {
-	err = u.mysql.Model("user_project").Where("user_id=? and project_id = ?", userProject.UserID, userProject.ProjectID).Find(&userProject).Error
+func (u *userService) CreateUserProject(search *UserProject) (err error) {
+	err = u.mysql.Model("user_project").Where("user_id=? and project_id = ?", search.UserID, search.ProjectID).Find(search).Error
 	if err != nil {
-		return err
-	}
-	if userProject.UserID != 0 && userProject.ProjectID != 0 {
+		log.Println(">>>>>>>>>无数据", err)
+		err = u.mysql.Create(search).Error
+		if err != nil {
+			return err
+		}
+	} else {
 		return errors.New("用户已存在该项目！")
-	}
-	err = u.mysql.Create(userProject).Error
-	if err != nil {
-		return err
 	}
 	return nil
 }
