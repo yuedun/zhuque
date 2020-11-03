@@ -2,16 +2,16 @@ package permission
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/yuedun/zhuque/db"
 
 	"github.com/gin-gonic/gin"
 )
 
-//List
+//List 获取所有权限列表
 func List(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -20,21 +20,15 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
-	userId, _ := strconv.Atoi(c.Query("userId"))
-	// page, _ := strconv.Atoi(c.Query("page"))
-	// limit, _ := strconv.Atoi(c.Query("limit"))
-	// offset := (page - 1) * limit
-	// var permission Permission
 	serverService := NewService(db.SQLLite)
-	list, count, err := serverService.GetPermissionList(userId)
+	list, err := serverService.GetPermissionList()
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code":  0,
-		"count": count,
-		"data":  list,
-		"msg":   "ok",
+		"code": 0,
+		"data": list,
+		"msg":  "ok",
 	})
 }
 
@@ -70,7 +64,6 @@ func CreatePermission(c *gin.Context) {
 	if err := c.ShouldBind(&permission); err != nil {
 		panic(err)
 	}
-	permission.CreatedAt = time.Now()
 	err := permissionService.CreatePermission(&permission)
 	if err != nil {
 		fmt.Println("err:", err)
@@ -96,7 +89,6 @@ func UpdatePermission(c *gin.Context) {
 	if err := c.ShouldBind(&permission); err != nil {
 		panic(err)
 	}
-	permission.UpdatedAt = time.Now()
 	err := permissionService.UpdatePermission(permissionID, &permission)
 	if err != nil {
 		panic(err)
@@ -120,16 +112,39 @@ func DeletePermission(c *gin.Context) {
 	})
 }
 
-//GetByUserID
-func GetByRole(c *gin.Context) {
+//RolePermissions
+func RolePermissions(c *gin.Context) {
 	roleID, _ := strconv.Atoi(c.Param("roleid"))
 	permissionService := NewService(db.SQLLite)
-	list, err := permissionService.GetByRole(roleID)
+	//所有权限
+	allPermissionList, err := permissionService.GetPermissionListForRole()
+	//角色已分配权限
+	rolePermissionList, err := permissionService.GetByRole(roleID)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
+
+	for _, per := range allPermissionList {
+		// permissionTree.Field = per.MenuURL
+		per.Spread = true
+		for _, rp := range rolePermissionList {
+			if per.ID == rp.ID {
+				per.Checked = true
+				// break
+			}
+
+			for _, child := range per.Children {
+				log.Println("per.Children>>>>>>>>>>>>>", rp.ID, child.ID)
+				if rp.ID == child.ID {
+					child.Checked = true
+					per.Checked = false
+					//layui tree插件父节点选中会忽略子节点是否选中，默认全选中。但子节点选中父节点也会选中，所以子节点选中时设置父节点为不选中，以免子节点全部选中。
+				}
+			}
+		}
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
-		"data":    list,
+		"data":    allPermissionList,
 	})
 }

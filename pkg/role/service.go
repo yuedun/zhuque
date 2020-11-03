@@ -14,6 +14,7 @@ type (
 	RoleService interface {
 		GetRoleInfo(search Role) (role Role, err error)
 		GetRoleList(page, limit int, search Role) (list []Role, count int, err error)
+		RolePermissions(roleID int) (list []Role, err error)
 		CreateRole(role *Role) (err error)
 		UpdateRole(ID int, role *Role) (err error)
 		DeleteRole(ID int) (err error)
@@ -45,6 +46,14 @@ func (u *roleService) GetRoleList(page, limit int, search Role) (list []Role, co
 		return list, count, err
 	}
 	return list, count, nil
+}
+
+func (u *roleService) RolePermissions(roleID int) (list []Role, err error) {
+	err = u.db.Model("role").Order("role_num asc").Find(&list).Error
+	if err != nil {
+		return list, err
+	}
+	return list, nil
 }
 
 func (u *roleService) CreateRole(role *Role) (err error) {

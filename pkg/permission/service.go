@@ -1,8 +1,6 @@
 package permission
 
 import (
-	"fmt"
-	"log"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -16,7 +14,8 @@ type (
 	*/
 	PermissionService interface {
 		GetPermissionInfo(search Permission) (permission Permission, err error)
-		GetPermissionList(userId int) (list []Permission, count int, err error)
+		GetPermissionList() (list []Permission, err error)
+		GetPermissionListForRole() (list []*PermissionTree, err error)
 		CreatePermission(permission *Permission) (err error)
 		UpdatePermission(ID int, permission *Permission) (err error)
 		DeletePermission(ID int) (err error)
@@ -43,17 +42,48 @@ func (u *permissionService) GetPermissionInfo(search Permission) (permission Per
 	return permission, nil
 }
 
-func (u *permissionService) GetPermissionList(userID int) (list []Permission, count int, err error) {
-	err = u.db.Model("permission").Order("order_number asc").Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+func (u *permissionService) GetPermissionList() (list []Permission, err error) {
+	err = u.db.Model("permission").Order("order_number asc").Find(&list).Error
 	if err != nil {
-		return list, count, err
+		return list, err
 	}
-	return list, count, nil
+	return list, nil
+}
+
+func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, err error) {
+	list := []Permission{}
+	//查询所有父级菜单
+	err = u.db.Model("permission").Where("is_menu = 0 AND parent_id > 0").Find(&list).Error
+	for _, pMenu := range list {
+		permis := new(PermissionTree)
+		permis.ID = pMenu.ID
+		permis.Title = pMenu.Title
+		permis.Field = pMenu.Authority
+		permisChildrenList := []Permission{}
+		//获取子菜单
+		err = u.db.Model("permission").Select("id, title").Where("is_menu = 1 AND parent_id = ?", pMenu.ID).Find(&permisChildrenList).Error
+		if err != nil {
+			return nil, err
+		}
+		treeChildrenList := []*PermissionTreeChildren{}
+		for _, children := range permisChildrenList {
+			treeChildre := PermissionTreeChildren{}
+			treeChildre.ID = children.ID
+			treeChildre.Title = children.Title
+			treeChildre.Field = children.Authority
+			treeChildrenList = append(treeChildrenList, &treeChildre)
+		}
+		permis.Children = treeChildrenList
+		tree = append(tree, permis)
+	}
+	if err != nil {
+		return tree, err
+	}
+	return tree, nil
 }
 
 func (u *permissionService) CreatePermission(permission *Permission) (err error) {
 	err = u.db.Create(permission).Error
-	fmt.Println(permission)
 	if err != nil {
 		return err
 	}
@@ -81,11 +111,9 @@ func (u *permissionService) GetByRole(roleID int) (list []Permission, err error)
 	role := new(role.Role)
 	err = u.db.Model("role").Where("id = ?", roleID).Find(role).Error
 	permissions := strings.Split(role.Permissions, ",")
-	log.Println(">>>>>>>>>>permissions", permissions)
 	for _, pID := range permissions {
 		permis := Permission{}
-		log.Println(">>>>>>>>>>pid", pID)
-		err = u.db.Model("permission").Select("id, authority_name").Where("id = ?", pID).Find(&permis).Error
+		err = u.db.Model("permission").Select("id, title").Where("id = ?", pID).Find(&permis).Error
 		if err != nil {
 			return nil, err
 		}

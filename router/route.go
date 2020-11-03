@@ -77,10 +77,10 @@ func Register(router *gin.Engine) {
 	permissionRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		permissionRouter.GET("/list", permission.List)
+		permissionRouter.GET("/role-permissions/:roleid", permission.RolePermissions)
 		permissionRouter.POST("/create", permission.CreatePermission)
 		permissionRouter.PUT("/update/:id", permission.UpdatePermission)
 		permissionRouter.DELETE("/:id", permission.DeletePermission)
-		permissionRouter.GET("/get-by-role/:roleid", permission.GetByRole)
 	}
 	//角色管理
 	roleRouter := router.Group("/role")

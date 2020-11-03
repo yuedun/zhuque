@@ -18,10 +18,9 @@ func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
 		// 请求前
-		log.Print("请求前")
-
+		s := string([]rune(c.HandlerName())[29:])
+		log.Print("请求前", s)
 		c.Next()
-
 		// 请求后
 		latency := time.Since(t)
 		// 获取发送的 status
