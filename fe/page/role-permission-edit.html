@@ -139,7 +139,34 @@
                     tree.reload('demoId1', {
 
                     });
-
+                }, save: function () {
+                    var roleid = $('input[name=roleID]').val();
+                    var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+                    var permissionsArry = [];
+                    checkedData.forEach(element => {
+                        permissionsArry.push(element.id);//父级菜单
+                        element.children.forEach(element2 => {
+                            permissionsArry.push(element2.id);//子菜单
+                        });
+                    });
+                    console.log(permissionsArry);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/role/set-permission',
+                        data: JSON.stringify({
+                            id: parseInt(roleid),
+                            permissions: permissionsArry.toString()
+                        }),
+                        contentType: "application/json",
+                        dataType: "json",
+                        success: function (res) {
+                            //重载实例
+                            layer.msg('设置成功')
+                        },
+                        error: function (err) {
+                            layer.msg('获取配置失败！');
+                        }
+                    });
                 }
             });
         });

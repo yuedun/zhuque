@@ -79,7 +79,7 @@ func CreateRole(c *gin.Context) {
 	})
 }
 
-//SetPermission
+//SetPermission 管理员设置用户权限
 func SetPermission(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {

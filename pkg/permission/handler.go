@@ -128,6 +128,28 @@ func GetByRole(c *gin.Context) {
 	if err != nil {
 		fmt.Println("err:", err)
 	}
+<<<<<<< Updated upstream
+=======
+
+	for _, per := range allPermissionList {
+		// permissionTree.Field = per.MenuURL
+		per.Spread = true
+		for _, rp := range rolePermissionList {
+			if per.ID == rp.ID {
+				per.Checked = true
+				// break
+			}
+
+			for _, child := range per.Children {
+				if rp.ID == child.ID {
+					child.Checked = true
+					per.Checked = false
+					//layui tree插件父节点选中会忽略子节点是否选中，默认全选中。但子节点选中父节点也会选中，所以子节点选中时设置父节点为不选中，以免子节点全部选中。
+				}
+			}
+		}
+	}
+>>>>>>> Stashed changes
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
 		"data":    list,

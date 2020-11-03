@@ -8,6 +8,7 @@ import (
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/util"
 
 	"github.com/gin-gonic/gin"
@@ -153,6 +154,9 @@ func Init(c *gin.Context) {
 		fmt.Println("err:", err)
 		panic(err)
 	}
+
+	permissionsService := permission.NewService(db.SQLLite)
+	rolePermissions, _ := permissionsService.GetPermissionForSide(userObj.RoleNum)
 	c.JSON(http.StatusOK,
 		map[string]interface{}{
 			"homeInfo": map[string]string{
@@ -167,7 +171,7 @@ func Init(c *gin.Context) {
 			"userInfo": map[string]interface{}{
 				"username": userObj.UserName,
 				"userID":   userObj.ID,
-				"role":     userObj.Role,
+				"role":     userObj.RoleNum,
 			},
 			"menuInfo": []map[string]interface{}{
 				{
@@ -175,56 +179,57 @@ func Init(c *gin.Context) {
 					"icon":   "fa fa-address-book",
 					"href":   "",
 					"target": "_self",
-					"child": []map[string]interface{}{
-						{
-							"title":  "快捷发布",
-							"href":   "page/quick-release.html",
-							"icon":   "fa fa-bolt",
-							"target": "_self",
-						},
-						{
-							"title":  "快捷发布-多项目",
-							"href":   "page/quick-release-v2.html",
-							"icon":   "fa fa-bolt",
-							"target": "_self",
-						},
-						{
-							"title":  "发布记录",
-							"href":   "page/deploy.html",
-							"icon":   "fa fa-tasks",
-							"target": "_self",
-						},
-						{
-							"title":  "命令部署",
-							"href":   "page/task.html",
-							"icon":   "fa fa-adjust",
-							"target": "_self",
-						},
-						{
-							"title":  "项目管理",
-							"href":   "page/projects.html",
-							"icon":   "fa fa-navicon",
-							"target": "_self",
-						},
-						{
-							"title":  "用户管理",
-							"href":   "page/users.html",
-							"icon":   "fa fa-users",
-							"target": "_self",
-						},
-						{
-							"title":  "角色管理",
-							"href":   "page/role.html",
-							"icon":   "fa fa-user-circle-o",
-							"target": "_self",
-						},
-						{
-							"title":  "菜单管理",
-							"href":   "page/menu.html",
-							"icon":   "fa fa-list-alt",
-							"target": "_self",
-						},
-					},
+					"child":  rolePermissions,
+					// []map[string]interface{}{
+					// 	{
+					// 		"title":  "快捷发布",
+					// 		"href":   "page/quick-release.html",
+					// 		"icon":   "fa fa-bolt",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "快捷发布-多项目",
+					// 		"href":   "page/quick-release-v2.html",
+					// 		"icon":   "fa fa-bolt",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "发布记录",
+					// 		"href":   "page/deploy.html",
+					// 		"icon":   "fa fa-tasks",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "命令部署",
+					// 		"href":   "page/task.html",
+					// 		"icon":   "fa fa-adjust",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "项目管理",
+					// 		"href":   "page/projects.html",
+					// 		"icon":   "fa fa-navicon",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "用户管理",
+					// 		"href":   "page/users.html",
+					// 		"icon":   "fa fa-users",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "角色管理",
+					// 		"href":   "page/role.html",
+					// 		"icon":   "fa fa-user-circle-o",
+					// 		"target": "_self",
+					// 	},
+					// 	{
+					// 		"title":  "权限管理",
+					// 		"href":   "page/menu.html",
+					// 		"icon":   "fa fa-list-alt",
+					// 		"target": "_self",
+					// 	},
+					// },
 				},
 			},
 		})

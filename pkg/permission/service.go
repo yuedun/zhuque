@@ -21,6 +21,7 @@ type (
 		UpdatePermission(ID int, permission *Permission) (err error)
 		DeletePermission(ID int) (err error)
 		GetByRole(roleID int) (list []Permission, err error)
+		GetPermissionForSide(roleNum int) (list []Permission, err error)
 	}
 )
 
@@ -49,6 +50,21 @@ func (u *permissionService) GetPermissionList(userID int) (list []Permission, co
 		return list, count, err
 	}
 	return list, count, nil
+}
+
+// GetPermissionForSide 侧边栏菜单
+func (u *permissionService) GetPermissionForSide(roleNum int) (menus []Permission, err error) {
+	// roleService := role.NewService(db.SQLLite)
+	// roleObj := role.Role{
+	// 	RoleNum: roleNum,
+	// }
+	// roleResult, _ := roleService.GetRoleInfo(roleObj)
+	//查询所有父级菜单
+	err = u.db.Model("permission").Where("is_menu = 0 AND parent_id > 0").Find(&menus).Error
+	if err != nil {
+		return menus, err
+	}
+	return menus, nil
 }
 
 func (u *permissionService) CreatePermission(permission *Permission) (err error) {
