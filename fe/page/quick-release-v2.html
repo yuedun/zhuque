@@ -58,7 +58,7 @@
 
             {{#  
                 var releaseDate = function(){
-                    return (moment(d.updatedAt).add(10, 'm') < moment())|| d.nowRelease;
+                    return (moment(d.updatedAt).add(5, 'm') < moment())|| d.nowRelease;
                 }; 
                 var approve = function(){
                     return sessionStorage.getItem('role') == 1;

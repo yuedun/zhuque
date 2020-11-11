@@ -107,7 +107,7 @@ func Server(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布。", task.TaskName)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在10分钟后发布。提交人：%s", task.TaskName, task.Username)
 		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
@@ -121,7 +121,7 @@ func Server(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
-			"data":    "10分钟后可发布",
+			"data":    "5分钟后可发布",
 		})
 	} else {
 		cmdOut, err = taskServer.ReleaseTask(task.ID)
