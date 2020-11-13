@@ -36,7 +36,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">权限名称</label>
             <div class="layui-input-inline">
-                <input type="text" name="authorityName" required lay-verify="required" placeholder="权限名称" autocomplete="off"
+                <input type="text" name="title" required lay-verify="required" placeholder="权限名称" autocomplete="off"
                     class="layui-input">
             </div>
         </div>
@@ -97,14 +97,14 @@
             treetable.render({
                 treeColIndex: 1,
                 treeSpid: -1,
-                treeIdName: 'authorityId',
+                treeIdName: 'id',
                 treePidName: 'parentId',
                 elem: '#munu-table',
                 url: '/permission/list',
                 page: false,
                 cols: [[
                     { type: 'numbers' },
-                    { field: 'authorityName', minWidth: 200, title: '权限名称' },
+                    { field: 'title', minWidth: 200, title: '权限名称' },
                     { field: 'authority', title: '权限标识' },
                     { field: 'menuUrl', title: '菜单url' },
                     { field: 'orderNumber', width: 80, align: 'center', title: '排序号' },
@@ -149,13 +149,13 @@
                         shade: 0.2,
                         maxmin: true,
                         shadeClose: true,
-                        area: ['30%', '50%'],
+                        area: ['30%', '75%'],
                         content: $('#edit-menu'),
                         success: function (layero, index) {
                             // var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
                             //获取子页面的元素，进行数据渲染
                             $(layero).find("input[name=authorityId]").val(data.authorityId);
-                            $(layero).find("input[name=authorityName]").val(data.authorityName);
+                            $(layero).find("input[name=title]").val(data.title);
                             $(layero).find('input[name=orderNumber]').val(data.orderNumber);
                             $(layero).find('input[name=menuUrl]').val(data.menuUrl);
                             $(layero).find('input[name=menuIcon]').val(data.menuIcon);

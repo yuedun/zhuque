@@ -18,8 +18,8 @@
                 <pre>
                     <code>
 # 初始化，会在指定目录拉取git仓库
-$ pm2 deploy &lt;configuration_file&gt; &lt;environment&gt; setup 
-# e.g., pm2 deploy ecosystem.config.js production setup
+$ pm2 deploy projects/&lt;project_name&gt; &lt;environment&gt; setup 
+# e.g., pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production setup
 
 # 把发布机上的文件传到对应应用服务器上
 $ scp projects/&lt;project_name&gt;/ecosystem.config.js admin@&lt;ip&gt;:/data/www/&lt;应用服务器目录&gt;/current
@@ -46,7 +46,10 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
                     <div class="layui-input-block">
                         <input type="text" name="cmd"
                             value="pm2 deploy projects/test-deploy/ecosystem.config.js production --force"
-                            lay-verify="cmd" autocomplete="off" placeholder="请输入发布命令" class="layui-input">
+                            lay-verify="cmd" autocomplete="off" placeholder="请输入发布命令" class="layui-input" list="cache">
+                        <datalist id="cache">
+                            
+                        </datalist>
                     </div>
                 </div>
 
@@ -63,39 +66,20 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
     <script>
-        layui.use(['form', 'layedit', 'laydate', 'jquery'], function () {
+        layui.use(['form', 'jquery'], function () {
             var form = layui.form
                 , layer = layui.layer
-                , layedit = layui.layedit
-                , $ = layui.jquery
-                , laydate = layui.laydate;
+                , $ = layui.jquery;
 
-            //日期
-            laydate.render({
-                elem: '#date'
-            });
-            laydate.render({
-                elem: '#date1'
-            });
-
-            //创建一个编辑器
-            var editIndex = layedit.build('LAY_demo_editor');
-
-            //自定义验证规则
-            form.verify({
-                title: function (value) {
-                    if (value.length < 5) {
-                        return '标题至少得5个字符啊';
-                    }
-                }
-                , pass: [
-                    /^[\S]{6,12}$/
-                    , '密码必须6到12位，且不能出现空格'
-                ]
-                , content: function (value) {
-                    layedit.sync(editIndex);
-                }
-            });
+            var cacheList = localStorage.getItem('cmdCacheList');
+            if (cacheList && cacheList.length > 0) {
+                cacheList = JSON.parse(cacheList);
+                var dataList = ''
+                cacheList.forEach(element => {
+                    dataList += '<option value="' + element + '">';
+                });
+                $('#cache').html(dataList);
+            }
 
             //监听提交
             form.on('submit(demo1)', function (data) {
@@ -114,6 +98,16 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
                         , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
                     });
                     layer.close(index);
+                    try {
+                        if (cacheList && cacheList.length > 0) {
+                            cacheList.push(data.field.cmd)
+                        } else {
+                            cacheList = [data.field.cmd];
+                        }
+                        localStorage.setItem("cmdCacheList", JSON.stringify(cacheList))
+                    } catch (error) {
+
+                    }
                 }).fail(function (err) {
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });

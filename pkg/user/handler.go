@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -301,6 +302,39 @@ func DeleteUserProject(c *gin.Context) {
 	upID, _ := strconv.Atoi(c.Param("id"))
 	userService := NewService(db.SQLLite)
 	err := userService.DeleteUserProject(upID)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+	})
+}
+
+//ChangePassword 修改密码
+func ChangePassword(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	claims := jwt.ExtractClaims(c)
+	userID64 := claims["user_id"].(float64)
+	userID := int(userID64)
+	user := new(User)
+	user.ID = userID
+	oldPwd := c.PostForm("old_password")
+	userService := NewService(db.SQLLite)
+	uresult, err := userService.GetUserInfo(*user)
+	if err != nil {
+		panic(err)
+	}
+	if util.GetMD5(oldPwd) != uresult.Password {
+		panic(errors.New("原始密码不正确！"))
+	}
+	user.Password = util.GetMD5(c.PostForm("new_password"))
+	err = userService.UpdateUser(userID, user)
 	if err != nil {
 		fmt.Println("err:", err)
 	}

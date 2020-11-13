@@ -57,8 +57,9 @@ func WaitList(c *gin.Context) {
 	}()
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	from := c.Query("from")
 	offset := (page - 1) * limit
-	task := Task{ReleaseState: 2}
+	task := Task{ReleaseState: 2, From: from}
 	serverService := NewService(db.SQLLite)
 	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {

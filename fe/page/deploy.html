@@ -53,9 +53,9 @@
                     <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
                 </div>
             </script>
-            
+
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-            
+
         </div>
     </div>
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
@@ -76,7 +76,7 @@
                 }],
                 cols: [[
                     { type: "checkbox" },
-                    { field: 'id', title: 'ID', sort: true },
+                    { field: 'id', title: 'ID', width: 80, sort: true },
                     { field: 'taskName', title: '上线单' },
                     { field: 'project', title: '项目', sort: true },
                     { field: 'username', title: '用户名' },
@@ -89,7 +89,7 @@
                             var html = '';
                             if (d.releaseState == 1) {
                                 html = '<span class="layui-badge layui-bg-green">成功</span>';
-                            } else if(d.releaseState == 0){
+                            } else if (d.releaseState == 0) {
                                 html = '<span class="layui-badge">失败</span>';
                             } else {
                                 html = '<span class="layui-badge layui-bg-blue">待发布</span>';

@@ -28,7 +28,9 @@
                     <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
                     <button type="button" class="layui-btn layui-btn-sm" lay-demo="setChecked">勾选指定节点</button>
                     <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button>
+                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="save">确定</button>
                 </div>
+                <input type="hidden" name="roleID">
                 <div id="tree"></div>
             </div>
         </div>
@@ -44,74 +46,77 @@
             var util = layui.util;
 
             //模拟数据
-            var data = [{
-                title: '一级1',
-                id: 1,
-                field: 'name1',
-                checked: true,
-                spread: true,
-                children: [{
-                    title: '二级1-1 可允许跳转',
-                    id: 3,
-                    field: 'name11',
-                    href: 'https://www.layui.com/'
-                },
-                {
-                    title: '二级1-2',
-                    id: 4,
-                    spread: true
-                },
-                {
-                    title: '二级1-3',
-                    id: 20,
-                    field: ''
-                }]
-            },
-            {
-                title: '一级2',
-                id: 2,
-                field: '',
-                spread: true,
-                children: [{
-                    title: '二级2-1',
-                    id: 5,
-                    field: '',
-                    spread: true
-                },
-                {
-                    title: '二级2-2',
-                    id: 6,
-                    field: ''
-                }]
-            },
-            {
-                title: '一级3',
-                id: 16,
-                field: '',
-                children: [{
-                    title: '二级3-1',
-                    id: 17,
-                    field: '',
-                    fixed: true
-                },
-                {
-                    title: '二级3-2',
-                    id: 27,
-                    field: ''
-                }]
-            }];
+            // var data = [{
+            //     title: '一级1',
+            //     id: 1,
+            //     field: 'name1',
+            //     checked: true,
+            //     spread: true,
+            //     children: [{
+            //         title: '二级1-1 可允许跳转',
+            //         id: 3,
+            //         field: 'name11',
+            //         href: 'https://www.layui.com/'
+            //     },
+            //     {
+            //         title: '二级1-2',
+            //         id: 4,
+            //         spread: true
+            //     },
+            //     {
+            //         title: '二级1-3',
+            //         id: 20,
+            //         field: ''
+            //     }]
+            // },
+            // {
+            //     title: '一级2',
+            //     id: 2,
+            //     field: '',
+            //     spread: true,
+            //     children: [{
+            //         title: '二级2-1',
+            //         id: 5,
+            //         field: '',
+            //         spread: true
+            //     },
+            //     {
+            //         title: '二级2-2',
+            //         id: 6,
+            //         field: ''
+            //     }]
+            // },
+            // {
+            //     title: '一级3',
+            //     id: 16,
+            //     field: '',
+            //     spread: true,
+            //     children: [{
+            //         title: '二级3-1',
+            //         id: 17,
+            //         field: '',
+            //         fixed: true
+            //     },
+            //     {
+            //         title: '二级3-2',
+            //         id: 27,
+            //         field: '',
+            //         checked: true
+            //     }]
+            // }];
 
             //初始化数据
             (function init() {
-                var id = $('input[name=id]').val()
+                var roleid = $('input[name=roleID]').val();
+                //1.获取所有权限，2.获取该角色权限，3.渲染
                 $.ajax({
                     type: 'GET',
-                    url: '/permission/get-by-userID/' + id,
+                    url: '/permission/role-permissions/' + roleid,
                     success: function (res) {
-                        //渲染
+                        //1.获取所有权限，2.获取该角色权限，3.渲染
                         tree.render({
                             elem: '#tree'
-                            , data: data
+                            , data: res.data
                             , showCheckbox: true  //是否显示复选框
                             , id: 'demoId1'
                             , isJump: true //是否允许点击节点时弹出新窗口跳转
@@ -140,6 +145,7 @@
 
                     });
                 }, save: function () {
+<<<<<<< HEAD
                     var roleid = $('input[name=roleID]').val();
                     var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
                     var permissionsArry = [];
@@ -162,6 +168,20 @@
                         success: function (res) {
                             //重载实例
                             layer.msg('设置成功')
+=======
+                    $.ajax({
+                        type: 'GET',
+                        url: '/role/set-permissions/' + roleid,
+                        success: function (res) {
+                            //1.获取所有权限，2.获取该角色权限，3.渲染
+                            tree.render({
+                                elem: '#tree'
+                                , data: res.data
+                                , showCheckbox: true  //是否显示复选框
+                                , id: 'demoId1'
+                                , isJump: true //是否允许点击节点时弹出新窗口跳转
+                            });
+>>>>>>> master
                         },
                         error: function (err) {
                             layer.msg('获取配置失败！');
