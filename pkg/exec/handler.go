@@ -108,7 +108,7 @@ func Server(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布。提交人：%s", task.TaskName, task.Username)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布%s。提交人：%s", task.TaskName, task.Project, task.Username)
 		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
@@ -189,7 +189,7 @@ func ServerV2(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布。提交人：%s", task.TaskName, task.Username)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布%s。提交人：%s", task.TaskName, task.Project, task.Username)
 		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
