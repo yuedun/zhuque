@@ -13,6 +13,7 @@ type Task struct {
 	NowRelease   bool      `json:"nowRelease" gorm:"default:false"` // 是否可以立即发布，需要等待n分钟后发布，该值由管理员审批操作
 	Cmd          string    `json:"cmd"`                             // 发布命令
 	ApproveMsg   string    `json:"approveMsg"`                      //审批意见
+	From         string    `json:"from"`                            //单项目发布single，多项目发布multi
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
