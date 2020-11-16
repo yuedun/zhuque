@@ -28,12 +28,13 @@
                 <div class="layui-btn-group">
                     <button class="layui-btn" id="btn-expand">全部展开</button>
                     <button class="layui-btn layui-btn-normal" id="btn-fold">全部折叠</button>
+                    <button class="layui-btn" id="btn-add">添加菜单</button>
                 </div>
                 <table id="munu-table" class="layui-table" lay-filter="munu-table"></table>
             </div>
         </div>
     </div>
-    <form class="layui-form" id="edit-menu" action="" style="display: none;">
+    <form class="layui-form" id="edit-menu" action="" style="display: none;" lay-filter="edit-menu">
         <div class="layui-form-item">
             <label class="layui-form-label">权限名称</label>
             <div class="layui-input-inline">
@@ -74,15 +75,63 @@
             <div class="layui-input-inline">
                 <select name="menuType">
                     <option value=""></option>
-                    <option value="1">菜单</option>
-                    <option value="2">按钮</option>
+                    <option value="0">菜单</option>
+                    <option value="1">按钮</option>
                 </select>
             </div>
         </div>
+    </form>
+    <form class="layui-form" id="add-menu" action="" style="display: none;" lay-filter="add-menu">
         <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
-                <button class="layui-btn" id="cancleBtn">取消</button>
+            <label class="layui-form-label">权限名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="title" required lay-verify="required" placeholder="权限名称" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">父菜单id</label>
+            <div class="layui-input-inline">
+                <input type="text" name="parentId" required lay-verify="required" placeholder="父菜单id" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限标识</label>
+            <div class="layui-input-inline">
+                <input type="text" name="authority" required lay-verify="required" placeholder="权限标识" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单url</label>
+            <div class="layui-input-inline">
+                <input type="text" name="href" required lay-verify="required" placeholder="菜单url" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">图标</label>
+            <div class="layui-input-inline">
+                <input type="text" name="icon" required lay-verify="required" placeholder="图标" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input type="number" name="orderNumber" required lay-verify="required" placeholder="排序"
+                    autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline">
+                <select name="menuType">
+                    <option value=""></option>
+                    <option value="0">菜单</option>
+                    <option value="1">按钮</option>
+                </select>
             </div>
         </div>
     </form>
@@ -95,10 +144,11 @@
     <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
     <script src="../js/lay-config.js?v=1.0.4" charset="utf-8"></script>
     <script>
-        layui.use(['table', 'treetable'], function () {
+        layui.use(['table', 'treetable', 'form'], function () {
             var $ = layui.jquery;
             var table = layui.table;
             var treetable = layui.treetable;
+            var form = layui.form;
 
             // 渲染表格
             layer.load(2);
@@ -112,13 +162,13 @@
                 // url: '../api/menus.json',
                 page: false,
                 cols: [[
-                    { type: 'numbers' },
+                    { field: 'id', title: '菜单ID', width: 80 },
                     { field: 'title', minWidth: 200, title: '权限名称' },
                     { field: 'authority', title: '权限标识' },
                     { field: 'href', title: '菜单url' },
                     {
                         field: 'icon', title: '图标', align: 'center', templet: function (d) {
-                            return '<i class="' + d.icon + '"></i>'+d.icon
+                            return '<i class="' + d.icon + '"></i>' + d.icon
                         }
                     },
                     { field: 'orderNumber', width: 80, align: 'center', title: '排序号' },
@@ -148,6 +198,39 @@
             $('#btn-fold').click(function () {
                 treetable.foldAll('#munu-table');
             });
+            $('#btn-add').click(function () {
+                var index = layer.open({
+                    title: '添加权限',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['30%', '55%'],
+                    content: $('#add-menu'),
+                    btn: ['确定', '取消'],
+                    yes: function (index, layero) {
+                        var formdata = form.val('add-menu');
+                        formdata.orderNumber = parseInt(formdata.orderNumber);
+                        formdata.menuType = parseInt(formdata.menuType);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/permission/create',
+                            contentType: 'application/json',
+                            data: JSON.stringify(formdata),
+                            success: function (res) {
+                                layer.msg('添加成功！');
+                                layer.close(index);
+                            },
+                            error: function (err) {
+                                layer.msg(err.statusText);
+                            }
+                        });
+                    },
+                    cancel: function () {
+                        layer.close(index);
+                    }
+                });
+            });
 
             //监听工具条
             table.on('tool(munu-table)', function (obj) {
@@ -163,30 +246,47 @@
                         shade: 0.2,
                         maxmin: true,
                         shadeClose: true,
-                        area: ['30%', '75%'],
+                        area: ['30%', '55%'],
                         content: $('#edit-menu'),
+                        btn: ['确定', '取消'],
+                        yes: function (index, layero) {
+                            var formdata = form.val('edit-menu');
+                            formdata.orderNumber = parseInt(formdata.orderNumber);
+                            formdata.menuType = parseInt(formdata.menuType);
+                            $.ajax({
+                                type: 'PUT',
+                                url: '/permission/update/' + data.id,
+                                contentType: 'application/json',
+                                data: JSON.stringify(formdata),
+                                success: function (res) {
+                                    layer.msg('修改成功！');
+                                    layer.close(index);
+                                },
+                                error: function (err) {
+                                    layer.msg(err.statusText);
+                                }
+                            });
+                        },
+                        cancel: function () {
+                            layer.close(index);
+                        },
                         success: function (layero, index) {
                             // var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
                             //获取子页面的元素，进行数据渲染
                             $(layero).find("input[name=id]").val(data.id);
                             $(layero).find("input[name=title]").val(data.title);
+                            $(layero).find("input[name=parentId]").val(data.parentId);
                             $(layero).find('input[name=orderNumber]').val(data.orderNumber);
                             $(layero).find('input[name=href]').val(data.href);
                             $(layero).find('input[name=icon]').val(data.icon);
                             $(layero).find('input[name=authority]').val(data.authority);
                             $(layero).find('input[name=checked]').val(data.checked);
-                            $(layero).find('input[name=menuType]').val(data.menuType);
+                            $(layero).find('select[name=menuType]').val(data.menuType);
                             $(layero).find('input[name=parentId]').val(data.parentId);
+                            form.render('select');//select回显
                         }
                     });
                 }
-            });
-
-            // 监听取消
-            $('#cancleBtn').on("click", function () {
-                var iframeIndex = parent.layer.getFrameIndex(window.name);
-                parent.layer.close(iframeIndex);
-                return false;
             });
         });
     </script>
