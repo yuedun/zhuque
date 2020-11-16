@@ -36,7 +36,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">角色</label>
             <div class="layui-input-block">
-                <select name="role">
+                <select name="roleNum">
                     <option value=""></option>
                     <option value="1">超管</option>
                     <option value="2">管理员</option>
@@ -60,8 +60,8 @@
 
             //监听提交
             form.on('submit(saveBtn)', function (data) {
-                data.field.role = $('select[name=role]').val();
-                data.field.role = parseInt(data.field.role);
+                data.field.roleNum = $('select[name=roleNum]').val();
+                data.field.roleNum = parseInt(data.field.roleNum);
                 var id = data.field.id;
                 delete data.field.id;
                 $.ajax({

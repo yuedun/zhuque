@@ -55,7 +55,7 @@ func (u *permissionService) GetPermissionList() (list []Permission, err error) {
 func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, err error) {
 	list := []Permission{}
 	//查询所有父级菜单
-	err = u.db.Model("permission").Where("is_menu = 0 AND parent_id > 0").Find(&list).Error
+	err = u.db.Model("permission").Where("menu_type = 0 AND parent_id > 0").Find(&list).Error
 	for _, pMenu := range list {
 		permis := new(PermissionTree)
 		permis.ID = pMenu.ID
@@ -63,7 +63,7 @@ func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, 
 		permis.Field = pMenu.Authority
 		permisChildrenList := []Permission{}
 		//获取子菜单
-		err = u.db.Model("permission").Select("id, title").Where("is_menu = 1 AND parent_id = ?", pMenu.ID).Find(&permisChildrenList).Error
+		err = u.db.Model("permission").Select("id, title").Where("menu_type = 1 AND parent_id = ?", pMenu.ID).Find(&permisChildrenList).Error
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,15 @@ func (u *permissionService) CreatePermission(permission *Permission) (err error)
 }
 
 func (u *permissionService) UpdatePermission(ID int, permission *Permission) (err error) {
-	err = u.db.Model(permission).Where("id = ?", ID).Updates(permission).Error
+	upMap := map[string]interface{}{
+		"title":       permission.Title,
+		"orderNumber": permission.OrderNumber,
+		"href":        permission.Href,
+		"icon":        permission.Icon,
+		"authority":   permission.Authority,
+		"menuType":    permission.MenuType,
+	}
+	err = u.db.Model(Permission{}).Where("id = ?", ID).Updates(upMap).Error
 	if err != nil {
 		return err
 	}

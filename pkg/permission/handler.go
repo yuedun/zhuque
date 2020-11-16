@@ -2,7 +2,6 @@ package permission
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -112,7 +111,7 @@ func DeletePermission(c *gin.Context) {
 	})
 }
 
-//RolePermissions
+//RolePermissions 角色管理-分配权限
 func RolePermissions(c *gin.Context) {
 	roleID, _ := strconv.Atoi(c.Param("roleid"))
 	permissionService := NewService(db.SQLLite)
@@ -132,7 +131,6 @@ func RolePermissions(c *gin.Context) {
 				// break
 			}
 			for _, child := range per.Children {
-				log.Println("per.Children>>>>>>>>>>>>>", rp.ID, child.ID)
 				if rp.ID == child.ID {
 					child.Checked = true
 					per.Checked = false
