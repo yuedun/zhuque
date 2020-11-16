@@ -145,7 +145,6 @@
 
                     });
                 }, save: function () {
-<<<<<<< HEAD
                     var roleid = $('input[name=roleID]').val();
                     var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
                     var permissionsArry = [];
@@ -168,20 +167,6 @@
                         success: function (res) {
                             //重载实例
                             layer.msg('设置成功')
-=======
-                    $.ajax({
-                        type: 'GET',
-                        url: '/role/set-permissions/' + roleid,
-                        success: function (res) {
-                            //1.获取所有权限，2.获取该角色权限，3.渲染
-                            tree.render({
-                                elem: '#tree'
-                                , data: res.data
-                                , showCheckbox: true  //是否显示复选框
-                                , id: 'demoId1'
-                                , isJump: true //是否允许点击节点时弹出新窗口跳转
-                            });
->>>>>>> master
                         },
                         error: function (err) {
                             layer.msg('获取配置失败！');

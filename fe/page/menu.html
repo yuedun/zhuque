@@ -6,6 +6,7 @@
     <title>menu</title>
     <link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../css/public.css" media="all">
+    <link rel="stylesheet" href="../lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
     <style>
         .layui-btn:not(.layui-btn-lg):not(.layui-btn-sm):not(.layui-btn-xs) {
             height: 34px;
@@ -50,21 +51,28 @@
         <div class="layui-form-item">
             <label class="layui-form-label">菜单url</label>
             <div class="layui-input-inline">
-                <input type="text" name="menuUrl" required lay-verify="required" placeholder="菜单url" autocomplete="off"
+                <input type="text" name="href" required lay-verify="required" placeholder="菜单url" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">图标</label>
+            <div class="layui-input-inline">
+                <input type="text" name="icon" required lay-verify="required" placeholder="图标" autocomplete="off"
                     class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">排序</label>
             <div class="layui-input-inline">
-                <input type="number" name="orderNumber" required lay-verify="required" placeholder="排序" autocomplete="off"
-                    class="layui-input">
+                <input type="number" name="orderNumber" required lay-verify="required" placeholder="排序"
+                    autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">类型</label>
             <div class="layui-input-inline">
-                <select name="isMenu">
+                <select name="menuType">
                     <option value=""></option>
                     <option value="1">菜单</option>
                     <option value="2">按钮</option>
@@ -101,16 +109,22 @@
                 treePidName: 'parentId',
                 elem: '#munu-table',
                 url: '/permission/list',
+                // url: '../api/menus.json',
                 page: false,
                 cols: [[
                     { type: 'numbers' },
                     { field: 'title', minWidth: 200, title: '权限名称' },
                     { field: 'authority', title: '权限标识' },
-                    { field: 'menuUrl', title: '菜单url' },
+                    { field: 'href', title: '菜单url' },
+                    {
+                        field: 'icon', title: '图标', align: 'center', templet: function (d) {
+                            return '<i class="' + d.icon + '"></i>'+d.icon
+                        }
+                    },
                     { field: 'orderNumber', width: 80, align: 'center', title: '排序号' },
                     {
-                        field: 'isMenu', width: 80, align: 'center', templet: function (d) {
-                            if (d.isMenu == 1) {
+                        field: 'menuType', width: 80, align: 'center', templet: function (d) {
+                            if (d.menuType == 1) {
                                 return '<span class="layui-badge layui-bg-gray">按钮</span>';
                             }
                             if (d.parentId == -1) {
@@ -154,14 +168,14 @@
                         success: function (layero, index) {
                             // var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
                             //获取子页面的元素，进行数据渲染
-                            $(layero).find("input[name=authorityId]").val(data.authorityId);
+                            $(layero).find("input[name=id]").val(data.id);
                             $(layero).find("input[name=title]").val(data.title);
                             $(layero).find('input[name=orderNumber]').val(data.orderNumber);
-                            $(layero).find('input[name=menuUrl]').val(data.menuUrl);
-                            $(layero).find('input[name=menuIcon]').val(data.menuIcon);
+                            $(layero).find('input[name=href]').val(data.href);
+                            $(layero).find('input[name=icon]').val(data.icon);
                             $(layero).find('input[name=authority]').val(data.authority);
                             $(layero).find('input[name=checked]').val(data.checked);
-                            $(layero).find('input[name=isMenu]').val(data.isMenu);
+                            $(layero).find('input[name=menuType]').val(data.menuType);
                             $(layero).find('input[name=parentId]').val(data.parentId);
                         }
                     });

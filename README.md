@@ -10,7 +10,7 @@
 [前端框架](http://layuimini.99php.cn/docs/index.html)
 [前端框架](http://layuimini.99php.cn/onepage/v2/index.html)
 [前端框架](https://www.layui.com/doc/)
-[图标库](https://fontawesome.dashgame.com/)
+[Font Awesome图标库](https://fontawesome.dashgame.com/)
 [后端框架gorm](http://gorm.book.jasperxu.com/)
 [后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
