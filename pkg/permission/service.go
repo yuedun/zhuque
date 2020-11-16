@@ -121,7 +121,7 @@ func (u *permissionService) CreatePermission(permission *Permission) (err error)
 }
 
 func (u *permissionService) UpdatePermission(ID int, permission *Permission) (err error) {
-	err = u.db.Model(permission).Where("authority_id = ?", ID).Updates(permission).Error
+	err = u.db.Model(permission).Where("id = ?", ID).Updates(permission).Error
 	if err != nil {
 		return err
 	}
