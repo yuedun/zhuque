@@ -212,6 +212,7 @@
                         var formdata = form.val('add-menu');
                         formdata.orderNumber = parseInt(formdata.orderNumber);
                         formdata.menuType = parseInt(formdata.menuType);
+                        formdata.parentId = parseInt(formdata.parentId);
                         $.ajax({
                             type: 'POST',
                             url: '/permission/create',
