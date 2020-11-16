@@ -145,18 +145,28 @@
 
                     });
                 }, save: function () {
+                    var roleid = $('input[name=roleID]').val();
+                    var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+                    var permissionsArry = [];
+                    checkedData.forEach(element => {
+                        permissionsArry.push(element.id);//父级菜单
+                        element.children.forEach(element2 => {
+                            permissionsArry.push(element2.id);//子菜单
+                        });
+                    });
+                    console.log(permissionsArry);
                     $.ajax({
-                        type: 'GET',
-                        url: '/role/set-permissions/' + roleid,
+                        type: 'POST',
+                        url: '/role/set-permission',
+                        data: JSON.stringify({
+                            id: parseInt(roleid),
+                            permissions: permissionsArry.toString()
+                        }),
+                        contentType: "application/json",
+                        dataType: "json",
                         success: function (res) {
-                            //1.获取所有权限，2.获取该角色权限，3.渲染
-                            tree.render({
-                                elem: '#tree'
-                                , data: res.data
-                                , showCheckbox: true  //是否显示复选框
-                                , id: 'demoId1'
-                                , isJump: true //是否允许点击节点时弹出新窗口跳转
-                            });
+                            //重载实例
+                            layer.msg('设置成功')
                         },
                         error: function (err) {
                             layer.msg('获取配置失败！');

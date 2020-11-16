@@ -123,7 +123,6 @@ func RolePermissions(c *gin.Context) {
 	if err != nil {
 		fmt.Println("err:", err)
 	}
-
 	for _, per := range allPermissionList {
 		// permissionTree.Field = per.MenuURL
 		per.Spread = true
@@ -132,7 +131,6 @@ func RolePermissions(c *gin.Context) {
 				per.Checked = true
 				// break
 			}
-
 			for _, child := range per.Children {
 				log.Println("per.Children>>>>>>>>>>>>>", rp.ID, child.ID)
 				if rp.ID == child.ID {

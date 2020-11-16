@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
+	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/role"
 )
 
@@ -20,6 +21,7 @@ type (
 		UpdatePermission(ID int, permission *Permission) (err error)
 		DeletePermission(ID int) (err error)
 		GetByRole(roleID int) (list []Permission, err error)
+		GetPermissionForSide(roleNum int) (menus []Menus, err error)
 	}
 )
 
@@ -80,6 +82,34 @@ func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, 
 		return tree, err
 	}
 	return tree, nil
+}
+
+// GetPermissionForSide 侧边栏菜单
+func (u *permissionService) GetPermissionForSide(roleNum int) (menus []Menus, err error) {
+	roleService := role.NewService(db.SQLLite)
+	roleResult, err := roleService.RolePermissions(roleNum)
+	if err != nil {
+		return nil, err
+	}
+	persArr := strings.Split(roleResult.Permissions, ",")
+	//查询上边侧边
+	var topMenus []Menus
+	err = u.db.Model("permission").Where("parent_id = -1").Find(&topMenus).Error
+	if err != nil {
+		return menus, err
+	}
+	for _, m := range topMenus {
+		//查询左侧菜单
+		var sideMenus []Permission
+		err = u.db.Model("permission").Where("parent_id = ? AND menu_type = 0 AND id IN (?)", m.ID, persArr).Order("order_number ASC").Find(&sideMenus).Error
+		if err != nil {
+			return menus, err
+		}
+		m.Child = sideMenus
+		menus = append(menus, m)
+	}
+
+	return menus, nil
 }
 
 func (u *permissionService) CreatePermission(permission *Permission) (err error) {

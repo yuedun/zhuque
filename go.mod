@@ -1,12 +1,12 @@
 module github.com/yuedun/zhuque
 
-go 1.14
+go 1.15
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/gin-gonic/gin v1.6.3
 	github.com/jinzhu/gorm v1.9.16
-	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
+	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
 
