@@ -74,7 +74,7 @@ module.exports = {
         </div>
         <div class="layui-form-item">
             <div class="layui-input-block">
-                <button class="layui-btn" id="cancleBtn">取消</button>
+                <button class="layui-btn" id="cancleBtn">关闭</button>
             </div>
         </div>
     </div>
@@ -84,23 +84,6 @@ module.exports = {
             var form = layui.form,
                 layer = layui.layer,
                 $ = layui.$;
-
-            //初始化数据
-            (function init() {
-                var id = $('input[name=id]').val()
-                $.ajax({
-                    type: 'GET',
-                    url: '/project/get-by-id/' + id,
-                    success: function (res) {
-                        $("input[name=gitRepo]").val(res.data.gitRepo);
-                        $("input[name=branch]").val(res.data.branch);
-                        //数据库中有值替换
-                        if (res.data.config) {
-                            $('textarea[name=config]').val(res.data.config);
-                        }
-                    },
-                });
-            })()
 
             // 监听取消
             $('#cancleBtn').on("click", function () {

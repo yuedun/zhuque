@@ -151,6 +151,7 @@
                             body.contents().find("input[name=name]").val(data.name);
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
+                            body.contents().find('textarea[name=config]').val(data.config);
                         }
                     });
                     $(window).on("resize", function () {
@@ -185,6 +186,7 @@
                             body.contents().find("input[name=name]").val(data.name);
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
+                            body.contents().find('textarea[name=config]').val(data.config);
                         }
                     });
                     $(window).on("resize", function () {

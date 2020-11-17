@@ -74,7 +74,7 @@ module.exports = {
         </div>
         <div class="layui-form-item">
             <div class="layui-input-block">
-                <button class="layui-btn layui-btn-normal" id="submit-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+                <button class="layui-btn layui-btn-normal" id="submit-btn" lay-submit lay-filter="saveBtn">保存</button>
                 <button class="layui-btn" id="cancleBtn">取消</button>
             </div>
         </div>
@@ -85,31 +85,6 @@ module.exports = {
             var form = layui.form,
                 layer = layui.layer,
                 $ = layui.$;
-
-            //初始化数据
-            (function init() {
-                var id = $('input[name=id]').val();
-                if (!id) {
-                    layer.msg('获取id失败！');
-                    $('#submit-btn').attr('disabled', true).addClass('layui-btn-disabled');
-                }
-                $.ajax({
-                    type: 'GET',
-                    url: '/project/get-by-id/' + id,
-                    success: function (res) {
-                        $("input[name=gitRepo]").val(res.data.gitRepo);
-                        $("input[name=branch]").val(res.data.branch);
-                        //数据库中有值替换
-                        if (res.data.config) {
-                            $('textarea[name=config]').val(res.data.config);
-                        }
-                    },
-                    error: function (err) {
-                        layer.msg('获取配置失败！');
-                        $('#submit-btn').attr('disabled', true).addClass('layui-btn-disabled');
-                    }
-                });
-            })()
 
             //监听提交
             form.on('submit(saveBtn)', function (data) {

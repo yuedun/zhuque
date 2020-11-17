@@ -23,3 +23,11 @@ const (
 func (User) TableName() string {
 	return "user"
 }
+
+type UserLoginInfo struct {
+	ID          int    `json:"id"`
+	UserName    string `json:"username"`
+	Password    string `json:"password"`
+	RoleNum     int    `json:"roleNum"` // 1超级管理员（最高权限），2管理员（管理空间，一个空间有多个项目），3发布人员
+	Permissions string `json:"permissions"`
+}
