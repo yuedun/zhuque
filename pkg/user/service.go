@@ -15,6 +15,8 @@ type (
 	*/
 	UserService interface {
 		GetUserInfo(userObj User) (user User, err error)
+		//获取登录用户信息，包含权限信息
+		GetLoginUserInfo(userObj User) (user UserLoginInfo, err error)
 		GetUserList(offset, limit int, userObj User) (user []User, count int, err error)
 		GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error)
 		CreateUser(user *User) (err error)
@@ -38,6 +40,16 @@ func NewService(mysql *gorm.DB) UserService {
 
 func (u *userService) GetUserInfo(userObj User) (user User, err error) {
 	err = u.mysql.Where(userObj).Find(&user).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+func (u *userService) GetLoginUserInfo(userObj User) (user UserLoginInfo, err error) {
+	err = u.mysql.Table("user AS u").
+		Select("u.id AS id, u.user_name AS user_name, u.password AS password, r.permissions AS permissions").
+		Joins("INNER JOIN role AS r ON u.role_num = r.role_num").
+		Where("u.user_name = ?", userObj.UserName).Find(&user).Error
 	if err != nil {
 		return user, err
 	}
