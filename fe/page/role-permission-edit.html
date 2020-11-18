@@ -19,17 +19,18 @@
 <body>
     <div class="layuimini-container">
         <div class="layuimini-main">
-            <blockquote class="layui-elem-quote">
+            <!-- <blockquote class="layui-elem-quote">
                 Layui的树形组件。<br>
                 <a href="https://www.layui.com/doc/modules/tree.html" target="_blank" class="layui-btn ">tree</a>
-            </blockquote>
+            </blockquote> -->
             <div>
                 <div class="layui-btn-container">
-                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
+                    <!-- <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
                     <button type="button" class="layui-btn layui-btn-sm" lay-demo="setChecked">勾选指定节点</button>
-                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button>
+                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button> -->
                     <button type="button" class="layui-btn layui-btn-sm" lay-demo="save">确定</button>
                 </div>
+                <hr class="layui-bg-black">
                 <input type="hidden" name="roleID">
                 <div id="tree"></div>
             </div>
@@ -44,66 +45,6 @@
             var $ = layui.jquery;
             var tree = layui.tree;
             var util = layui.util;
-
-            //模拟数据
-            // var data = [{
-            //     title: '一级1',
-            //     id: 1,
-            //     field: 'name1',
-            //     checked: true,
-            //     spread: true,
-            //     children: [{
-            //         title: '二级1-1 可允许跳转',
-            //         id: 3,
-            //         field: 'name11',
-            //         href: 'https://www.layui.com/'
-            //     },
-            //     {
-            //         title: '二级1-2',
-            //         id: 4,
-            //         spread: true
-            //     },
-            //     {
-            //         title: '二级1-3',
-            //         id: 20,
-            //         field: ''
-            //     }]
-            // },
-            // {
-            //     title: '一级2',
-            //     id: 2,
-            //     field: '',
-            //     spread: true,
-            //     children: [{
-            //         title: '二级2-1',
-            //         id: 5,
-            //         field: '',
-            //         spread: true
-            //     },
-            //     {
-            //         title: '二级2-2',
-            //         id: 6,
-            //         field: ''
-            //     }]
-            // },
-            // {
-            //     title: '一级3',
-            //     id: 16,
-            //     field: '',
-            //     spread: true,
-            //     children: [{
-            //         title: '二级3-1',
-            //         id: 17,
-            //         field: '',
-            //         fixed: true
-            //     },
-            //     {
-            //         title: '二级3-2',
-            //         id: 27,
-            //         field: '',
-            //         checked: true
-            //     }]
-            // }];
 
             //初始化数据
             (function init() {
@@ -130,21 +71,21 @@
 
             //按钮事件
             util.event('lay-demo', {
-                getChecked: function (othis) {
-                    var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+                // getChecked: function (othis) {
+                //     var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+                //     layer.alert(JSON.stringify(checkedData), { shade: 0 });
+                //     console.log(checkedData);
+                // },
+                // setChecked: function () {
+                //     tree.setChecked('demoId1', [12, 16]); //勾选指定节点
+                // },
+                // reload: function () {
+                //     //重载实例
+                //     tree.reload('demoId1', {
 
-                    layer.alert(JSON.stringify(checkedData), { shade: 0 });
-                    console.log(checkedData);
-                }
-                , setChecked: function () {
-                    tree.setChecked('demoId1', [12, 16]); //勾选指定节点
-                }
-                , reload: function () {
-                    //重载实例
-                    tree.reload('demoId1', {
-
-                    });
-                }, save: function () {
+                //     });
+                // },
+                save: function () {
                     var roleid = $('input[name=roleID]').val();
                     var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
                     var permissionsArry = [];
