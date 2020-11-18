@@ -59,7 +59,7 @@
 
             //监听提交
             form.on('submit(saveBtn)', function (data) {
-                data.field.role = parseInt(data.field.role);
+                data.field.roleNum = parseInt(data.field.roleNum);
                 $.ajax({
                     type: 'POST',
                     url: '/user/create',
