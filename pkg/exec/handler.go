@@ -108,7 +108,7 @@ func Server(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布%s。提交人：%s", task.TaskName, task.Project, task.Username)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
 		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
@@ -122,7 +122,7 @@ func Server(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
-			"data":    "5分钟后可发布",
+			"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
 		})
 	} else {
 		cmdOut, err = taskServer.ReleaseTask(task.ID)
@@ -189,7 +189,7 @@ func ServerV2(c *gin.Context) {
 	var cmdOut string
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在5分钟后发布%s。提交人：%s", task.TaskName, task.Project, task.Username)
+		content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
 		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
@@ -203,7 +203,7 @@ func ServerV2(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
-			"data":    "10分钟后可发布",
+			"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
 		})
 	} else {
 		cmdOut, err = taskServer.ReleaseTaskV2(task.ID)

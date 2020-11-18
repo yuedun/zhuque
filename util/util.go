@@ -22,6 +22,7 @@ type Config struct {
 	Token        string `yaml:"token"`
 	EmailTo      string `yaml:"emailTo"`
 	TestUser     string `yaml:"testUser"`
+	DelayDeploy  int    `yaml:"delayDeploy"` //延时发布时间，单位秒。默认5分钟
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -35,6 +36,9 @@ func GetConf(filename string) (*Config, error) {
 	if err != nil {
 		log.Println(err)
 		return nil, err
+	}
+	if c.DelayDeploy == 0 {
+		c.DelayDeploy = 5
 	}
 	return c, nil
 }

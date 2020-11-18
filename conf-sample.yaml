@@ -7,3 +7,4 @@ dingTalk: https://oapi.dingtalk.com/robot/send?access_token=xxx # 钉钉webhook
 emailService: http://xxx
 token: xx
 emailTo: xx;
+delayDeploy: 5 # 默认5分钟
