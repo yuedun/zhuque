@@ -25,10 +25,11 @@
             </blockquote> -->
             <div>
                 <div class="layui-btn-container">
-                    <!-- <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
-                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="setChecked">勾选指定节点</button>
-                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button> -->
-                    <button type="button" class="layui-btn layui-btn-sm" lay-demo="save">确定</button>
+                    <!-- <button type="button" class="layui-btn" lay-event="getChecked">获取选中节点数据</button>
+                    <button type="button" class="layui-btn" lay-event="setChecked">勾选指定节点</button>
+                    <button type="button" class="layui-btn" lay-event="reload">重载实例</button> -->
+                    <button type="button" class="layui-btn" lay-event="save">确定</button>
+                    <button type="button" class="layui-btn layui-btn-primary" lay-event="cancel">取消</button>
                 </div>
                 <hr class="layui-bg-black">
                 <input type="hidden" name="roleID">
@@ -70,7 +71,7 @@
             })()
 
             //按钮事件
-            util.event('lay-demo', {
+            util.event('lay-event', {
                 // getChecked: function (othis) {
                 //     var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
                 //     layer.alert(JSON.stringify(checkedData), { shade: 0 });
@@ -95,7 +96,6 @@
                             permissionsArry.push(element2.id);//子菜单
                         });
                     });
-                    console.log(permissionsArry);
                     $.ajax({
                         type: 'POST',
                         url: '/role/set-permission',
@@ -113,6 +113,10 @@
                             layer.msg('获取配置失败！');
                         }
                     });
+                },
+                cancel: function () {
+                    var iframeIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(iframeIndex);
                 }
             });
         });
