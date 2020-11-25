@@ -20,7 +20,7 @@
             <form class="layui-form" action="">
                 <div class="layui-form-item">
                     <label class="layui-form-label required">发布单</label>
-                    <div class="layui-input-inline" style="width: 476px;"> 
+                    <div class="layui-input-inline" style="width: 476px;">
                         <input type="text" name="taskName" lay-verify="required" lay-reqtext="发布单不能为空"
                             placeholder="请输入发布单" value="" class="layui-input">
                     </div>
@@ -150,7 +150,7 @@
                 var data = obj.data;
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
-                        var index2 = layer.load(0, {offset: '30%'});
+                        var index2 = layer.load(0, { offset: '30%' });
                         $('.time-use').show();
                         var timeCount = 1;
                         var t2 = setInterval(function () {
@@ -250,8 +250,8 @@
                 var checkStatus = table.checkStatus(obj.config.id);
                 switch (obj.event) {
                     case 'LAYTABLE_RELOAD':
-                    table.reload('currentTableId');
-                    layer.msg('刷新成功');
+                        table.reload('currentTableId');
+                        layer.msg('刷新成功');
                         break;
                     case 'delete':
                         layer.msg('删除');
@@ -264,18 +264,19 @@
 
             //监听提交发布
             form.on('submit(release)', function (data) {
-                var index = layer.load(0, {offset: '30%'});
+                var index = layer.load(0, { offset: '30%' });
                 $('.time-use').show();
                 var timeCount = 1;
                 var t = setInterval(function () {
                     timeCount++
                     $('.time-use').text(timeCount + 's')
-                }, 1000)
+                }, 1000);
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
                 $.post('/exec/server', data.field, function (res) {
                     layer.close(index);//关闭加载状态
                     clearInterval(t);
+                    // code=1是直接发布，code=2是审核发布
                     if (res.code == 1) {
                         layer.open({
                             type: 1
@@ -290,8 +291,12 @@
                             , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
                         });
                     } else {
+                        clearInterval(t);
                         layer.msg(res.data, { icon: 6 });
-                        table.reload('currentTableId');
+                        // 轮训刷新
+                        var t2 = setInterval(function () {
+                            table.reload('currentTableId');
+                        }, 5000);
                     }
                 }).fail(function (err) {
                     layer.close(index);

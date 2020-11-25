@@ -155,7 +155,8 @@
                             body.find("input[name=id]").val(data.id);
                             body.find("input[name=username]").val(data.username);
                             body.find("input[name=email]").val(data.email);
-                            body.find("select[name=role]").val(data.role);
+                            body.find("select[name=roleNum]").val(data.roleNum);
+                            form.render('select');
                         },
                     });
                     $(window).on("resize", function () {
