@@ -120,7 +120,7 @@ func Server(c *gin.Context) {
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
 		go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
 		c.JSON(200, gin.H{
-			"code":    2, //code=1是直接发布，code=2是审核发布
+			"code":    2, // code=1是直接发布，code=2是审核发布
 			"message": "ok",
 			"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
 		})

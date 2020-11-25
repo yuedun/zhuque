@@ -204,7 +204,9 @@ func Approve(c *gin.Context) {
 		"content": content,
 	}
 	messageService := message.NewMessage()
-	messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
+	// 异步发送，避免阻塞，发送成功与否都没关系
+	go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
+	go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
 	c.JSON(http.StatusOK, gin.H{
 		"data":    "",
 		"message": "ok",
