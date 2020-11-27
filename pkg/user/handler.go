@@ -367,7 +367,7 @@ func ForgotPassword(c *gin.Context) {
 		panic(err)
 	}
 	messageService := message.NewMessage()
-	link := fmt.Sprintf("%s/reset-password?token=%s", util.Conf.HostName, token)
+	link := fmt.Sprintf("%s/user/reset-password?token=%s", util.Conf.HostName, token)
 	content := fmt.Sprintf("【朱雀】点击链接重置密码。<a href='%s'>点击重置</a>或复制链接：%s", link, link)
 	err = messageService.SendEmailV2("忘记密码", content, []string{user.Email})
 	if err != nil {

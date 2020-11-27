@@ -82,7 +82,7 @@
                 <div class="tip">
                     <span class="icon-nocheck"></span>
                     <span class="login-tip">保持登录</span>
-                    <a href="javascript:" class="forget-password">忘记密码？</a>
+                    <a href="javascript:" class="forget-password">重置密码</a>
                 </div>
                 <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
                     <button class="login-btn" lay-submit="" lay-filter="login">立即登录</button>
@@ -119,6 +119,24 @@
                 } else {
                     $(this).addClass('icon-check');
                 }
+            });
+            $('.forget-password').on('click', function () {
+                var username = $('input[name=username]').val();
+                if (!username) {
+                    layer.msg('请输入您的用户名');
+                    return
+                }
+                layer.msg('将会向您的邮箱发送重置链接，确定发送吗？', {
+                    time: 20000, //20s后自动关闭
+                    btn: ['确定', '取消'],
+                    yes: function(){
+                        $.get('/user/forgot-password',{ username: username }, function(res, status){
+                            layer.msg('发送成功！');
+                        }).fail(function(res){
+                            layer.msg("发送失败！", { icon: 5 });
+                        });
+                    }
+                });
             });
 
             // 进行登录操作

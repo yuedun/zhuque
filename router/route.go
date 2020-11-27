@@ -15,7 +15,7 @@ import (
 func Register(router *gin.Engine) {
 	router.Use(middleware.Logger()) //全局中间件
 	userRouter := router.Group("/user")
-	// userRouter.Use(middleware.Logger())
+	userRouter.Use(middleware.Logger())
 	//user路由注册,可以给各个group加中间件
 	userRouter.POST("/login", middleware.Jwt().LoginHandler)
 	userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
