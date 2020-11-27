@@ -6,5 +6,10 @@ dingTalk: https://oapi.dingtalk.com/robot/send?access_token=xxx # 钉钉webhook
 
 emailService: http://xxx
 token: xx
-emailTo: xx;
-delayDeploy: 5 # 默认5分钟
+delayDeploy: 5 # 默认5分钟后可自行发布，不需要审核
+
+mailHost: smtp.163.com # 邮件服务器地址
+mailPort: 465 # 邮件端口
+mailUser: xxx@163.com # 邮件发送账户
+mailPWD: xxx # 邮件授权密码     
+mailTo: xxx@126.com # 邮件发送地址,多个用;分割

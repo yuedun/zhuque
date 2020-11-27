@@ -46,7 +46,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
-		Key:         []byte("secret key"),
+		Key:         []byte(util.Conf.JWTSecret),
 		Timeout:     time.Hour * 24 * 10, //10天
 		MaxRefresh:  time.Hour * 24 * 10,
 		IdentityKey: identityKey,

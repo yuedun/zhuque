@@ -6,23 +6,31 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	yaml "gopkg.in/yaml.v3"
 )
 
+// 保存数据变量
 var Conf *Config
 
 //profile variables
 type Config struct {
-	Port         string `yaml:"port"`     //服务端口
-	Dbpath       string `yaml:"dbpath"`   //sqlite数据库文件位置
-	Env          string `yaml:"env"`      //执行环境
-	DingTalk     string `yaml:"dingTalk"` //钉钉webhook
-	EmailService string `yaml:"emailService"`
-	Token        string `yaml:"token"`
-	EmailTo      string `yaml:"emailTo"`
-	TestUser     string `yaml:"testUser"`
-	DelayDeploy  int    `yaml:"delayDeploy"` //延时发布时间，单位秒。默认5分钟
+	Port         string `yaml:"port"`         // 服务端口
+	Dbpath       string `yaml:"dbpath"`       // sqlite数据库文件位置
+	Env          string `yaml:"env"`          // 执行环境
+	DingTalk     string `yaml:"dingTalk"`     // 钉钉webhook
+	EmailService string `yaml:"emailService"` // 邮件接口服务
+	MailHost     string `yaml:"mailHost"`     // 邮件服务器地址
+	MailPort     int    `yaml:"mailPort"`     // 邮件端口
+	MailUser     string `yaml:"mailUser"`     // 邮件发送账户
+	MailPWD      string `yaml:"mailPWD"`      // 邮件授权密码
+	MailTo       string `yaml:"mailTo"`       // 邮件发送地址
+	TestUser     string `yaml:"testUser"`     // 测试登录用户
+	DelayDeploy  int    `yaml:"delayDeploy"`  // 延时发布时间，单位秒。默认5分钟
+	JWTSecret    string `yaml:"JWTSecret"`    // jwt安全密匙
+	HostName     string `yaml:"hostName"`     //服务地址
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -39,6 +47,9 @@ func GetConf(filename string) (*Config, error) {
 	}
 	if c.DelayDeploy == 0 {
 		c.DelayDeploy = 5
+	}
+	if c.JWTSecret == "" {
+		c.JWTSecret = "JWTSecret"
 	}
 	return c, nil
 }
@@ -63,4 +74,28 @@ func GeneratePassword(mobile string) string {
 	p := b[7:]
 	password := "hello" + string(p)
 	return GetMD5(password)
+}
+
+// CreateToken 生成jwt
+func CreateToken(uid, secret string) (string, error) {
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"uid": uid,
+		"exp": time.Now().Add(time.Minute * 15).Unix(),
+	})
+	token, err := at.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+// ParseToken 解密jwt
+func ParseToken(token string, secret string) (string, error) {
+	claim, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return claim.Claims.(jwt.MapClaims)["uid"].(string), nil
 }

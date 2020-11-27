@@ -4,9 +4,12 @@ go 1.15
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/jinzhu/gorm v1.9.16
 	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
 

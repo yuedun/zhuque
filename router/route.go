@@ -20,9 +20,11 @@ func Register(router *gin.Engine) {
 	userRouter.POST("/login", middleware.Jwt().LoginHandler)
 	userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
 	userRouter.GET("/logout", middleware.Jwt().LogoutHandler)
+	userRouter.GET("/forgot-password", user.ForgotPassword) //忘记密码，发送邮件
+	userRouter.GET("/reset-password", user.RestPassword)    //根据邮件链接重置密码
 	userRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
-		userRouter.GET("/info/:id", middleware.Jwt().MiddlewareFunc(), user.GetUserInfo) //单独给某个路由添加中间件
+		userRouter.GET("/info/:id", user.GetUserInfo) //单独给某个路由添加中间件
 		userRouter.GET("/list", user.List)
 		userRouter.POST("/create", user.CreateUser)
 		userRouter.PUT("/update/:id", user.UpdateUser)

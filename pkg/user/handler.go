@@ -9,6 +9,7 @@ import (
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/yuedun/zhuque/pkg/message"
 	"github.com/yuedun/zhuque/pkg/permission"
 	"github.com/yuedun/zhuque/util"
 
@@ -156,7 +157,6 @@ func Init(c *gin.Context) {
 		panic(err)
 	}
 
-	log.Println(">>>>>>>>>>>>", userObj.RoleNum)
 	permissionsService := permission.NewService(db.SQLLite)
 	sidePermissions, _ := permissionsService.GetPermissionForSide(userObj.RoleNum)
 	c.JSON(http.StatusOK,
@@ -341,5 +341,71 @@ func ChangePassword(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
+	})
+}
+
+//ForgotPassword 忘记密码，发送带链接邮件
+func ForgotPassword(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	username := c.Query("username")
+	userService := NewService(db.SQLLite)
+	userObj := User{
+		UserName: username,
+	}
+	user, err := userService.GetUserInfo(userObj)
+	if err != nil {
+		panic(err)
+	}
+	token, err := util.CreateToken(username, util.Conf.JWTSecret)
+	if err != nil {
+		panic(err)
+	}
+	messageService := message.NewMessage()
+	link := fmt.Sprintf("%s/reset-password?token=%s", util.Conf.HostName, token)
+	content := fmt.Sprintf("【朱雀】点击链接重置密码。<a href='%s'>点击重置</a>或复制链接：%s", link, link)
+	err = messageService.SendEmailV2("忘记密码", content, []string{user.Email})
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "邮件发送成功",
+	})
+}
+
+//RestPassword 重置密码
+func RestPassword(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	token := c.Query("token")
+	decryptStr, err := util.ParseToken(token, util.Conf.JWTSecret)
+	if err != nil {
+		panic(err)
+	}
+	userService := NewService(db.SQLLite)
+	userObj := User{
+		UserName: decryptStr,
+	}
+	user, err := userService.GetUserInfo(userObj)
+	if err != nil {
+		panic(err)
+	}
+	user.Password = util.GetMD5(user.UserName)
+	err = userService.UpdateUser(user.ID, &user)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "密码已重置为用户名。",
 	})
 }

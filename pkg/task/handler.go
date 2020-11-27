@@ -2,9 +2,9 @@ package task
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/yuedun/zhuque/db"
@@ -182,7 +182,6 @@ func Approve(c *gin.Context) {
 	if err := c.ShouldBind(&params); err != nil {
 		panic(err)
 	}
-	log.Println(">>>>>>>>>>>>", params)
 	task, err := taskService.Approve(params)
 	if err != nil {
 		panic(err)
@@ -203,10 +202,11 @@ func Approve(c *gin.Context) {
 	bodyObj["text"] = map[string]interface{}{
 		"content": content,
 	}
+	mailTo := strings.Split(util.Conf.MailTo, ";")
 	messageService := message.NewMessage()
 	// 异步发送，避免阻塞，发送成功与否都没关系
 	go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-	go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
+	go messageService.SendEmailV2(task.TaskName, content, mailTo)
 	c.JSON(http.StatusOK, gin.H{
 		"data":    "",
 		"message": "ok",

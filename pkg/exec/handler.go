@@ -107,18 +107,20 @@ func Server(c *gin.Context) {
 	// 如果是测服直接发布
 	var cmdOut string
 	if util.Conf.Env == "prod" {
-		// 发送消息通知
+		// content消息内容
 		content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
-		log.Printf(content)
+
+		//bodyObj 钉钉消息体
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
 		bodyObj["text"] = map[string]interface{}{
 			"content": content,
 		}
+		mailTo := strings.Split(util.Conf.MailTo, ";")
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
+		go messageService.SendEmailV2(task.TaskName, content, mailTo)
 		c.JSON(200, gin.H{
 			"code":    2, // code=1是直接发布，code=2是审核发布
 			"message": "ok",
@@ -196,10 +198,11 @@ func ServerV2(c *gin.Context) {
 		bodyObj["text"] = map[string]interface{}{
 			"content": content,
 		}
+		mailTo := strings.Split(util.Conf.MailTo, ";")
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmail(task.TaskName, content, util.Conf.EmailTo)
+		go messageService.SendEmailV2(task.TaskName, content, mailTo)
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
