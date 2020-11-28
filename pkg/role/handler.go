@@ -1,7 +1,7 @@
 package role
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -47,7 +47,7 @@ func GetRoleInfo(c *gin.Context) {
 	}
 	role, err := roleService.GetRoleInfo(roleObj)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    role,
@@ -71,7 +71,7 @@ func CreateRole(c *gin.Context) {
 	}
 	err := roleService.CreateRole(&role)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    role,
@@ -95,7 +95,7 @@ func SetPermission(c *gin.Context) {
 	}
 	err := roleService.UpdateRole(role.ID, &role)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    role,
@@ -134,7 +134,7 @@ func DeleteRole(c *gin.Context) {
 	roleService := NewService(db.SQLLite)
 	err := roleService.DeleteRole(roleID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",

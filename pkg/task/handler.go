@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -84,7 +85,7 @@ func GetTaskInfo(c *gin.Context) {
 	}
 	task, err := taskService.GetTaskInfo(taskObj)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    task,
@@ -97,7 +98,7 @@ func GetTaskInfoBySql(c *gin.Context) {
 	taskService := NewService(db.SQLLite)
 	task, err := taskService.GetTaskInfoBySQL()
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": task,
@@ -121,7 +122,7 @@ func CreateTask(c *gin.Context) {
 	task.CreatedAt = time.Now()
 	err := taskService.CreateTask(&task)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    task,
@@ -161,7 +162,7 @@ func DeleteTask(c *gin.Context) {
 	taskService := NewService(db.SQLLite)
 	err := taskService.DeleteTask(taskID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",

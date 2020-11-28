@@ -54,6 +54,13 @@ type loginData struct {
 
 //GetUserInfo
 func GetUserInfo(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
 	userID, _ := strconv.Atoi(c.Param("id"))
 	username := c.Param("username")
 	email := c.Param("email")
@@ -65,7 +72,8 @@ func GetUserInfo(c *gin.Context) {
 	}
 	user, err := userService.GetUserInfo(userObj)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
+		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    user,
@@ -92,7 +100,7 @@ func CreateUser(c *gin.Context) {
 	user.CreatedAt = time.Now()
 	err := userService.CreateUser(&user)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    user,
@@ -114,7 +122,7 @@ func UpdateUser(c *gin.Context) {
 	} else {
 		err := userService.UpdateUser(userID, &user)
 		if err != nil {
-			fmt.Println("err:", err)
+			log.Println("err:", err)
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"data":    user,
@@ -129,7 +137,7 @@ func DeleteUser(c *gin.Context) {
 	userService := NewService(db.SQLLite)
 	err := userService.DeleteUser(userID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
@@ -153,7 +161,7 @@ func Init(c *gin.Context) {
 	user := User{ID: userID}
 	userObj, err := userService.GetUserInfo(user)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 		panic(err)
 	}
 
@@ -304,7 +312,7 @@ func DeleteUserProject(c *gin.Context) {
 	userService := NewService(db.SQLLite)
 	err := userService.DeleteUserProject(upID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
@@ -329,6 +337,7 @@ func ChangePassword(c *gin.Context) {
 	userService := NewService(db.SQLLite)
 	uresult, err := userService.GetUserInfo(*user)
 	if err != nil {
+		log.Println("err:", err)
 		panic(err)
 	}
 	if util.GetMD5(oldPwd) != uresult.Password {
@@ -337,7 +346,7 @@ func ChangePassword(c *gin.Context) {
 	user.Password = util.GetMD5(c.PostForm("new_password"))
 	err = userService.UpdateUser(userID, user)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
@@ -360,6 +369,7 @@ func ForgotPassword(c *gin.Context) {
 	}
 	user, err := userService.GetUserInfo(userObj)
 	if err != nil {
+		log.Println("err:", err)
 		panic(err)
 	}
 	token, err := util.CreateToken(username, util.Conf.JWTSecret)
@@ -369,7 +379,7 @@ func ForgotPassword(c *gin.Context) {
 	messageService := message.NewMessage()
 	link := fmt.Sprintf("%s/user/reset-password?token=%s", util.Conf.HostName, token)
 	content := fmt.Sprintf("【朱雀】点击链接重置密码。<a href='%s'>点击重置</a>或复制链接：%s", link, link)
-	err = messageService.SendEmailV2("忘记密码", content, []string{user.Email})
+	err = messageService.SendEmailV2("重置密码", content, []string{user.Email})
 	if err != nil {
 		panic(err)
 	}
@@ -398,6 +408,7 @@ func RestPassword(c *gin.Context) {
 	}
 	user, err := userService.GetUserInfo(userObj)
 	if err != nil {
+		log.Println("err:", err)
 		panic(err)
 	}
 	user.Password = util.GetMD5(user.UserName)

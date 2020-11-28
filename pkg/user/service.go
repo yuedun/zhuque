@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/jinzhu/gorm"
@@ -80,7 +79,7 @@ func (u *userService) GetUserProjects(offset, limit int, userObj User) (userProj
 
 func (u *userService) CreateUser(user *User) (err error) {
 	err = u.mysql.Create(user).Error
-	fmt.Println(user)
+	log.Println(user)
 	if err != nil {
 		return err
 	}

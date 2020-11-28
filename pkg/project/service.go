@@ -1,7 +1,7 @@
 package project
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -81,7 +81,7 @@ func (u *projectService) GetProjectInfoBySQL() (project Project, err error) {
 
 func (u *projectService) CreateProject(project *Project) (err error) {
 	err = u.mysql.Create(project).Error
-	fmt.Println(project)
+	log.Println(project)
 	if err != nil {
 		return err
 	}

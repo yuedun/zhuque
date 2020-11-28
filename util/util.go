@@ -62,7 +62,7 @@ func GetMD5(password string) string {
 	Md5Inst.Write([]byte(password))
 	Result := Md5Inst.Sum(nil)
 	// 以下两种输出结果一样
-	fmt.Println("hex解码>>>>>>>", hex.EncodeToString(Result), "\n")
+	log.Println("hex解码>>>>>>>", hex.EncodeToString(Result), "\n")
 	return fmt.Sprintf("%x", Result)
 }
 

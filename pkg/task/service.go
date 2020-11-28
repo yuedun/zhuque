@@ -65,7 +65,7 @@ func (u *taskService) GetTaskInfoBySQL() (task Task, err error) {
 
 func (u *taskService) CreateTask(task *Task) (err error) {
 	err = u.db.Create(task).Error
-	fmt.Println(task)
+	log.Println(task)
 	if err != nil {
 		return err
 	}

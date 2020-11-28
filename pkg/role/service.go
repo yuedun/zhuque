@@ -1,7 +1,7 @@
 package role
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -59,7 +59,7 @@ func (u *roleService) RolePermissions(roleNum int) (role Role, err error) {
 
 func (u *roleService) CreateRole(role *Role) (err error) {
 	err = u.db.Create(role).Error
-	fmt.Println(role)
+	log.Println(role)
 	if err != nil {
 		return err
 	}

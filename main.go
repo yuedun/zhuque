@@ -44,6 +44,7 @@ func init() {
 }
 
 func main() {
+	log.SetFlags(log.Llongfile | log.LstdFlags) //输出行号
 	r := gin.Default()
 	// r.LoadHTMLGlob("templates/*") //加载模板
 	r.Static("/fe", "./fe")

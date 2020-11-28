@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -41,7 +41,7 @@ func GetPermissionInfo(c *gin.Context) {
 	}
 	permission, err := permissionService.GetPermissionInfo(permissionObj)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    permission,
@@ -65,7 +65,7 @@ func CreatePermission(c *gin.Context) {
 	}
 	err := permissionService.CreatePermission(&permission)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data":    permission,
@@ -104,7 +104,7 @@ func DeletePermission(c *gin.Context) {
 	permissionService := NewService(db.SQLLite)
 	err := permissionService.DeletePermission(permissionID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
@@ -120,7 +120,7 @@ func RolePermissions(c *gin.Context) {
 	//角色已分配权限
 	rolePermissionList, err := permissionService.GetByRole(roleID)
 	if err != nil {
-		fmt.Println("err:", err)
+		log.Println("err:", err)
 	}
 	for _, per := range allPermissionList {
 		// permissionTree.Field = per.MenuURL
