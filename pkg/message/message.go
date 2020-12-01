@@ -3,7 +3,6 @@ package message
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -18,8 +17,8 @@ type Message interface {
 	//SendDingTalk 发送钉钉消息
 	SendDingTalk(dingTalkURL string, bodyObj interface{}) (dingRes DingTalkRes, err error)
 	// SendEmail 发送邮件
-	SendEmail(title, content string, to string) (emailRes EmailRes, err error)
-	SendEmailV2(subject string, body string, mailAddress []string) (err error)
+	SendEmail(subject, body string, to string) (emailRes EmailRes, err error)
+	SendEmailV2(subject, body string, to []string) (err error)
 }
 
 /*
@@ -65,18 +64,18 @@ func (msg *message) SendDingTalk(dingTalkURL string, bodyObj interface{}) (dingR
 }
 
 //使用现有邮件服务
-func (msg *message) SendEmail(title, content string, to string) (emailRes EmailRes, err error) {
+func (msg *message) SendEmail(subject, body string, to string) (emailRes EmailRes, err error) {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
-	w.WriteField("subject", "【朱雀】"+title)
+	w.WriteField("subject", "【朱雀】"+subject)
 	w.WriteField("to", to)
 	strs := []string{
-		content,
+		body,
 	}
 	w.WriteField("content", strings.Join(strs, "\r\n"))
 	w.Close()
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%v/mail/send-mail?token=%v", "util.Conf.EmailService", "util.Conf.Token"), &b)
+	req, err := http.NewRequest("POST", util.Conf.EmailService, &b)
 	if err != nil {
 		log.Println(err)
 		return emailRes, err
@@ -88,25 +87,25 @@ func (msg *message) SendEmail(title, content string, to string) (emailRes EmailR
 		log.Println("发送请求失败：", err)
 		return emailRes, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("读取body失败：", err)
 		return emailRes, err
 	}
 	log.Println("发送邮件结果：", string(body))
-	json.Unmarshal(body, &emailRes)
+	json.Unmarshal(resBody, &emailRes)
 	return emailRes, nil
 }
 
 // 发送邮件
-func (msg *message) SendEmailV2(subject string, body string, mailAddress []string) (err error) {
+func (msg *message) SendEmailV2(subject, body string, to []string) (err error) {
 	m := gomail.NewMessage()
 	// 这种方式可以添加别名，即 nickname， 也可以直接用<code>m.SetHeader("From", MAIL_USER)</code>
 	nickname := "zhuque"
 	// nickname := "=?UTF-8?B?" + base64.StdEncoding.EncodeToString([]byte("标题")) + "?="//解决中文乱码
 	m.SetHeader("From", nickname+"<"+util.Conf.MailUser+">")
 	// 发送给多个用户
-	m.SetHeader("To", mailAddress...)
+	m.SetHeader("To", to...)
 	// 设置邮件主题
 	m.SetHeader("Subject", subject)
 	// 设置邮件正文
