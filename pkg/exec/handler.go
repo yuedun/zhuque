@@ -12,6 +12,7 @@ import (
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/message"
 	"github.com/yuedun/zhuque/pkg/task"
+	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/util"
 
 	"os/exec"
@@ -116,7 +117,14 @@ func Server(c *gin.Context) {
 		bodyObj["text"] = map[string]interface{}{
 			"content": content,
 		}
-		mailTo := strings.Split(util.Conf.MailTo, ";")
+		// 发送给有项目权限的人
+		userService := user.NewService(db.SQLLite)
+		mailTo, err := userService.GetProjectUsersEmail(task.Project)
+		if err != nil {
+			//邮件错误忽略，不影响主流程
+			log.Println(err)
+		}
+		// mailTo := strings.Split(users, ";")
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
@@ -198,7 +206,14 @@ func ServerV2(c *gin.Context) {
 		bodyObj["text"] = map[string]interface{}{
 			"content": content,
 		}
-		mailTo := strings.Split(util.Conf.MailTo, ";")
+		// 发送给有项目权限的人
+		userService := user.NewService(db.SQLLite)
+		mailTo, err := userService.GetProjectUsersEmail(task.Project)
+		if err != nil {
+			//邮件错误忽略，不影响主流程
+			log.Println(err)
+		}
+		// mailTo := strings.Split(users, ";")
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)

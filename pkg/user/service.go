@@ -23,6 +23,8 @@ type (
 		UpdateUser(userID int, user *User) (err error)
 		DeleteUser(userID int) (err error)
 		DeleteUserProject(upID int) (err error)
+		//获取项目关联用户
+		GetProjectUsersEmail(projectName string) (emails []string, err error)
 	}
 )
 
@@ -123,4 +125,17 @@ func (u *userService) DeleteUserProject(upID int) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (u *userService) GetProjectUsersEmail(projectName string) (emails []string, err error) {
+	// SELECT u.email from project AS p INNER JOIN user_project AS up ON p.id = up.project_id INNER JOIN user AS u ON u.id = up.user_id WHERE p.name='zhuque'
+	err = u.mysql.Table("project AS p").
+		Select("u.email AS email").
+		Joins("INNER JOIN user_project AS up ON p.id = up.project_id").
+		Joins("INNER JOIN user AS u ON u.id = up.user_id").
+		Where("p.name = ?", projectName).Pluck("email", &emails).Error
+	if err != nil {
+		return emails, err
+	}
+	return emails, nil
 }
