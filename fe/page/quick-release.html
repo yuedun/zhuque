@@ -55,22 +55,22 @@
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
             <script type="text/html" id="currentTableBar">
-                {{#  
+                {{#
                     var releaseDate = function(){
                         return (moment(d.updatedAt).add(5, 'm') < moment())|| d.nowRelease;
                     }; 
                     var approve = function(){
-                        return sessionStorage.getItem('role') == 1;
+                        return (sessionStorage.getItem('role') == 1 || sessionStorage.getItem('role') == 2);
                     }
                 }}
                 <!-- 这里同样支持 laytpl 语法，是否可发布 -->
-                {{#  if(releaseDate()){ }}
+                {{# if(releaseDate()){ }}
                 <a class="layui-btn layui-btn-normal layui-btn-xs data-count-release" lay-event="release">发布</a>
-                {{#  } }}
+                {{# } }}
                 <!-- 是否可审批，可操作立即发布和阻止发布d.approve -->
                 {{#  if(approve()){ }}
                 <a class="layui-btn layui-btn-warm layui-btn-xs data-count-approve" lay-event="approve">审批</a>
-                {{#  } }}
+                {{# } }}
                 <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
             </script>
         </div>
