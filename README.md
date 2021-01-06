@@ -14,6 +14,13 @@
 [后端框架gorm](http://gorm.book.jasperxu.com/)
 [后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
+# 本地开发
+## 首次运行
+1. 复制`conf-sample.yaml`文件为`conf.yaml`文件。
+2. 配置`env`变量为`debug`。
+3. 修改`\zhuque\pkg\user\handler.go`,`Init`函数的返回数据`menuInfo`为注释代码，因为第一次运行系统没有系统数据，需要模拟数据。
+4. 使用`test`账号，密码test登录系统，增加角色数据，用户数据，分配权限。然后可以使用新用户登录。
+
 ## 部署流程
 1. 在服务器指定位置下载源码。
 2. 安装go环境。go可以交叉编译，但是由于sqlite的缘故，windows环境下并不能顺利的编译linux版本，所以最好还是在linux环境下编译。

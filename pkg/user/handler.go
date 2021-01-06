@@ -160,7 +160,8 @@ func Init(c *gin.Context) {
 	userService := NewService(db.SQLLite)
 	user := User{ID: userID}
 	userObj, err := userService.GetUserInfo(user)
-	if err != nil {
+	// 第一次使用系统没有系统数据，所以需要使用测试账号
+	if err != nil && util.Conf.Env != "debug" {
 		log.Println("err:", err)
 		panic(err)
 	}
@@ -184,6 +185,7 @@ func Init(c *gin.Context) {
 				"role":     userObj.RoleNum,
 			},
 			"menuInfo": sidePermissions,
+			// 第一次使用可以使用下面的数据
 			// "menuInfo": []map[string]interface{}{
 			// 	{
 			// 		"title":  "系统管理",

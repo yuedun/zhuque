@@ -57,5 +57,6 @@ func main() {
 	if port == "" {
 		port = "8090"
 	}
+	log.Println("环境变量env:", util.Conf.Env)
 	r.Run(":" + port) // listen and serve on 0.0.0.0:8090
 }
