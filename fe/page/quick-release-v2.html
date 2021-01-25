@@ -60,7 +60,7 @@
                     return (moment(d.updatedAt).add(5, 'm') < moment())|| d.nowRelease;
                 }; 
                 var approve = function(){
-                    return sessionStorage.getItem('role') == 1;
+                    return (sessionStorage.getItem('role') == 1 || sessionStorage.getItem('role') == 2);
                 }
             }}
             <!-- 这里同样支持 laytpl 语法，是否可发布 -->
