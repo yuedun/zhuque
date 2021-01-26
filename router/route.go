@@ -66,13 +66,14 @@ func Register(router *gin.Engine) {
 	}
 	//发送命令路由注册
 	execRouter := router.Group("/exec")
-	execRouter.Use(middleware.Jwt().MiddlewareFunc())
+	// execRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)
 		execRouter.POST("/server-v2", exec.ServerV2)
 		execRouter.POST("/release/:id", exec.Release)
 		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
+		execRouter.GET("/deploy-project/:id", exec.DeployProject)
 	}
 	//权限管理
 	permissionRouter := router.Group("/permission")

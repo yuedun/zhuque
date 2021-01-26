@@ -1,21 +1,23 @@
 package exec
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/message"
+	"github.com/yuedun/zhuque/pkg/project"
 	"github.com/yuedun/zhuque/pkg/task"
 	"github.com/yuedun/zhuque/pkg/user"
 	"github.com/yuedun/zhuque/util"
-
-	"os/exec"
 )
 
 // Send 发送命令到服务器
@@ -32,19 +34,12 @@ func Send(c *gin.Context) {
 		panic(errors.New("命令无效！"))
 	}
 	log.Println("用户输入命令：", userCmd)
-	var cmdOut []byte
-	var err error
-	var cmd *exec.Cmd
-	// 执行单个shell命令时, 直接运行即可
-	cmd = exec.Command("bash", "-c", userCmd)
-	if cmdOut, err = cmd.CombinedOutput(); err != nil {
-		log.Println("输出错误：", err)
-		log.Println("输出错误2：", string(cmdOut))
+	cmdOut, err := ExecCmdSync(userCmd)
+	if err != nil {
 		c.JSON(200, gin.H{
 			"message": err,
 			"data":    strings.ReplaceAll(string(cmdOut), "\n", "<br>"),
 		})
-		return
 	}
 	// 默认输出有一个换行
 	log.Println(string(cmdOut))
@@ -274,5 +269,69 @@ func ReleaseV2(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    cmdOut,
+	})
+}
+
+// Deploy 第一次部署
+// 1.git拉代码到发布机指定目录下，项目名和发布系统中保持一致。
+// 2.安装依赖，编译等操作
+// 3.同步代码到目标机器的指定目录下
+func DeployProject(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	projectID, _ := strconv.Atoi(c.Param("id"))
+	projectObj := project.Project{
+		ID: projectID,
+	}
+	projectService := project.NewService(db.SQLLite)
+	projectResult, _ := projectService.GetProjectInfo(projectObj)
+	var config map[string]interface{}
+	err := json.Unmarshal([]byte(projectResult.Config), &config)
+	if err != nil {
+		panic(err)
+	}
+	production := config["deploy"].(map[string]interface{})
+	productionJSON, err := json.Marshal(production["production"])
+	log.Println(string(productionJSON))
+	var deployConfig project.DeployConfig
+	err = json.Unmarshal(productionJSON, &deployConfig)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(deployConfig.Host)
+	var buffer bytes.Buffer
+	// 目录不存在则git clone
+	if ex := util.PathExists(util.Conf.APPDir); ex == false {
+		log.Println(">>>>>>>>>>>", ex)
+		cmd1 := fmt.Sprintf("git clone -b %s %s %s", deployConfig.Ref, deployConfig.Repo, path.Join(util.Conf.APPDir, projectResult.Name))
+		log.Println("第一步：检出代码：", cmd1)
+		cmdOut, err := ExecCmdSync(cmd1)
+		if err != nil {
+			panic(err)
+		}
+		buffer.Write(cmdOut)
+	}
+	cmd2 := "cd " + path.Join(util.Conf.APPDir, projectResult.Name) + " && npm i"
+	log.Println("第二步：安装依赖：", cmd2)
+	cmdOut, err := ExecCmdSync(cmd2)
+	if err != nil {
+		panic(err)
+	}
+	buffer.Write(cmdOut)
+	cmd3 := fmt.Sprintf("rsync -av %s %s", path.Join(util.Conf.APPDir, projectResult.Name), fmt.Sprintf("%s@%s:%s", deployConfig.User, deployConfig.Host, deployConfig.Path))
+	log.Println("第三步：同步代码：", cmd3)
+	cmdOut, err = ExecCmdSync(cmd3)
+	if err != nil {
+		panic(err)
+	}
+	// 默认输出有一个换行
+	log.Println("执行结果：", string(cmdOut))
+	c.JSON(200, gin.H{
+		"data": string(buffer.Bytes()),
 	})
 }

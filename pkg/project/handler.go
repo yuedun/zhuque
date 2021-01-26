@@ -198,7 +198,7 @@ func CreateProject(c *gin.Context) {
 	})
 }
 
-//UpdateProject
+// UpdateProject 修改项目信息
 func UpdateProject(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -221,7 +221,11 @@ func UpdateProject(c *gin.Context) {
 	}
 
 	var d1 = []byte(project.Config)
-	err := ioutil.WriteFile(filePath+"/ecosystem.config.js", d1, 0666) //写入文件(字节数组)
+	fileName := "ecosystem.config.js"
+	if project.DeployMechanism == "scp" {
+		fileName = "ecosystem.json"
+	}
+	err := ioutil.WriteFile(filePath+"/"+fileName, d1, 0666) //写入文件(字节数组)
 	if err != nil {
 		panic(err)
 	}

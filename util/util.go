@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -31,6 +32,7 @@ type Config struct {
 	DelayDeploy  int    `yaml:"delayDeploy"`  // 延时发布时间，单位秒。默认5分钟
 	JWTSecret    string `yaml:"JWTSecret"`    // jwt安全密匙
 	HostName     string `yaml:"hostName"`     //服务地址
+	APPDir       string `yaml:"appDir"`       // 要发布的应用存储目录
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -50,6 +52,9 @@ func GetConf(filename string) (*Config, error) {
 	}
 	if c.JWTSecret == "" {
 		c.JWTSecret = "JWTSecret"
+	}
+	if c.APPDir == "" {
+		c.APPDir = "../apps"
 	}
 	return c, nil
 }
@@ -98,4 +103,13 @@ func ParseToken(token string, secret string) (string, error) {
 		return "", err
 	}
 	return claim.Claims.(jwt.MapClaims)["uid"].(string), nil
+}
+
+// PathExists 判断文件或文件夹是否存在
+func PathExists(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }

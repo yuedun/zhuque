@@ -152,6 +152,7 @@
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
+                            body.contents().find('input[name=deployMechanism][value=' + data.deployMechanism + ']').prop("checked", true);
                         }
                     });
                     $(window).on("resize", function () {
