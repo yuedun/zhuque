@@ -15,6 +15,7 @@ type Project struct {
 }
 
 type DeployConfig struct {
+	APPName        string   `json:"appName"` // 用于clone代码指定项目名
 	User           string   `json:"user"`
 	Host           []string `json:"host"`
 	Ref            string   `json:"ref"`
@@ -23,6 +24,7 @@ type DeployConfig struct {
 	PreDeployLocal string   `json:"pre-deploy-local"`
 	PostDeploy     string   `json:"post-deploy"`
 	PreSetup       string   `json:"pre-setup"`
+	RsyncArgs      string   `json:"rsyncArgs"` // rsync参数
 }
 
 // 设置User的表名为`user`

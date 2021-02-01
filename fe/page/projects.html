@@ -45,10 +45,18 @@
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
             <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-xs data-count-show" lay-event="show">查看</a>
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
-        </script>
+                {{#
+                    var deploy = function(){
+                        return d.deployMechanism=="scp";
+                    }
+                }}
+                <a class="layui-btn layui-btn-xs data-count-show" lay-event="show">查看</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+                {{# if(deploy()){ }}
+                <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="deploy">一键部署</a>
+                {{# } }}
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            </script>
 
         </div>
     </div>
@@ -194,6 +202,53 @@
                         layer.full(index);
                     });
                     return false;
+                } else if (obj.event === 'deploy') {
+                    layer.confirm('确定部署吗？', function (index) {
+                        $.ajax({
+                            url: '/exec/deploy-project/' + data.id,
+                            type: 'get',
+                            data: {},
+                            success: function (res) {
+                                layer.close(index);
+                            },
+                            error: function (res) {
+                                console.error(res.responseJSON.message);
+                                layer.msg(res.responseJSON.message);
+                            }
+                        });
+                    });
+
+                    layer.confirm('确定部署吗？', function (index) {
+                        var index2 = layer.load(0, { offset: '30%' });
+                        $('.time-use').show();
+                        var timeCount = 1;
+                        var t2 = setInterval(function () {
+                            timeCount++
+                            $('.time-use').text(timeCount + 's')
+                        }, 1000)
+                        $.get('/exec/deploy-project/' + obj.data.id, function (res) {
+                            layer.close(index2);//关闭加载状态
+                            clearInterval(t2);
+                            layer.open({
+                                type: 1
+                                , title: '发布结果' //不显示标题栏
+                                , closeBtn: 1
+                                , area: '800px;'
+                                , shade: 0.8
+                                , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                                , btn: ['关闭']
+                                , btnAlign: 'c'
+                                , moveType: 1 //拖拽模式，0或者1
+                                , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
+                            });
+                        }).fail(function (err) {
+                            console.error(err.responseJSON.message);
+                            clearInterval(t2);
+                            layer.close(index2);//关闭加载状态
+                            layer.msg(err.responseJSON.message, { icon: 5 });
+                        })
+                        layer.close(index);
+                    });
                 }
             });
 

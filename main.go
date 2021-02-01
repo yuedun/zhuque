@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/permission"
@@ -17,6 +18,7 @@ import (
 	"github.com/yuedun/zhuque/util"
 )
 
+// 全局配置
 var Conf *util.Config
 
 func init() {
@@ -26,7 +28,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	db.SQLLite, err = gorm.Open("sqlite3", Conf.Dbpath)
+	db.SQLLite, err = gorm.Open(Conf.Dialects, Conf.Dbpath)
 	if err != nil {
 		log.Println("failed to connect database")
 		panic(err)

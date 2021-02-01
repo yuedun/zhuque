@@ -19,7 +19,8 @@ var Conf *Config
 //profile variables
 type Config struct {
 	Port         string `yaml:"port"`         // 服务端口
-	Dbpath       string `yaml:"dbpath"`       // sqlite数据库文件位置
+	Dialects     string `yaml:"dialects"`     //使用的数据库类型：mysql,sqlite3
+	Dbpath       string `yaml:"dbpath"`       // sqlite数据库文件位置或mysql连接地址
 	Env          string `yaml:"env"`          // 执行环境
 	DingTalk     string `yaml:"dingTalk"`     // 钉钉webhook
 	EmailService string `yaml:"emailService"` // 邮件接口服务
@@ -55,6 +56,9 @@ func GetConf(filename string) (*Config, error) {
 	}
 	if c.APPDir == "" {
 		c.APPDir = "../apps"
+	}
+	if c.Dialects == "" {
+		c.Dialects = "sqlite3"
 	}
 	return c, nil
 }

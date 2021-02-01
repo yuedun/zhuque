@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path"
 	"strconv"
 	"strings"
 
@@ -293,44 +292,38 @@ func DeployProject(c *gin.Context) {
 	var config map[string]interface{}
 	err := json.Unmarshal([]byte(projectResult.Config), &config)
 	if err != nil {
+		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
 		panic(err)
 	}
 	production := config["deploy"].(map[string]interface{})
 	productionJSON, err := json.Marshal(production["production"])
-	log.Println(string(productionJSON))
 	var deployConfig project.DeployConfig
 	err = json.Unmarshal(productionJSON, &deployConfig)
 	if err != nil {
+		log.Println("项目配置解析失败，请检查配置json是否正确2:", err)
 		panic(err)
 	}
-	log.Println(deployConfig.Host)
 	var buffer bytes.Buffer
 	// 目录不存在则git clone
-	if ex := util.PathExists(util.Conf.APPDir); ex == false {
-		log.Println(">>>>>>>>>>>", ex)
-		cmd1 := fmt.Sprintf("git clone -b %s %s %s", deployConfig.Ref, deployConfig.Repo, path.Join(util.Conf.APPDir, projectResult.Name))
-		log.Println("第一步：检出代码：", cmd1)
-		cmdOut, err := ExecCmdSync(cmd1)
+	if exists := util.PathExists(util.Conf.APPDir); exists == false {
+		log.Println(">>>>>>>>>>>", exists)
+		// 分支，gitrepo，
+		output, err := CloneRepo(deployConfig, projectResult.Name)
 		if err != nil {
 			panic(err)
 		}
-		buffer.Write(cmdOut)
+		buffer.Write(output)
 	}
-	cmd2 := "cd " + path.Join(util.Conf.APPDir, projectResult.Name) + " && npm i"
-	log.Println("第二步：安装依赖：", cmd2)
-	cmdOut, err := ExecCmdSync(cmd2)
+	output, err := InstallDep(deployConfig, projectResult.Name)
 	if err != nil {
 		panic(err)
 	}
-	buffer.Write(cmdOut)
-	cmd3 := fmt.Sprintf("rsync -av %s %s", path.Join(util.Conf.APPDir, projectResult.Name), fmt.Sprintf("%s@%s:%s", deployConfig.User, deployConfig.Host, deployConfig.Path))
-	log.Println("第三步：同步代码：", cmd3)
-	cmdOut, err = ExecCmdSync(cmd3)
+	buffer.Write(output)
+	output, err = SyncCode(deployConfig, projectResult.Name)
 	if err != nil {
 		panic(err)
 	}
-	// 默认输出有一个换行
-	log.Println("执行结果：", string(cmdOut))
+	buffer.Write(output)
 	c.JSON(200, gin.H{
 		"data": string(buffer.Bytes()),
 	})
