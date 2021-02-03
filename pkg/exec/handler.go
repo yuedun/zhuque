@@ -59,8 +59,8 @@ func Server(c *gin.Context) {
 		}
 	}()
 	//cmd的值是项目名
-	cmdParam, ok := c.GetPostForm("cmd")
-	if !ok || cmdParam == "" {
+	projectName, ok := c.GetPostForm("cmd")
+	if !ok || projectName == "" {
 		panic(errors.New("命令无效！"))
 	}
 	userID, ok := c.GetPostForm("userID")
@@ -76,65 +76,84 @@ func Server(c *gin.Context) {
 		panic(errors.New("用户名无效！"))
 	}
 	restart, ok := c.GetPostForm("restart")
-	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", cmdParam)
-	if restart == "on" {
-		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
-		userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force", cmdParam)
+	// 判断发布类型，pm2还是scp
+	projectServer := project.NewService(db.SQLLite)
+	projectObj := project.Project{
+		Name: projectName,
 	}
-	log.Println("用户输入命令：", userCmd)
-
-	// 1.创建发布单
-	taskServer := task.NewService(db.SQLLite)
-	task := task.Task{
-		TaskName:     taskName,
-		Project:      cmdParam,
-		UserID:       userID,
-		Username:     username,
-		ReleaseState: 2,
-		Cmd:          userCmd,
-		From:         "single",
-	}
-	err := taskServer.CreateTask(&task)
+	project, err := projectServer.GetProjectInfo(projectObj)
 	if err != nil {
 		panic(err)
 	}
-
-	// 如果是测服直接发布
-	var cmdOut string
-	if util.Conf.Env == "prod" {
-		// content消息内容
-		content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
-
-		//bodyObj 钉钉消息体
-		bodyObj := make(map[string]interface{})
-		bodyObj["msgtype"] = "text"
-		bodyObj["text"] = map[string]interface{}{
-			"content": content,
-		}
-		// 发送给有项目权限的人
-		userService := user.NewService(db.SQLLite)
-		mailTo, err := userService.GetProjectUsersEmail(task.Project)
-		if err != nil {
-			//邮件错误忽略，不影响主流程
-			log.Println(err)
-		}
-		// mailTo := strings.Split(users, ";")
-		messageService := message.NewMessage()
-		// 异步发送，避免阻塞，发送成功与否都没关系
-		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmailV2(task.TaskName, content, mailTo)
-		c.JSON(200, gin.H{
-			"code":    2, // code=1是直接发布，code=2是审核发布
-			"message": "ok",
-			"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
-		})
-	} else {
-		cmdOut, err = taskServer.ReleaseTask(task.ID)
+	// scp发布类型
+	if project.DeployMechanism == "scp" {
+		output := Scp(project.ID)
 		c.JSON(200, gin.H{
 			"code":    1, //code=1是直接发布，code=2是审核发布
 			"message": err,
-			"data":    cmdOut,
+			"data":    output,
 		})
+	} else {
+		userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+		if restart == "on" {
+			// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
+			userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force", projectName)
+		}
+		log.Println("用户输入命令：", userCmd)
+
+		// 1.创建发布单
+		taskServer := task.NewService(db.SQLLite)
+		task := task.Task{
+			TaskName:     taskName,
+			Project:      projectName,
+			UserID:       userID,
+			Username:     username,
+			ReleaseState: 2,
+			Cmd:          userCmd,
+			From:         "single",
+		}
+		err = taskServer.CreateTask(&task)
+		if err != nil {
+			panic(err)
+		}
+
+		// 如果是测服直接发布
+		var cmdOut string
+		if util.Conf.Env == "prod" {
+			// content消息内容
+			content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
+
+			//bodyObj 钉钉消息体
+			bodyObj := make(map[string]interface{})
+			bodyObj["msgtype"] = "text"
+			bodyObj["text"] = map[string]interface{}{
+				"content": content,
+			}
+			// 发送给有项目权限的人
+			userService := user.NewService(db.SQLLite)
+			mailTo, err := userService.GetProjectUsersEmail(task.Project)
+			if err != nil {
+				//邮件错误忽略，不影响主流程
+				log.Println(err)
+			}
+			// mailTo := strings.Split(users, ";")
+			messageService := message.NewMessage()
+			// 异步发送，避免阻塞，发送成功与否都没关系
+			go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
+			go messageService.SendEmailV2(task.TaskName, content, mailTo)
+			c.JSON(200, gin.H{
+				"code":    2, // code=1是直接发布，code=2是审核发布
+				"message": "ok",
+				"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
+			})
+		} else {
+			cmdOut, err = taskServer.ReleaseTask(task.ID)
+			c.JSON(200, gin.H{
+				"code":    1, //code=1是直接发布，code=2是审核发布
+				"message": err,
+				"data":    cmdOut,
+			})
+		}
 	}
 }
 
@@ -304,7 +323,7 @@ func DeployProject(c *gin.Context) {
 		panic(err)
 	}
 	var buffer bytes.Buffer
-	// 目录不存在则git clone
+	// 拉代码
 	if exists := util.PathExists(util.Conf.APPDir); exists == false {
 		log.Println(">>>>>>>>>>>", exists)
 		// 分支，gitrepo，
@@ -314,11 +333,13 @@ func DeployProject(c *gin.Context) {
 		}
 		buffer.Write(output)
 	}
+	// 装依赖
 	output, err := InstallDep(deployConfig, projectResult.Name)
 	if err != nil {
 		panic(err)
 	}
 	buffer.Write(output)
+	// 同步代码
 	output, err = SyncCode(deployConfig, projectResult.Name)
 	if err != nil {
 		panic(err)

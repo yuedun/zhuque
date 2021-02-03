@@ -300,6 +300,7 @@
                         }, 5000);
                     }
                 }).fail(function (err) {
+                    clearInterval(t);
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
