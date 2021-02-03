@@ -98,7 +98,7 @@ func Scp(projectID int) string {
 	}
 	var buffer bytes.Buffer
 	// 拉代码
-	if exists := util.PathExists(util.Conf.APPDir); exists == false {
+	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectResult.Name)); exists == false {
 		log.Println(">>>>>>>>>>>", exists)
 		// 分支，gitrepo，
 		output, err := CloneRepo(deployConfig, projectResult.Name)
