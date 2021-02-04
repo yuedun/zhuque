@@ -156,7 +156,7 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 			buffer.Write(out)
 			log.Println(string(out))
 		}
-		if i == 3 {
+		if i == hostLen {
 			goto L
 		}
 	}
@@ -195,7 +195,7 @@ func PostDeploy(deployConfig project.DeployConfig) ([]byte, error) {
 			buffer.Write(out)
 			log.Println(string(out))
 		}
-		if i == 3 {
+		if i == hostLen {
 			goto L
 		}
 	}
