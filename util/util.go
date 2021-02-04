@@ -111,6 +111,7 @@ func ParseToken(token string, secret string) (string, error) {
 
 // PathExists 判断文件或文件夹是否存在
 func PathExists(path string) bool {
+	log.Println("判断目录是否存在：", path)
 	_, err := os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
 		if os.IsExist(err) {

@@ -14,3 +14,4 @@ mailPort: 465 # 邮件端口
 mailUser: xxx@163.com # 邮件发送账户
 mailPWD: xxx # 邮件授权密码     
 mailTo: xxx@126.com # 邮件发送地址,多个用;分割
+appDir: ../apps # 要发布的应用目录

@@ -1,8 +1,6 @@
 package exec
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -91,7 +89,7 @@ func Server(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code":    1, //code=1是直接发布，code=2是审核发布
 			"message": err,
-			"data":    output,
+			"data":    strings.ReplaceAll(string(output), "\n", "<br>"),
 		})
 	} else {
 		userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
@@ -287,65 +285,5 @@ func ReleaseV2(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    cmdOut,
-	})
-}
-
-// Deploy 第一次部署
-// 1.git拉代码到发布机指定目录下，项目名和发布系统中保持一致。
-// 2.安装依赖，编译等操作
-// 3.同步代码到目标机器的指定目录下
-func DeployProject(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.(error).Error(),
-			})
-		}
-	}()
-	projectID, _ := strconv.Atoi(c.Param("id"))
-	projectObj := project.Project{
-		ID: projectID,
-	}
-	projectService := project.NewService(db.SQLLite)
-	projectResult, _ := projectService.GetProjectInfo(projectObj)
-	var config map[string]interface{}
-	err := json.Unmarshal([]byte(projectResult.Config), &config)
-	if err != nil {
-		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
-		panic(err)
-	}
-	production := config["deploy"].(map[string]interface{})
-	productionJSON, err := json.Marshal(production["production"])
-	var deployConfig project.DeployConfig
-	err = json.Unmarshal(productionJSON, &deployConfig)
-	if err != nil {
-		log.Println("项目配置解析失败，请检查配置json是否正确2:", err)
-		panic(err)
-	}
-	var buffer bytes.Buffer
-	// 拉代码
-	if exists := util.PathExists(util.Conf.APPDir); exists == false {
-		log.Println(">>>>>>>>>>>", exists)
-		// 分支，gitrepo，
-		output, err := CloneRepo(deployConfig, projectResult.Name)
-		if err != nil {
-			panic(err)
-		}
-		buffer.Write(output)
-	}
-	// 装依赖
-	output, err := InstallDep(deployConfig, projectResult.Name)
-	if err != nil {
-		panic(err)
-	}
-	buffer.Write(output)
-	// 同步代码
-	output, err = SyncCode(deployConfig, projectResult.Name)
-	if err != nil {
-		panic(err)
-	}
-	buffer.Write(output)
-	c.JSON(200, gin.H{
-		"data": string(buffer.Bytes()),
 	})
 }

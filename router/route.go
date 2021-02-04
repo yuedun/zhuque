@@ -73,7 +73,6 @@ func Register(router *gin.Engine) {
 		execRouter.POST("/server-v2", exec.ServerV2)
 		execRouter.POST("/release/:id", exec.Release)
 		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
-		execRouter.GET("/deploy-project/:id", exec.DeployProject)
 	}
 	//权限管理
 	permissionRouter := router.Group("/permission")

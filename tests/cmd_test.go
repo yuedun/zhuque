@@ -60,3 +60,16 @@ func TestCat(t *testing.T) {
 
 	fmt.Printf("%s\n", out)
 }
+
+func TestFile(t *testing.T) {
+	_, err := os.Stat("../../apps/vx-1")
+	// t.Log(f.IsDir())
+	t.Log(err)
+	if err != nil {
+		if os.IsExist(err) {
+			t.Log("存在")
+			return
+		}
+		t.Log("不存在")
+	}
+}

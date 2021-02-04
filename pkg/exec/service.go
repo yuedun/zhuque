@@ -15,16 +15,16 @@ import (
 
 // ExecCmdSync 同步执行命令
 func ExecCmdSync(userCmd string) ([]byte, error) {
-	var cmdOut []byte
+	var stdoutStderr []byte
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	cmd = exec.Command("bash", "-c", userCmd)
-	if cmdOut, err := cmd.CombinedOutput(); err != nil {
-		log.Println("输出错误：", err)
-		log.Println("输出错误2：", string(cmdOut))
-		return nil, fmt.Errorf("错误码：%s，错误信息：%s", err.Error(), string(cmdOut))
+	stdoutStderr, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Println("错误码：", err)
 	}
-	return cmdOut, nil
+	log.Println("执行结果：", string(stdoutStderr))
+	return stdoutStderr, nil
 }
 
 // CloneRepo clone代码
@@ -76,6 +76,7 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 	return out, nil
 }
 
+// Scp 使用rsync同步代码
 func Scp(projectID int) string {
 	projectObj := project.Project{
 		ID: projectID,
@@ -97,9 +98,9 @@ func Scp(projectID int) string {
 		panic(err)
 	}
 	var buffer bytes.Buffer
+	var output []byte
 	// 拉代码
 	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectResult.Name)); exists == false {
-		log.Println(">>>>>>>>>>>", exists)
 		// 分支，gitrepo，
 		output, err := CloneRepo(deployConfig, projectResult.Name)
 		if err != nil {
@@ -108,7 +109,7 @@ func Scp(projectID int) string {
 		buffer.Write(output)
 	}
 	// 装依赖
-	output, err := InstallDep(deployConfig, projectResult.Name)
+	output, err = InstallDep(deployConfig, projectResult.Name)
 	if err != nil {
 		panic(err)
 	}
