@@ -37,7 +37,8 @@ func DeployControl(projectID int) (string, error) {
 	}
 	var buffer bytes.Buffer
 	var output []byte
-	// 拉代码
+
+	// 克隆代码
 	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectResult.Name)); exists == false {
 		// 分支，gitrepo，
 		output, err := CloneRepo(deployConfig, projectResult.Name)
@@ -46,12 +47,21 @@ func DeployControl(projectID int) (string, error) {
 		}
 		buffer.Write(output)
 	}
+
+	// 拉新代码
+	output, err = GitPull(deployConfig, projectResult.Name)
+	if err != nil {
+		return "", err
+	}
+	buffer.Write(output)
+
 	// 装依赖
 	output, err = InstallDep(deployConfig, projectResult.Name)
 	if err != nil {
 		return "", err
 	}
 	buffer.Write(output)
+
 	// 同步代码到远程服务器
 	output, err = SyncCode(deployConfig, projectResult.Name)
 	if err != nil {
@@ -83,7 +93,7 @@ func ExecCmdSync(userCmd string) ([]byte, error) {
 		log.Println("错误码：", err)
 		return nil, errors.New(string(stdoutStderr))
 	}
-	log.Println(userCmd, "执行结果：", string(stdoutStderr))
+	log.Println(userCmd, "执行结果：\n", string(stdoutStderr))
 	return stdoutStderr, nil
 }
 
@@ -125,6 +135,17 @@ func PostSetup() ([]byte, error) {
 // PreDeployLocal 3
 func PreDeployLocal() ([]byte, error) {
 	return nil, nil
+}
+
+// GitPull 3
+func GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
+	gitpull := fmt.Sprintf("cd %s; git pull origin %s; git log --oneline -1", path.Join(util.Conf.APPDir, projectName), deployConfig.Ref)
+	cmdOut, err := ExecCmdSync(gitpull)
+	if err != nil {
+		log.Println("拉取代码失败：", err)
+		return nil, err
+	}
+	return cmdOut, nil
 }
 
 // SyncCode 4 同步代码
