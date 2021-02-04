@@ -130,9 +130,8 @@ func PreDeployLocal() ([]byte, error) {
 func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
-	errch := make(chan error)
 	for _, host := range deployConfig.Host {
-		go func(host string) {
+		go func(host string, ch chan []byte) {
 			// 用户名@IP:远程目录
 			remotePath := fmt.Sprintf("%s@%s:%s", deployConfig.User, host, deployConfig.Path)
 			// rsync参数，宿主机项目，目标机地址
@@ -141,11 +140,11 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 			cmdput, err := ExecCmdSync(cmd3)
 			if err != nil {
 				log.Println("第三步：同步代码执行失败：", err)
-				errch <- err
+				ch <- []byte(err.Error())
 				return
 			}
 			ch <- cmdput
-		}(host)
+		}(host, ch)
 	}
 	i := 0
 	var buffer bytes.Buffer
@@ -156,9 +155,6 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 			i++
 			buffer.Write(out)
 			log.Println(string(out))
-		case e := <-errch:
-			outErr = e
-			goto L
 		}
 		if i == 3 {
 			goto L
@@ -175,19 +171,19 @@ L:
 func PostDeploy(deployConfig project.DeployConfig) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
-	errch := make(chan error) //不需要缓冲，只要接收到一个错误就退出
+	// errch := make(chan error) //不需要缓冲，只要接收到一个错误就退出
 	for _, host := range deployConfig.Host {
-		go func(host string, ch chan []byte, errch chan error) {
+		go func(host string, ch chan []byte) {
 			// 用户名@IP 命令
 			ssh := fmt.Sprintf("ssh %s@%s \"%s\"", deployConfig.User, host, deployConfig.PostDeploy)
 			cmdput, err := ExecCmdSync(ssh)
 			if err != nil {
 				log.Println("postDeploy过程 远程命令执行失败：", err)
-				errch <- err
+				ch <- []byte(err.Error())
 				return
 			}
 			ch <- cmdput
-		}(host, ch, errch)
+		}(host, ch)
 	}
 	i := 0
 	var buffer bytes.Buffer
@@ -198,9 +194,6 @@ func PostDeploy(deployConfig project.DeployConfig) ([]byte, error) {
 			i++
 			buffer.Write(out)
 			log.Println(string(out))
-		case e := <-errch:
-			outErr = e
-			goto L
 		}
 		if i == 3 {
 			goto L
