@@ -91,7 +91,7 @@ func Server(c *gin.Context) {
 		}
 		c.JSON(200, gin.H{
 			"code":    1, //code=1是直接发布，code=2是审核发布
-			"message": err.Error(),
+			"message": "",
 			"data":    strings.ReplaceAll(string(output), "\n", "<br>"),
 		})
 	} else {
