@@ -1,27 +1,25 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/user"
 )
 
 //！！！！重要作用，用于初始化数据库
-func TestMain(m *testing.M) {
-	fmt.Println("begin")
-	dba, err := gorm.Open("sqlite3", "../../zhuque.db")
-	dba.LogMode(true)
-	db.SQLLite = dba
-	if err != nil {
-		panic(err)
-	}
-	m.Run()
-	fmt.Println("end")
-}
+// func TestMain(m *testing.M) {
+// 	fmt.Println("begin")
+// 	dba, err := gorm.Open("sqlite3", "../../zhuque.db")
+// 	dba.LogMode(true)
+// 	db.SQLLite = dba
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	m.Run()
+// 	fmt.Println("end")
+// }
 
 func TestGetUser(t *testing.T) {
 	userService := user.NewService(db.SQLLite)

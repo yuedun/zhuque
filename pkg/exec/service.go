@@ -130,7 +130,7 @@ func PreDeployLocal() ([]byte, error) {
 func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
-	errch := make(chan error, hostLen)
+	errch := make(chan error)
 	for _, host := range deployConfig.Host {
 		go func(host string) {
 			// 用户名@IP:远程目录
@@ -142,12 +142,32 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 			if err != nil {
 				log.Println("第三步：同步代码执行失败：", err)
 				errch <- err
+				return
 			}
 			ch <- cmdput
 		}(host)
 	}
-	out, err := <-ch, <-errch
-	return out, err
+	i := 0
+	var buffer bytes.Buffer
+	var outErr error
+	for {
+		select {
+		case out := <-ch:
+			i++
+			buffer.Write(out)
+			log.Println(string(out))
+		case e := <-errch:
+			outErr = e
+			goto L
+		}
+		if i == 3 {
+			goto L
+		}
+	}
+L:
+	log.Println("out")
+
+	return buffer.Bytes(), outErr
 }
 
 // PostDeploy 5 远程应用服务器上发布 用户自定义命令：比如重启服务
@@ -155,19 +175,39 @@ func SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, er
 func PostDeploy(deployConfig project.DeployConfig) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
-	errch := make(chan error, hostLen)
+	errch := make(chan error) //不需要缓冲，只要接收到一个错误就退出
 	for _, host := range deployConfig.Host {
-		go func(host string) {
+		go func(host string, ch chan []byte, errch chan error) {
 			// 用户名@IP 命令
 			ssh := fmt.Sprintf("ssh %s@%s \"%s\"", deployConfig.User, host, deployConfig.PostDeploy)
 			cmdput, err := ExecCmdSync(ssh)
 			if err != nil {
 				log.Println("postDeploy过程 远程命令执行失败：", err)
 				errch <- err
+				return
 			}
 			ch <- cmdput
-		}(host)
+		}(host, ch, errch)
 	}
-	out, err := <-ch, <-errch
-	return out, err
+	i := 0
+	var buffer bytes.Buffer
+	var outErr error
+	for {
+		select {
+		case out := <-ch:
+			i++
+			buffer.Write(out)
+			log.Println(string(out))
+		case e := <-errch:
+			outErr = e
+			goto L
+		}
+		if i == 3 {
+			goto L
+		}
+	}
+L:
+	log.Println("out")
+
+	return buffer.Bytes(), outErr
 }
