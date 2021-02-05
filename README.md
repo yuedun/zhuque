@@ -461,3 +461,8 @@ scp发布是较为常用的发布方式，但朱雀使用的是rsync发布，主
 推荐的做法是在发布机上拉代码，编译。
 同步代码到远程应用服务器，重启。
 也就是说远程应用服务只需重启即可，不需要做编译操作，在发布机上编译即可。
+
+scp发布模式的配置文件和pm2一样，主要用到的三个参数是：
+- build 编译命令，可选。如：npm run build
+- rsyncArgs rsync参数，可选。如：--exclude node_modules
+- post-deploy 在应用服务器上执行的命令，如：重启服务 pm2 restart app.js
