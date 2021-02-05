@@ -31,7 +31,7 @@ func Send(c *gin.Context) {
 		panic(errors.New("命令无效！"))
 	}
 	log.Println("用户输入命令：", userCmd)
-	cmdOut, err := ExecCmdSync(userCmd)
+	cmdOut, err := CmdSync(userCmd)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"message": err,
