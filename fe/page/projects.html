@@ -149,7 +149,7 @@
                             //获取子页面的元素，进行数据渲染
                             body.contents().find("input[name=id]").val(data.id);
                             body.contents().find("input[name=name]").val(data.name);
-                            body.contents().find('input[name=env]').val(data.env);
+                            body.contents().find('select[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
                             body.contents().find('input[name=deployMechanism][value=' + data.deployMechanism + ']').prop("checked", true);

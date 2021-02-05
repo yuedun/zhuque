@@ -27,13 +27,17 @@ func DeployControl(projectID int) (string, error) {
 		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
 		return "", err
 	}
-	production := config["deploy"].(map[string]interface{})
-	productionJSON, err := json.Marshal(production["production"])
+	enviroment := config["deploy"].(map[string]interface{})
+	envJSON, err := json.Marshal(enviroment[projectResult.Env])
 	var deployConfig project.DeployConfig
-	err = json.Unmarshal(productionJSON, &deployConfig)
+	err = json.Unmarshal(envJSON, &deployConfig)
 	if err != nil {
 		log.Println("项目配置解析失败，请检查配置json是否正确2:", err)
 		return "", err
+	}
+	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {
+		log.Println("请检查配置是否完整")
+		return "", errors.New("<p style='color:red;'>请检查配置是否完整</p>")
 	}
 	var buffer bytes.Buffer
 	var output []byte
