@@ -85,24 +85,25 @@ func Server(c *gin.Context) {
 		panic(err)
 	}
 	taskServer := task.NewService(db.SQLLite)
-	// 1.创建发布单
-	task := task.Task{
-		TaskName:     taskName,
-		Project:      projectName,
-		UserID:       userID,
-		ReleaseState: 2, //待发布
-		Username:     username,
-		From:         "single",
-	}
-	taskID, err := taskServer.CreateTask(&task)
-	if err != nil {
-		panic(err)
-	}
+
 	execService := NewService(db.SQLLite)
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
 	// scp发布类型
 	if project.DeployMechanism == "scp" {
+		// 1.创建发布单
+		task := task.Task{
+			TaskName:     taskName,
+			Project:      projectName,
+			UserID:       userID,
+			ReleaseState: 2, //待发布
+			Username:     username,
+			From:         "single",
+		}
+		taskID, err := taskServer.CreateTask(&task)
+		if err != nil {
+			panic(err)
+		}
 		// 如果是测服直接发布
 		if util.Conf.Env == "prod" {
 			execService.SendMessage(task)
@@ -128,7 +129,20 @@ func Server(c *gin.Context) {
 		}
 		log.Println("用户输入命令：", userCmd)
 
-		task.Cmd = userCmd
+		// 1.创建发布单
+		task := task.Task{
+			TaskName:     taskName,
+			Project:      projectName,
+			UserID:       userID,
+			ReleaseState: 2, //待发布
+			Username:     username,
+			Cmd:          userCmd,
+			From:         "single",
+		}
+		taskID, err := taskServer.CreateTask(&task)
+		if err != nil {
+			panic(err)
+		}
 		// 如果是测服直接发布
 		if util.Conf.Env == "prod" {
 			execService.SendMessage(task)

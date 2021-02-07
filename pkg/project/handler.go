@@ -60,8 +60,6 @@ func NameList(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	log.Println(list)
-
 	// 分组数据
 	nameList := make(map[string][]Project)
 	for _, val := range list {

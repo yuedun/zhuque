@@ -111,7 +111,7 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 		return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), err
 	}
 	// 默认输出有一个换行
-	log.Println(string(cmdOut))
+	log.Println(">>>>>", string(cmdOut))
 	if err = u.db.Model(&task).UpdateColumn("releaseState", 1).Error; err != nil {
 		return "", err
 	}
