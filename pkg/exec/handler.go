@@ -31,7 +31,8 @@ func Send(c *gin.Context) {
 		panic(errors.New("命令无效！"))
 	}
 	log.Println("用户输入命令：", userCmd)
-	cmdOut, err := CmdSync(userCmd)
+	execService := NewService(db.SQLLite)
+	cmdOut, err := execService.CmdSync(userCmd)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"message": err,
@@ -83,17 +84,42 @@ func Server(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+	taskServer := task.NewService(db.SQLLite)
+	// 1.创建发布单
+	task := task.Task{
+		TaskName:     taskName,
+		Project:      projectName,
+		UserID:       userID,
+		ReleaseState: 2, //待发布
+		Username:     username,
+		From:         "single",
+	}
+	taskID, err := taskServer.CreateTask(&task)
+	if err != nil {
+		panic(err)
+	}
+	execService := NewService(db.SQLLite)
+	resCode := 1 // code=1是直接发布，code=2是审核发布
+	resData := ""
 	// scp发布类型
 	if project.DeployMechanism == "scp" {
-		output, err := DeployControl(project.ID)
-		if err != nil {
-			output = err.Error()
+		// 如果是测服直接发布
+		if util.Conf.Env == "prod" {
+			execService.SendMessage(task)
+			resCode = 2
+			resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
+		} else {
+			output, err := execService.DeployControl(project.ID, taskID)
+			if err != nil {
+				task.ReleaseState = 0
+				taskServer.UpdateTask(taskID, &task)
+				output = err.Error()
+			} else {
+				task.ReleaseState = 1
+				taskServer.UpdateTask(taskID, &task)
+			}
+			resData = strings.ReplaceAll(string(output), "\n", "<br>")
 		}
-		c.JSON(200, gin.H{
-			"code":    1, //code=1是直接发布，code=2是审核发布
-			"message": "",
-			"data":    strings.ReplaceAll(string(output), "\n", "<br>"),
-		})
 	} else {
 		userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
 		if restart == "on" {
@@ -102,60 +128,21 @@ func Server(c *gin.Context) {
 		}
 		log.Println("用户输入命令：", userCmd)
 
-		// 1.创建发布单
-		taskServer := task.NewService(db.SQLLite)
-		task := task.Task{
-			TaskName:     taskName,
-			Project:      projectName,
-			UserID:       userID,
-			Username:     username,
-			ReleaseState: 2,
-			Cmd:          userCmd,
-			From:         "single",
-		}
-		err = taskServer.CreateTask(&task)
-		if err != nil {
-			panic(err)
-		}
-
+		task.Cmd = userCmd
 		// 如果是测服直接发布
-		var cmdOut string
 		if util.Conf.Env == "prod" {
-			// content消息内容
-			content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
-
-			//bodyObj 钉钉消息体
-			bodyObj := make(map[string]interface{})
-			bodyObj["msgtype"] = "text"
-			bodyObj["text"] = map[string]interface{}{
-				"content": content,
-			}
-			// 发送给有项目权限的人
-			userService := user.NewService(db.SQLLite)
-			mailTo, err := userService.GetProjectUsersEmail(task.Project)
-			if err != nil {
-				//邮件错误忽略，不影响主流程
-				log.Println(err)
-			}
-			// mailTo := strings.Split(users, ";")
-			messageService := message.NewMessage()
-			// 异步发送，避免阻塞，发送成功与否都没关系
-			go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-			go messageService.SendEmailV2(task.TaskName, content, mailTo)
-			c.JSON(200, gin.H{
-				"code":    2, // code=1是直接发布，code=2是审核发布
-				"message": "ok",
-				"data":    fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy),
-			})
+			execService.SendMessage(task)
+			resCode = 2
+			resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
 		} else {
-			cmdOut, err = taskServer.ReleaseTask(task.ID)
-			c.JSON(200, gin.H{
-				"code":    1, //code=1是直接发布，code=2是审核发布
-				"message": err,
-				"data":    cmdOut,
-			})
+			resData, err = taskServer.ReleaseTask(taskID)
 		}
 	}
+	c.JSON(200, gin.H{
+		"code":    resCode, //code=1是直接发布，code=2是审核发布
+		"message": err,
+		"data":    resData,
+	})
 }
 
 // ServerV2 快捷发布，发布多个项目，主要是正产环境集群发布
@@ -204,7 +191,7 @@ func ServerV2(c *gin.Context) {
 		Cmd:          userCmd,
 		From:         "multi",
 	}
-	err := taskServer.CreateTask(&task)
+	_, err := taskServer.CreateTask(&task)
 	if err != nil {
 		panic(err)
 	}

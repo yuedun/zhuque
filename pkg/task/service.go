@@ -19,7 +19,7 @@ type (
 		GetTaskInfo(search Task) (task Task, err error)
 		GetTaskList(offet, limit int, search Task) (list []Task, count int, err error)
 		GetTaskInfoBySQL() (task Task, err error)
-		CreateTask(task *Task) (err error)
+		CreateTask(task *Task) (ID int, err error)
 		UpdateTask(ID int, task *Task) (err error)
 		DeleteTask(ID int) (err error)
 		ReleaseTask(ID int) (string, error)
@@ -63,13 +63,13 @@ func (u *taskService) GetTaskInfoBySQL() (task Task, err error) {
 	return task, nil
 }
 
-func (u *taskService) CreateTask(task *Task) (err error) {
+func (u *taskService) CreateTask(task *Task) (ID int, err error) {
 	err = u.db.Create(task).Error
 	log.Println(task)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return task.ID, nil
 }
 
 func (u *taskService) UpdateTask(ID int, task *Task) (err error) {

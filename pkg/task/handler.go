@@ -120,7 +120,7 @@ func CreateTask(c *gin.Context) {
 		panic(err)
 	}
 	task.CreatedAt = time.Now()
-	err := taskService.CreateTask(&task)
+	_, err := taskService.CreateTask(&task)
 	if err != nil {
 		log.Println("err:", err)
 	}
