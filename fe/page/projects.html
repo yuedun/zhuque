@@ -75,6 +75,7 @@
                     { field: 'status', title: '状态', sort: true },
                     { field: 'env', title: '环境' },
                     { field: 'namespace', title: '空间' },
+                    { field: 'deployMechanism', title: '发布方式' },
                     { title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center" }
                 ]],
                 limits: [10, 15, 20, 25, 50, 100],
@@ -153,6 +154,7 @@
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
                             body.contents().find('input[name=deployMechanism][value=' + data.deployMechanism + ']').prop("checked", true);
+                            form.render('radio')
                         }
                     });
                     $(window).on("resize", function () {
@@ -188,6 +190,9 @@
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
+                            body.contents().find('input[name="deployMechanism"][value="' + data.deployMechanism + '"]').prop("checked", true);
+                            form.render('radio')
+                            console.log(">>>>>>>set view");
                         }
                     });
                     $(window).on("resize", function () {

@@ -100,6 +100,9 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	// 执行单个shell命令时, 直接运行即可
 	// 从数据库中取出project和cmd组合。
 	log.Println("执行命令", task.Cmd)
+	if err = u.db.Model(&task).UpdateColumn("releaseState", 3).Error; err != nil {
+		return "更新数据失败", err
+	}
 	cmd = exec.Command("bash", "-c", task.Cmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
@@ -124,6 +127,9 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	task, err := u.GetTaskInfo(search)
 	if err != nil {
 		return "", err
+	}
+	if err = u.db.Model(&task).UpdateColumn("releaseState", 3).Error; err != nil {
+		return "更新数据失败", err
 	}
 	projectList := strings.Split(task.Project, ",")
 	projectLen := len(projectList)

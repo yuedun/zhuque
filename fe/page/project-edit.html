@@ -33,9 +33,9 @@
                 <label class="layui-form-label">环境</label>
                 <div class="layui-input-inline">
                     <select name="env" lay-verify="required">
-                        <option value="testing">testing</option>
-                        <option value="staging">staging</option>
-                        <option value="production">production</option>
+                        <option value="testing">testing(测服)</option>
+                        <option value="staging">staging(预发)</option>
+                        <option value="production">production(生产)</option>
                     </select>
                 </div>
             </div>
@@ -49,7 +49,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">发布方式</label>
             <div class="layui-input-block">
-                <input type="radio" name="deployMechanism" value="pm2" title="pm2发布" checked>
+                <input type="radio" name="deployMechanism" value="pm2" title="pm2发布">
                 <input type="radio" name="deployMechanism" value="scp" title="scp发布">
             </div>
         </div>

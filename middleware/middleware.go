@@ -30,6 +30,18 @@ func Logger() gin.HandlerFunc {
 	}
 }
 
+//GetUser 获取用户信息中间件
+func SetUserInfo() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		userID64 := claims["user_id"].(float64)
+		userID := int(userID64)
+		log.Print("登录用户id:", userID)
+		c.Keys["userid"] = userID
+		c.Next()
+	}
+}
+
 type LoginUser struct {
 	UserID      int
 	UserName    string

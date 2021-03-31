@@ -1,6 +1,6 @@
 module github.com/yuedun/zhuque
 
-go 1.15
+go 1.16
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
