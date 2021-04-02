@@ -87,7 +87,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 			}
 			username := loginVals.Username
 			password := loginVals.Password
-			userService := user.NewService(db.SQLLite)
+			userService := user.NewService(db.DB)
 			userObj := user.User{
 				UserName: username,
 			}

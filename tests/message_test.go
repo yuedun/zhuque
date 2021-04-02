@@ -54,6 +54,6 @@ func TestEmail(t *testing.T) {
 	mailTo := strings.Split(Conf.MailTo, ";")
 	t.Log("mailTo", mailTo)
 	messageService := message.NewMessage()
-	err := messageService.SendEmailV2("朱雀", "测试", mailTo)
+	err := messageService.SendEmail("朱雀", "测试", mailTo)
 	t.Log(err)
 }

@@ -13,7 +13,7 @@ import (
 // 	fmt.Println("begin")
 // 	dba, err := gorm.Open("sqlite3", "../../zhuque.db")
 // 	dba.LogMode(true)
-// 	db.SQLLite = dba
+// 	db.DB = dba
 // 	if err != nil {
 // 		panic(err)
 // 	}
@@ -22,7 +22,7 @@ import (
 // }
 
 func TestGetUser(t *testing.T) {
-	userService := user.NewService(db.SQLLite)
+	userService := user.NewService(db.DB)
 	userObj := user.User{ID: 5}
 	user, err := userService.GetUserInfo(userObj)
 	if err != nil {
@@ -32,7 +32,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	userService := user.NewService(db.SQLLite)
+	userService := user.NewService(db.DB)
 	newUser := new(user.User)
 	newUser.Email = ""
 	err := userService.CreateUser(newUser)
@@ -44,7 +44,7 @@ func TestCreateUser(t *testing.T) {
 
 //查询项目关联的用户
 func TestProjectUsers(t *testing.T) {
-	userService := user.NewService(db.SQLLite)
+	userService := user.NewService(db.DB)
 	emails, err := userService.GetProjectUsersEmail("zhuque")
 	if err != nil {
 		t.Error(err)

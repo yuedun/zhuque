@@ -31,7 +31,7 @@ func Send(c *gin.Context) {
 		panic(errors.New("命令无效！"))
 	}
 	log.Println("用户输入命令：", userCmd)
-	execService := NewService(db.SQLLite)
+	execService := NewService(db.DB)
 	cmdOut, err := execService.CmdSync(userCmd)
 	if err != nil {
 		c.JSON(200, gin.H{
@@ -76,7 +76,7 @@ func Server(c *gin.Context) {
 	}
 	restart, ok := c.GetPostForm("restart")
 	// 判断发布类型，pm2还是scp
-	projectServer := project.NewService(db.SQLLite)
+	projectServer := project.NewService(db.DB)
 	projectObj := project.Project{
 		Name: projectName,
 	}
@@ -84,9 +84,9 @@ func Server(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	taskServer := task.NewService(db.SQLLite)
+	taskServer := task.NewService(db.DB)
 
-	execService := NewService(db.SQLLite)
+	execService := NewService(db.DB)
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
 	// scp发布类型
@@ -195,7 +195,7 @@ func ServerV2(c *gin.Context) {
 	log.Println("用户输入命令：", userCmd)
 
 	// 1.创建发布单
-	taskServer := task.NewService(db.SQLLite)
+	taskServer := task.NewService(db.DB)
 	task := task.Task{
 		TaskName:     taskName,
 		Project:      strings.Join(projects, ","),
@@ -222,7 +222,7 @@ func ServerV2(c *gin.Context) {
 			"content": content,
 		}
 		// 发送给有项目权限的人
-		userService := user.NewService(db.SQLLite)
+		userService := user.NewService(db.DB)
 		mailTo, err := userService.GetProjectUsersEmail(task.Project)
 		if err != nil {
 			//邮件错误忽略，不影响主流程
@@ -232,7 +232,7 @@ func ServerV2(c *gin.Context) {
 		messageService := message.NewMessage()
 		// 异步发送，避免阻塞，发送成功与否都没关系
 		go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-		go messageService.SendEmailV2(task.TaskName, content, mailTo)
+		go messageService.SendEmail(task.TaskName, content, mailTo)
 		c.JSON(200, gin.H{
 			"code":    2, //code=1是直接发布，code=2是审核发布
 			"message": "ok",
@@ -258,7 +258,7 @@ func Release(c *gin.Context) {
 		}
 	}()
 	taskID, _ := strconv.Atoi(c.Param("id"))
-	taskServer := task.NewService(db.SQLLite)
+	taskServer := task.NewService(db.DB)
 	// TODO需要验证是否可发布
 	cmdOut, err := taskServer.ReleaseTask(taskID)
 	if err != nil {
@@ -280,7 +280,7 @@ func ReleaseV2(c *gin.Context) {
 		}
 	}()
 	taskID, _ := strconv.Atoi(c.Param("id"))
-	taskServer := task.NewService(db.SQLLite)
+	taskServer := task.NewService(db.DB)
 	// TODO需要验证是否可发布
 	cmdOut, err := taskServer.ReleaseTaskV2(taskID)
 	if err != nil {

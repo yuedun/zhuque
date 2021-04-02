@@ -28,19 +28,19 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	db.SQLLite, err = gorm.Open(Conf.Dialects, Conf.Dbpath)
+	db.DB, err = gorm.Open(Conf.Dialects, Conf.Dbpath)
 	if err != nil {
 		log.Println("failed to connect database")
 		panic(err)
 	}
-	db.SQLLite.AutoMigrate(&user.User{})
-	db.SQLLite.AutoMigrate(&user.UserProject{})
-	db.SQLLite.AutoMigrate(&project.Project{})
-	db.SQLLite.AutoMigrate(&task.Task{})
-	db.SQLLite.AutoMigrate(&permission.Permission{})
-	db.SQLLite.AutoMigrate(&role.Role{})
-	// db.SQLLite.AutoMigrate(&role.RolePermission{})
-	db.SQLLite.LogMode(true)
+	db.DB.AutoMigrate(&user.User{})
+	db.DB.AutoMigrate(&user.UserProject{})
+	db.DB.AutoMigrate(&project.Project{})
+	db.DB.AutoMigrate(&task.Task{})
+	db.DB.AutoMigrate(&permission.Permission{})
+	db.DB.AutoMigrate(&role.Role{})
+	db.DB.AutoMigrate(&role.RolePermission{})
+	db.DB.LogMode(true)
 	//Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 	//defer Db.Close()
 }

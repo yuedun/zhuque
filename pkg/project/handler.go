@@ -29,7 +29,7 @@ func List(c *gin.Context) {
 	projectName := c.Query("searchParams[projectName]")
 	var project Project
 	project.Name = projectName
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	list, count, err := projectService.GetProjectList(offset, limit, project)
 	if err != nil {
 		panic(err)
@@ -55,7 +55,7 @@ func NameList(c *gin.Context) {
 	log.Println("登录用户userid:", claims["user_id"])
 	userID64 := claims["user_id"].(float64)
 	userID := int(userID64)
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	list, err := projectService.GetProjectNameList(userID)
 	if err != nil {
 		panic(err)
@@ -92,7 +92,7 @@ func NameListV2(c *gin.Context) {
 	log.Println("登录用户userid:", claims["user_id"])
 	userID64 := claims["user_id"].(float64)
 	userID := int(userID64)
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	list, err := projectService.GetProjectNameList(userID)
 	if err != nil {
 		panic(err)
@@ -123,7 +123,7 @@ func NameListAll(c *gin.Context) {
 			})
 		}
 	}()
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	list, err := projectService.GetAllProjectNameList()
 	if err != nil {
 		panic(err)
@@ -157,7 +157,7 @@ func GetProjectInfo(c *gin.Context) {
 		}
 	}()
 	projectID, _ := strconv.Atoi(c.Param("id"))
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	projectObj := Project{
 		ID: projectID,
 	}
@@ -184,7 +184,7 @@ func CreateProject(c *gin.Context) {
 	if err := c.ShouldBind(&project); err != nil {
 		panic(err)
 	}
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	project.CreatedAt = time.Now()
 	err := projectService.CreateProject(&project)
 	if err != nil {
@@ -206,7 +206,7 @@ func UpdateProject(c *gin.Context) {
 		}
 	}()
 	projectID, _ := strconv.Atoi(c.Param("id"))
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	var project Project
 	if err := c.ShouldBind(&project); err != nil {
 		panic(err)
@@ -247,7 +247,7 @@ func DeleteProject(c *gin.Context) {
 		}
 	}()
 	projectID, _ := strconv.Atoi(c.Param("id"))
-	projectService := NewService(db.SQLLite)
+	projectService := NewService(db.DB)
 	err := projectService.DeleteProject(projectID)
 	if err != nil {
 		panic(err)

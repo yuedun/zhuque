@@ -50,7 +50,7 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 	projectObj := project.Project{
 		ID: projectID,
 	}
-	projectService := project.NewService(db.SQLLite)
+	projectService := project.NewService(db.DB)
 	projectResult, _ := projectService.GetProjectInfo(projectObj)
 	var config map[string]interface{}
 	err := json.Unmarshal([]byte(projectResult.Config), &config)
@@ -296,7 +296,7 @@ func (u *execService) SendMessage(task task.Task) {
 		"content": content,
 	}
 	// 发送给有项目权限的人
-	userService := user.NewService(db.SQLLite)
+	userService := user.NewService(db.DB)
 	mailTo, err := userService.GetProjectUsersEmail(task.Project)
 	if err != nil {
 		//邮件错误忽略，不影响主流程
@@ -306,5 +306,5 @@ func (u *execService) SendMessage(task task.Task) {
 	messageService := message.NewMessage()
 	// 异步发送，避免阻塞，发送成功与否都没关系
 	go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-	go messageService.SendEmailV2(task.TaskName, content, mailTo)
+	go messageService.SendEmail(task.TaskName, content, mailTo)
 }
