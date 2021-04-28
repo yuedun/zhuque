@@ -81,6 +81,7 @@
                     { field: 'email', title: '邮箱', sort: true },
                     { field: 'status', title: '状态' },
                     { field: 'roleNum', title: '角色' },
+                    { field: 'createdAt', title: '创建时间', templet: "<div>{{layui.util.toDateString(d.createdAt, 'yyyy-MM-dd HH:mm:ss')}}</div>" },
                     { title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center" }
                 ]],
                 limits: [10, 15, 20, 25, 50, 100],

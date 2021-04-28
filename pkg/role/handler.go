@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/yuedun/zhuque/db"
-
 	"github.com/gin-gonic/gin"
+	"github.com/yuedun/zhuque/db"
 )
 
 //List
@@ -24,7 +23,7 @@ func List(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset := (page - 1) * limit
 	var role Role
-	serverService := NewService(db.SQLLite)
+	serverService := NewService(db.DB)
 	list, count, err := serverService.GetRoleList(offset, limit, role)
 	if err != nil {
 		panic(err)
@@ -41,7 +40,7 @@ func List(c *gin.Context) {
 func GetRoleInfo(c *gin.Context) {
 	roleID, _ := strconv.Atoi(c.Param("id"))
 	// name := c.Param("name")
-	roleService := NewService(db.SQLLite)
+	roleService := NewService(db.DB)
 	roleObj := Role{
 		RoleNum: roleID,
 	}
@@ -64,7 +63,7 @@ func CreateRole(c *gin.Context) {
 			})
 		}
 	}()
-	roleService := NewService(db.SQLLite)
+	roleService := NewService(db.DB)
 	role := Role{}
 	if err := c.ShouldBind(&role); err != nil {
 		panic(err)
@@ -88,7 +87,7 @@ func SetPermission(c *gin.Context) {
 			})
 		}
 	}()
-	roleService := NewService(db.SQLLite)
+	roleService := NewService(db.DB)
 	role := Role{}
 	if err := c.ShouldBind(&role); err != nil {
 		panic(err)
@@ -113,7 +112,7 @@ func UpdateRole(c *gin.Context) {
 		}
 	}()
 	roleID, _ := strconv.Atoi(c.Param("id"))
-	roleService := NewService(db.SQLLite)
+	roleService := NewService(db.DB)
 	var role Role
 	if err := c.ShouldBind(&role); err != nil {
 		panic(err)
@@ -131,7 +130,7 @@ func UpdateRole(c *gin.Context) {
 //DeleteRole
 func DeleteRole(c *gin.Context) {
 	roleID, _ := strconv.Atoi(c.Param("id"))
-	roleService := NewService(db.SQLLite)
+	roleService := NewService(db.DB)
 	err := roleService.DeleteRole(roleID)
 	if err != nil {
 		log.Println("err:", err)

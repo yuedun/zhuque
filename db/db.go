@@ -4,4 +4,4 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var SQLLite *gorm.DB
+var DB *gorm.DB

@@ -32,7 +32,11 @@
             <div class="layui-inline">
                 <label class="layui-form-label">环境</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="env" lay-verify="required" autocomplete="off" class="layui-input">
+                    <select name="env" lay-verify="required">
+                        <option value="testing">testing(测服)</option>
+                        <option value="staging">staging(预发)</option>
+                        <option value="production">production(生产)</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-inline">
@@ -40,6 +44,13 @@
                 <div class="layui-input-inline">
                     <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布方式</label>
+            <div class="layui-input-block">
+                <input type="radio" name="deployMechanism" value="pm2" title="pm2发布">
+                <input type="radio" name="deployMechanism" value="scp" title="scp发布">
             </div>
         </div>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">

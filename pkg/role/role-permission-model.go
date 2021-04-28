@@ -3,7 +3,7 @@ package role
 type RolePermission struct {
 	ID           int    `json:"id"`
 	RoleID       int    `json:"roleID"`
-	permissionID string `json:"permissionID"`
+	PermissionID string `json:"permissionID"`
 }
 
 // 设置Permission的表名为`permission`

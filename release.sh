@@ -9,4 +9,4 @@ echo "git pull"
 git pull origin master
 echo "重启服务"
 pm2 restart zhuque
-
+pm2 logs

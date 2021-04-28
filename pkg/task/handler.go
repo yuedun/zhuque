@@ -34,7 +34,7 @@ func List(c *gin.Context) {
 	task.TaskName = taskName
 	task.Project = projectName
 	task.Username = username
-	serverService := NewService(db.SQLLite)
+	serverService := NewService(db.DB)
 	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
@@ -61,7 +61,7 @@ func WaitList(c *gin.Context) {
 	from := c.Query("from")
 	offset := (page - 1) * limit
 	task := Task{ReleaseState: 2, From: from}
-	serverService := NewService(db.SQLLite)
+	serverService := NewService(db.DB)
 	list, count, err := serverService.GetTaskList(offset, limit, task)
 	if err != nil {
 		panic(err)
@@ -78,7 +78,7 @@ func WaitList(c *gin.Context) {
 func GetTaskInfo(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	name := c.Param("name")
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	taskObj := Task{
 		ID:       taskID,
 		TaskName: name,
@@ -95,7 +95,7 @@ func GetTaskInfo(c *gin.Context) {
 
 //GetTaskInfoBySql
 func GetTaskInfoBySql(c *gin.Context) {
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	task, err := taskService.GetTaskInfoBySQL()
 	if err != nil {
 		log.Println("err:", err)
@@ -114,13 +114,13 @@ func CreateTask(c *gin.Context) {
 			})
 		}
 	}()
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	task := Task{}
 	if err := c.ShouldBind(&task); err != nil {
 		panic(err)
 	}
 	task.CreatedAt = time.Now()
-	err := taskService.CreateTask(&task)
+	_, err := taskService.CreateTask(&task)
 	if err != nil {
 		log.Println("err:", err)
 	}
@@ -140,7 +140,7 @@ func UpdateTask(c *gin.Context) {
 		}
 	}()
 	taskID, _ := strconv.Atoi(c.Param("id"))
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	var task Task
 	if err := c.ShouldBind(&task); err != nil {
 		panic(err)
@@ -159,7 +159,7 @@ func UpdateTask(c *gin.Context) {
 //DeleteTask
 func DeleteTask(c *gin.Context) {
 	taskID, _ := strconv.Atoi(c.Param("id"))
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	err := taskService.DeleteTask(taskID)
 	if err != nil {
 		log.Println("err:", err)
@@ -178,7 +178,7 @@ func Approve(c *gin.Context) {
 			})
 		}
 	}()
-	taskService := NewService(db.SQLLite)
+	taskService := NewService(db.DB)
 	var params map[string]interface{}
 	if err := c.ShouldBind(&params); err != nil {
 		panic(err)
@@ -204,7 +204,7 @@ func Approve(c *gin.Context) {
 		"content": content,
 	}
 	// 发送给有项目权限的人
-	userService := user.NewService(db.SQLLite)
+	userService := user.NewService(db.DB)
 	mailTo, err := userService.GetProjectUsersEmail(task.Project)
 	if err != nil {
 		//邮件错误忽略，不影响主流程
@@ -214,7 +214,7 @@ func Approve(c *gin.Context) {
 	messageService := message.NewMessage()
 	// 异步发送，避免阻塞，发送成功与否都没关系
 	go messageService.SendDingTalk(util.Conf.DingTalk, bodyObj)
-	go messageService.SendEmailV2(task.TaskName, content, mailTo)
+	go messageService.SendEmail(task.TaskName, content, mailTo)
 	c.JSON(http.StatusOK, gin.H{
 		"data":    "",
 		"message": "ok",

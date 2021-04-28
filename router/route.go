@@ -40,6 +40,7 @@ func Register(router *gin.Engine) {
 	//user路由注册,可以给各个group加中间件
 	projectRouter.Use(middleware.Logger())
 	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
+	projectRouter.Use(middleware.SetUserInfo())
 	{
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)

@@ -37,8 +37,11 @@
         <div class="layui-form-item">
             <label class="layui-form-label required">环境</label>
             <div class="layui-input-block">
-                <input type="text" name="env" lay-verify="required" lay-reqtext="环境不能为空" placeholder="请输入环境" value=""
-                    class="layui-input">
+                <select name="env" lay-verify="required">
+                    <option value="testing">testing(测服)</option>
+                    <option value="staging">staging(预发)</option>
+                    <option value="production">production(生产)</option>
+                </select>
             </div>
         </div>
         <div class="layui-form-item">

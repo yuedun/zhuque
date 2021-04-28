@@ -45,10 +45,10 @@
             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
             <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-xs data-count-show" lay-event="show">查看</a>
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
-        </script>
+                <a class="layui-btn layui-btn-xs data-count-show" lay-event="show">查看</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            </script>
 
         </div>
     </div>
@@ -75,6 +75,7 @@
                     { field: 'status', title: '状态', sort: true },
                     { field: 'env', title: '环境' },
                     { field: 'namespace', title: '空间' },
+                    { field: 'deployMechanism', title: '发布方式' },
                     { title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center" }
                 ]],
                 limits: [10, 15, 20, 25, 50, 100],
@@ -149,9 +150,11 @@
                             //获取子页面的元素，进行数据渲染
                             body.contents().find("input[name=id]").val(data.id);
                             body.contents().find("input[name=name]").val(data.name);
-                            body.contents().find('input[name=env]').val(data.env);
+                            body.contents().find('select[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
+                            body.contents().find('input[name=deployMechanism][value=' + data.deployMechanism + ']').prop("checked", true);
+                            form.render('radio')
                         }
                     });
                     $(window).on("resize", function () {
@@ -187,6 +190,9 @@
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
+                            body.contents().find('input[name="deployMechanism"][value="' + data.deployMechanism + '"]').prop("checked", true);
+                            form.render('radio')
+                            console.log(">>>>>>>set view");
                         }
                     });
                     $(window).on("resize", function () {
