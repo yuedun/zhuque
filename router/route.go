@@ -67,7 +67,7 @@ func Register(router *gin.Engine) {
 	}
 	//发送命令路由注册
 	execRouter := router.Group("/exec")
-	execRouter.Use(middleware.Jwt().MiddlewareFunc())
+	// execRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)

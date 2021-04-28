@@ -156,7 +156,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (res) {
-                        layer.msg('登录成功', function () {
+                        layer.msg('登录成功', {time: 500}, function () {
                             document.cookie =
                                 "jwt=" +
                                 escape(res.token) +

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "git pull"
-git pull origin master
+echo "git pull origin $1"
+git pull origin $1
 
 echo "build..."
 go build
