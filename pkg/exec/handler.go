@@ -90,7 +90,7 @@ func Server(c *gin.Context) {
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
 	// scp发布类型
-	if project.DeployMechanism == "scp" {
+	if project.DeployType == "scp" {
 		// 1.创建发布单
 		task := task.Task{
 			TaskName:     taskName,
@@ -125,7 +125,7 @@ func Server(c *gin.Context) {
 		userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
 		if restart == "on" {
 			// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
-			userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force", projectName)
+			userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list", projectName)
 		}
 		log.Println("用户输入命令：", userCmd)
 
@@ -143,13 +143,16 @@ func Server(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		// 如果是测服直接发布
 		if util.Conf.Env == "prod" {
+			// 生产n分钟后发布
 			execService.SendMessage(task)
 			resCode = 2
 			resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
 		} else {
-			resData, err = taskServer.ReleaseTask(taskID)
+			// 测服直接发布 resCode=1，前端调用发布接口
+
+			// resData, err = taskServer.ReleaseTask(taskID)
+			resData = fmt.Sprint(taskID)
 		}
 	}
 	c.JSON(200, gin.H{
@@ -190,7 +193,7 @@ func ServerV2(c *gin.Context) {
 	userCmd := "pm2 deploy projects/%s/ecosystem.config.js production --force"
 	if restart == "on" {
 		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
-		userCmd = "pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force"
+		userCmd = "pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list"
 	}
 	log.Println("用户输入命令：", userCmd)
 

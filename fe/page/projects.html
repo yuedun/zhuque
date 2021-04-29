@@ -7,7 +7,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../lib/layui-v2.6.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../css/public.css" media="all">
 </head>
 
@@ -52,7 +52,7 @@
 
         </div>
     </div>
-    <script src="../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../lib/layui-v2.6.5/layui.js" charset="utf-8"></script>
     <script>
         layui.use(['form', 'table'], function () {
             var $ = layui.jquery,
@@ -75,7 +75,7 @@
                     { field: 'status', title: '状态', sort: true },
                     { field: 'env', title: '环境' },
                     { field: 'namespace', title: '空间' },
-                    { field: 'deployMechanism', title: '发布方式' },
+                    { field: 'deployType', title: '发布方式' },
                     { title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center" }
                 ]],
                 limits: [10, 15, 20, 25, 50, 100],
@@ -148,13 +148,13 @@
                         success: function (layero, index) {
                             var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
                             //获取子页面的元素，进行数据渲染
-                            body.contents().find("input[name=id]").val(data.id);
-                            body.contents().find("input[name=name]").val(data.name);
-                            body.contents().find('select[name=env]').val(data.env);
-                            body.contents().find('input[name=namespace]').val(data.namespace);
-                            body.contents().find('textarea[name=config]').val(data.config);
-                            body.contents().find('input[name=deployMechanism][value=' + data.deployMechanism + ']').prop("checked", true);
-                            form.render('radio')
+                            body.find("input[name=id]").val(data.id);
+                            body.find("input[name=name]").val(data.name);
+                            body.find('select[name=env]').val(data.env);
+                            body.find('input[name=namespace]').val(data.namespace);
+                            body.find('textarea[name=config]').val(data.config);
+                            body.find('input:radio[value=pm2]').prop('checked', true);
+                            form.render()
                         }
                     });
                     $(window).on("resize", function () {
@@ -190,7 +190,7 @@
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
-                            body.contents().find('input[name="deployMechanism"][value="' + data.deployMechanism + '"]').prop("checked", true);
+                            body.contents().find('input[name="deployType"][value="' + data.deployType + '"]').prop("checked", true);
                             form.render('radio')
                             console.log(">>>>>>>set view");
                         }

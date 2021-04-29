@@ -191,7 +191,7 @@ func CreateProject(c *gin.Context) {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data":    project,
+		"data":    nil,
 		"message": "ok",
 	})
 }
@@ -220,7 +220,7 @@ func UpdateProject(c *gin.Context) {
 
 	var d1 = []byte(project.Config)
 	fileName := "ecosystem.config.js"
-	if project.DeployMechanism == "scp" {
+	if project.DeployType == "scp" {
 		fileName = "ecosystem.json"
 	}
 	err := ioutil.WriteFile(filePath+"/"+fileName, d1, 0666) //写入文件(字节数组)
