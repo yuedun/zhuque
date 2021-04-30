@@ -28,7 +28,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">选择服务</label>
                     <div class="layui-input-inline">
-                        <select name="cmd" lay-verify="required" lay-search="" id="proList">
+                        <select name="project" lay-verify="required" lay-search="" id="proList">
                             <option value="">直接选择或搜索选择</option>
                         </select>
                     </div>
@@ -118,9 +118,9 @@
                     { type: "checkbox" },
                     { field: 'id', title: 'ID', sort: true },
                     { field: 'taskName', title: '上线单' },
-                    { field: 'project', title: '项目', sort: true },
+                    { field: 'project', title: '项目' },
                     { field: 'username', title: '用户名' },
-                    { field: 'env', title: '环境', sort: true },
+                    { field: 'deployType', title: '发布方式' },
                     {
                         field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.updatedAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
                     },
@@ -257,7 +257,6 @@
                         }
                     }
                 }).fail(function (err) {
-                    clearInterval(t);
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })

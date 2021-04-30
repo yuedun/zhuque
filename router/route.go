@@ -70,16 +70,11 @@ func Register(router *gin.Engine) {
 	execRouter.Use(middleware.Jwt().MiddlewareFunc())
 	{
 		execRouter.POST("/send", exec.Send)
-		execRouter.POST("/server", exec.Server)
 		execRouter.POST("/create-task-for-pm2", exec.CreateTaskForPM2)
 		execRouter.POST("/create-task-for-scp", exec.CreateTaskForSCP)
-
-		execRouter.POST("/server-v2", exec.ServerV2)
 		execRouter.POST("/create-task-for-pm2-v2", exec.CreateTaskForPM2V2)
-
-		execRouter.POST("/release/:id", exec.Release)
-		execRouter.POST("/release-for-pm2/:id", exec.Release)
-		execRouter.POST("/release-for-scp/:id", exec.Release)
+		execRouter.POST("/release/:id", exec.Release)               //pm2
+		execRouter.POST("/release-for-scp/:id", exec.ReleaseForSCP) //scp
 		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
 	}
 	//权限管理

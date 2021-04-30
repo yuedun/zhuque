@@ -5,7 +5,7 @@ import "time"
 type Task struct {
 	ID           int       `json:"id"`
 	TaskName     string    `json:"taskName"`
-	Project      string    `json:"project"` //要发布的项目，一次可发布多个
+	Project      string    `json:"project"` //要发布的项目名，一次可发布多个
 	UserID       string    `json:"userID"`
 	Username     string    `json:"username"`
 	Status       int       `json:"status"`                          //数据状态：1有效，0无效
@@ -14,6 +14,7 @@ type Task struct {
 	Cmd          string    `json:"cmd"`                             // 发布命令
 	ApproveMsg   string    `json:"approveMsg"`                      //审批意见
 	From         string    `json:"from"`                            //单项目发布single，多项目发布multi
+	DeployType   string    `json:"deployType"`                      // 发布方式：pm2,scp
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
