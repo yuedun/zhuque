@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -18,7 +19,8 @@ var Conf *Config
 //profile variables
 type Config struct {
 	Port         string `yaml:"port"`         // 服务端口
-	Dbpath       string `yaml:"dbpath"`       // sqlite数据库文件位置
+	Dialects     string `yaml:"dialects"`     //使用的数据库类型：mysql,sqlite3
+	Dbpath       string `yaml:"dbpath"`       // sqlite数据库文件位置或mysql连接地址
 	Env          string `yaml:"env"`          // 执行环境
 	DingTalk     string `yaml:"dingTalk"`     // 钉钉webhook
 	EmailService string `yaml:"emailService"` // 邮件接口服务
@@ -31,6 +33,7 @@ type Config struct {
 	DelayDeploy  int    `yaml:"delayDeploy"`  // 延时发布时间，单位秒。默认5分钟
 	JWTSecret    string `yaml:"JWTSecret"`    // jwt安全密匙
 	HostName     string `yaml:"hostName"`     //服务地址
+	APPDir       string `yaml:"appDir"`       // 要发布的应用存储目录
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -50,6 +53,12 @@ func GetConf(filename string) (*Config, error) {
 	}
 	if c.JWTSecret == "" {
 		c.JWTSecret = "JWTSecret"
+	}
+	if c.APPDir == "" {
+		c.APPDir = "../apps"
+	}
+	if c.Dialects == "" {
+		c.Dialects = "sqlite3"
 	}
 	return c, nil
 }
@@ -98,4 +107,17 @@ func ParseToken(token string, secret string) (string, error) {
 		return "", err
 	}
 	return claim.Claims.(jwt.MapClaims)["uid"].(string), nil
+}
+
+// PathExists 判断文件或文件夹是否存在
+func PathExists(path string) bool {
+	log.Println("判断目录是否存在：", path)
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
 }

@@ -86,7 +86,7 @@ func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, 
 
 // GetPermissionForSide 侧边栏菜单
 func (u *permissionService) GetPermissionForSide(roleNum int) (menus []Menus, err error) {
-	roleService := role.NewService(db.SQLLite)
+	roleService := role.NewService(db.DB)
 	roleResult, err := roleService.RolePermissions(roleNum)
 	if err != nil {
 		return nil, err

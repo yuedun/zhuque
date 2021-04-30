@@ -18,8 +18,8 @@ type (
 		GetAllProjectNameList() (list []Project, err error)
 		GetProjectInfoBySQL() (project Project, err error)
 		CreateProject(project *Project) (err error)
-		UpdateProject(serverID int, project *Project) (err error)
-		DeleteProject(serverID int) (err error)
+		UpdateProject(projectID int, project *Project) (err error)
+		DeleteProject(prjectID int) (err error)
 	}
 )
 
@@ -43,7 +43,10 @@ func (u *projectService) GetProjectInfo(search Project) (user Project, err error
 }
 
 func (u *projectService) GetProjectList(offset, limit int, search Project) (list []Project, count int, err error) {
-	err = u.mysql.Where("name LIKE ?", search.Name+"%").Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+	if search.Name != "" {
+		u.mysql = u.mysql.Where("name LIKE ?", search.Name+"%")
+	}
+	err = u.mysql.Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return list, count, err
 	}
@@ -88,16 +91,16 @@ func (u *projectService) CreateProject(project *Project) (err error) {
 	return nil
 }
 
-func (u *projectService) UpdateProject(userID int, project *Project) (err error) {
-	err = u.mysql.Model(project).Where("id = ?", userID).Update(project).Error
+func (u *projectService) UpdateProject(projectID int, project *Project) (err error) {
+	err = u.mysql.Model(project).Where("id = ?", projectID).Update(project).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *projectService) DeleteProject(ID int) (err error) {
-	u.mysql.Where("id = ?", ID).Delete(Project{})
+func (u *projectService) DeleteProject(projectID int) (err error) {
+	u.mysql.Where("id = ?", projectID).Delete(Project{})
 	if err != nil {
 		return err
 	}

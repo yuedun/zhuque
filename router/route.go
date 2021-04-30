@@ -40,6 +40,7 @@ func Register(router *gin.Engine) {
 	//user路由注册,可以给各个group加中间件
 	projectRouter.Use(middleware.Logger())
 	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
+	projectRouter.Use(middleware.SetUserInfo())
 	{
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)
@@ -70,8 +71,15 @@ func Register(router *gin.Engine) {
 	{
 		execRouter.POST("/send", exec.Send)
 		execRouter.POST("/server", exec.Server)
+		execRouter.POST("/create-task-for-pm2", exec.CreateTaskForPM2)
+		execRouter.POST("/create-task-for-scp", exec.CreateTaskForSCP)
+
 		execRouter.POST("/server-v2", exec.ServerV2)
+		execRouter.POST("/create-task-for-pm2-v2", exec.CreateTaskForPM2V2)
+
 		execRouter.POST("/release/:id", exec.Release)
+		execRouter.POST("/release-for-pm2/:id", exec.Release)
+		execRouter.POST("/release-for-scp/:id", exec.Release)
 		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
 	}
 	//权限管理

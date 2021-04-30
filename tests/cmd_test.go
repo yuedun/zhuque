@@ -60,3 +60,42 @@ func TestCat(t *testing.T) {
 
 	fmt.Printf("%s\n", out)
 }
+
+func TestFile(t *testing.T) {
+	_, err := os.Stat("../../apps/vx-1")
+	// t.Log(f.IsDir())
+	t.Log(err)
+	if err != nil {
+		if os.IsExist(err) {
+			t.Log("存在")
+			return
+		}
+		t.Log("不存在")
+	}
+}
+
+func TestChan(t *testing.T) {
+	ch := make(chan []byte, 3)
+	// errch := make(chan error, 3)
+	hosts := []string{"a", "b", "c"}
+	for _, host := range hosts {
+		go func(host string, ch chan []byte) {
+			t.Log("host:", host)
+			ch <- []byte(host)
+		}(host, ch)
+	}
+
+	i := 0
+	for {
+		select {
+		case out := <-ch:
+			i++
+			t.Log(string(out))
+		}
+		if i == 3 {
+			goto L
+		}
+	}
+L:
+	t.Log("out")
+}

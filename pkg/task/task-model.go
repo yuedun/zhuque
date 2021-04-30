@@ -9,7 +9,7 @@ type Task struct {
 	UserID       string    `json:"userID"`
 	Username     string    `json:"username"`
 	Status       int       `json:"status"`                          //数据状态：1有效，0无效
-	ReleaseState int       `json:"releaseState"`                    // 发布结果：1成功，0失败，2待发布
+	ReleaseState int       `json:"releaseState"`                    // 发布结果：1成功，0失败，2待发布，3发布中
 	NowRelease   bool      `json:"nowRelease" gorm:"default:false"` // 是否可以立即发布，需要等待n分钟后发布，该值由管理员审批操作
 	Cmd          string    `json:"cmd"`                             // 发布命令
 	ApproveMsg   string    `json:"approveMsg"`                      //审批意见

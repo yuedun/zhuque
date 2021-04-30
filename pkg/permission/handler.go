@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/yuedun/zhuque/db"
-
 	"github.com/gin-gonic/gin"
+	"github.com/yuedun/zhuque/db"
 )
 
 //List 获取所有权限列表
@@ -19,7 +18,7 @@ func List(c *gin.Context) {
 			})
 		}
 	}()
-	serverService := NewService(db.SQLLite)
+	serverService := NewService(db.DB)
 	list, err := serverService.GetPermissionList()
 	if err != nil {
 		panic(err)
@@ -35,7 +34,7 @@ func List(c *gin.Context) {
 func GetPermissionInfo(c *gin.Context) {
 	permissionID, _ := strconv.Atoi(c.Param("id"))
 	// name := c.Param("name")
-	permissionService := NewService(db.SQLLite)
+	permissionService := NewService(db.DB)
 	permissionObj := Permission{
 		ID: permissionID,
 	}
@@ -58,7 +57,7 @@ func CreatePermission(c *gin.Context) {
 			})
 		}
 	}()
-	permissionService := NewService(db.SQLLite)
+	permissionService := NewService(db.DB)
 	permission := Permission{}
 	if err := c.ShouldBind(&permission); err != nil {
 		panic(err)
@@ -83,7 +82,7 @@ func UpdatePermission(c *gin.Context) {
 		}
 	}()
 	permissionID, _ := strconv.Atoi(c.Param("id"))
-	permissionService := NewService(db.SQLLite)
+	permissionService := NewService(db.DB)
 	var permission Permission
 	if err := c.ShouldBind(&permission); err != nil {
 		panic(err)
@@ -101,7 +100,7 @@ func UpdatePermission(c *gin.Context) {
 //DeletePermission
 func DeletePermission(c *gin.Context) {
 	permissionID, _ := strconv.Atoi(c.Param("id"))
-	permissionService := NewService(db.SQLLite)
+	permissionService := NewService(db.DB)
 	err := permissionService.DeletePermission(permissionID)
 	if err != nil {
 		log.Println("err:", err)
@@ -114,7 +113,7 @@ func DeletePermission(c *gin.Context) {
 //RolePermissions 角色管理-分配权限
 func RolePermissions(c *gin.Context) {
 	roleID, _ := strconv.Atoi(c.Param("roleid"))
-	permissionService := NewService(db.SQLLite)
+	permissionService := NewService(db.DB)
 	//所有权限
 	allPermissionList, err := permissionService.GetPermissionListForRole()
 	//角色已分配权限
