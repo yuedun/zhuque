@@ -9,208 +9,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="../lib/layui-v2.6.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../css/public.css" media="all">
-    <link rel="stylesheet" href="../js/lay-module/step-lay/step.css" media="all">
     <style>
         body {
             background-color: #ffffff;
-        }
-
-        .lay-step {
-            margin: 0 !important;
         }
     </style>
 </head>
 
 <body>
-    <div class="layuimini-container">
-        <div class="layuimini-main">
-            <div class="layui-fluid">
-                <div class="layui-card">
-                    <div class="layui-card-body" style="padding-top: 40px;">
-                        <div class="layui-carousel" id="stepForm" lay-filter="stepForm">
-                            <div carousel-item>
-                                <!-- 第一步 -->
-                                <div>
-                                    <form class="layui-form layuimini-form" style="max-width: 670px;padding-top: 40px;">
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label required">空间</label>
-                                            <div class="layui-input-block">
-                                                <input type="text" name="namespace" lay-verify="required"
-                                                    lay-reqtext="空间名不能为空" placeholder="请输入空间" value=""
-                                                    class="layui-input">
-                                                <tip>一个相同的项目名称，同一个空间下有多个项目。比如：朱雀系统，玄武系统。</tip>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label required">项目名</label>
-                                            <div class="layui-input-block">
-                                                <input type="text" name="name" lay-verify="required"
-                                                    lay-reqtext="项目名不能为空" placeholder="请输入项目名" value=""
-                                                    class="layui-input">
-                                                <tip>不同机器使用不同的项目名，可以针对项目发布，也可以针对空间发布。比如：朱雀-1，朱雀-2，玄武-1，玄武-2</tip>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label required">环境</label>
-                                            <div class="layui-input-block">
-                                                <select name="env" lay-verify="required">
-                                                    <option value="testing">testing(测服)</option>
-                                                    <option value="staging">staging(预发)</option>
-                                                    <option value="production">production(生产)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label">发布方式</label>
-                                            <div class="layui-input-block">
-                                                <input type="radio" name="deployType" value="pm2" title="pm2发布" checked>
-                                                <input type="radio" name="deployType" value="scp" title="scp发布">
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <div class="layui-input-block">
-                                                <button class="layui-btn" lay-submit lay-filter="formStep">
-                                                    &emsp;下一步&emsp;
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                                <!-- 第二步 -->
-                                <div>
-                                    <form class="layui-form layuimini-form" id="deploypm2" style="max-width: 1024px;padding-top: 40px;">
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label">配置文件</label>
-                                            <div class="layui-input-block">
-                                                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
-module.exports = {
-    apps : [{
-        script: 'index.js',
-        watch: '.'
-    }],
-    
-    deploy : {
-        production : {
-            user : 'SSH_USERNAME',
-            host : 'SSH_HOSTMACHINE',
-            ref  : 'origin/master',
-            repo : 'GIT_REPOSITORY',
-            path : 'DESTINATION_PATH',
-            'pre-deploy-local': '',
-            'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-            'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
-        }
-    }
-};
-                                                </textarea>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <div class="layui-input-block">
-                                                <button type="button"
-                                                    class="layui-btn layui-btn-primary pre">上一步</button>
-                                                <button class="layui-btn" lay-submit lay-filter="formStep2">
-                                                    &emsp;确认&emsp;
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <form class="layui-form layuimini-form" id="deployscp" style="max-width: 670px;padding-top: 40px;display: none;">
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label required">项目名</label>
-                                            <div class="layui-input-block">
-                                                <input type="text" name="name" lay-verify="required"
-                                                    lay-reqtext="项目名不能为空" placeholder="请输入项目名" value=""
-                                                    class="layui-input">
-                                                <tip>不同机器使用不同的项目名，可以针对项目发布，也可以针对空间发布。比如：朱雀-1，朱雀-2，玄武-1，玄武-2</tip>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <label class="layui-form-label required">环境</label>
-                                            <div class="layui-input-block">
-                                                <select name="env" lay-verify="required">
-                                                    <option value="testing">testing(测服)</option>
-                                                    <option value="staging">staging(预发)</option>
-                                                    <option value="production">production(生产)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="layui-form-item">
-                                            <div class="layui-input-block">
-                                                <button type="button"
-                                                    class="layui-btn layui-btn-primary pre">上一步</button>
-                                                <button class="layui-btn" lay-submit lay-filter="formStep2">
-                                                    &emsp;确认&emsp;
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div style="color: #666;margin-top: 30px;margin-bottom: 40px;padding-left: 30px;">
-                            <h3>说明</h3><br>
-                            <h4>入款到保险箱</h4>
-                            <p>如果需要，这里可以放一些关于产品的常见问题说明。</p>
-                            <br>
-                            <h4>入款到现金</h4>
-                            <p>如果需要，这里可以放一些关于产品的常见问题说明。</p>
-                        </div>
-                    </div>
+    <div class="layui-form layuimini-form">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>基本配置</legend>
+        </fieldset>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">项目名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
             </div>
-
+            <div class="layui-inline">
+                <label class="layui-form-label">环境</label>
+                <div class="layui-input-inline">
+                    <select name="env" lay-verify="required">
+                        <option value="testing">testing(测服)</option>
+                        <option value="staging">staging(预发)</option>
+                        <option value="production">production(生产)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">空间</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布方式</label>
+            <div class="layui-input-block">
+                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType" checked>
+                <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType">
+            </div>
+        </div>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>任务配置</legend>
+        </fieldset>
+        <div id="pm2config">
+            <div class="layui-form-item">
+                <label class="layui-form-label">配置文件</label>
+                <div class="layui-input-block">
+                    <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
+    module.exports = {
+        apps : [{
+            script: 'index.js',
+            watch: '.'
+        }],
+        
+        deploy : {
+            production : {
+                user : 'SSH_USERNAME',
+                host : 'SSH_HOSTMACHINE',
+                ref  : 'origin/master',
+                repo : 'GIT_REPOSITORY',
+                path : 'DESTINATION_PATH',
+                'pre-deploy-local': '',
+                'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
+                'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
+            }
+        }
+    };</textarea>
+                </div>
+            </div>
+        </div>
+        <div id="scpconfig" class="layuimini-form" style="display: none;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="user" placeholder="请输入ssh用户名" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">host</label>
+                <div class="layui-input-block">
+                    <input type="text" name="host" placeholder="请输入ssh主机名，多个主机用,分割" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">ref</label>
+                <div class="layui-input-block">
+                    <input type="text" name="ref" placeholder="请输入分支" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">repo</label>
+                <div class="layui-input-block">
+                    <input type="text" name="repo" placeholder="请输入git仓库" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">path</label>
+                <div class="layui-input-block">
+                    <input type="text" name="path" placeholder="请输入部署路径" value="" class="layui-input">
+                    <tip>目标服务器部署路径</tip>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">pre-deploy-local</label>
+                <div class="layui-input-block">
+                    <input type="text" name="preDeployLocal" placeholder="请输入发布机执行操作" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">post-deploy</label>
+                <div class="layui-input-block">
+                    <input type="text" name="postDeploy" placeholder="请输入发布命令" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">build</label>
+                <div class="layui-input-block">
+                    <input type="text" name="build" placeholder="请输入构建命令" value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">rsync</label>
+                <div class="layui-input-block">
+                    <input type="text" name="rsyncArgs" placeholder="请输入rsync参数" value="" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" id="submit-btn" lay-submit lay-filter="saveBtn">保存</button>
+                <button class="layui-btn layui-btn-primary" id="cancleBtn">取消</button>
+            </div>
         </div>
     </div>
     <script src="../lib/layui-v2.6.5/layui.js" charset="utf-8"></script>
-    <script src="../js/lay-config.js?v=1.0.4" charset="utf-8"></script>
     <script>
-        layui.use(['form', 'step'], function () {
-            var $ = layui.$,
-                form = layui.form,
-                step = layui.step;
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                $ = layui.$;
 
-            var projectObj = null;
-
-            step.render({
-                elem: '#stepForm',
-                filter: 'stepForm',
-                width: '100%', //设置容器宽度
-                stepWidth: '750px',
-                height: '700px',
-                stepItems: [{
-                    title: '项目信息'
-                }, {
-                    title: '项目配置'
-                }]
-            });
-
-            form.on('submit(formStep)', function (data) {
-                console.log(">>>>>>>>>>", data.field);
-                projectObj = data.field;
-
-                if (data.field.deployType=='scp') {
-                    $('#deploypm2').hide();
-                    $('#deployscp').show();
-                } else {
-                    $('#deploypm2').show();
-                    $('#deployscp').hide();
-
-                }
-                step.next('#stepForm');
-                return false;
-            });
-
-            form.on('submit(formStep2)', function (data) {
-                console.log(">>>>>>>>>>", data.field);
-                projectObj = Object.assign(projectObj, data.field);
-                // step.next('#stepForm');
+            //监听提交
+            form.on('submit(saveBtn)', function (data) {
+                data.field.config = $('textarea[name=config]').val();
                 $.ajax({
                     type: 'POST',
                     url: '/project/create',
                     contentType: 'application/json',
-                    data: JSON.stringify(projectObj),
+                    data: JSON.stringify(data.field),
                     success: function (res) {
                         var index = layer.alert('保存成功！', {
                             title: '最终的提交信息'
@@ -223,19 +173,28 @@ module.exports = {
                         });
 
                         return false;
-                    },
+                    }
                 });
+            })
+            // 监听radio选择事件
+            form.on('radio(deployType)', function (data) {
+                console.log(data);
+                if (data.value == "scp") {
+                    $('#pm2config').hide();
+                    $('#scpconfig').show();
+                } else {
+                    $('#scpconfig').hide();
+                    $('#pm2config').show();
+                }
+            })
+            // 监听取消
+            $('#cancleBtn').on("click", function () {
+                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(iframeIndex);
                 return false;
             });
 
-            $('.pre').click(function () {
-                step.pre('#stepForm');
-            });
-
-            $('.next').click(function () {
-                step.next('#stepForm');
-            });
-        })
+        });
     </script>
 </body>
 

@@ -56,19 +56,15 @@ func WaitList(c *gin.Context) {
 			})
 		}
 	}()
-	page, _ := strconv.Atoi(c.Query("page"))
-	limit, _ := strconv.Atoi(c.Query("limit"))
 	from := c.Query("from")
-	offset := (page - 1) * limit
-	task := Task{ReleaseState: 2, From: from}
 	serverService := NewService(db.DB)
-	list, count, err := serverService.GetTaskList(offset, limit, task)
+	list, err := serverService.WaitTaskList(from)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code":  0,
-		"count": count,
+		"count": len(list),
 		"data":  list,
 		"msg":   "ok",
 	})

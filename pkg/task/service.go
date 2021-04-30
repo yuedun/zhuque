@@ -18,6 +18,7 @@ type (
 	TaskService interface {
 		GetTaskInfo(search Task) (task Task, err error)
 		GetTaskList(offet, limit int, search Task) (list []Task, count int, err error)
+		WaitTaskList(from string) (list []Task, err error)
 		GetTaskInfoBySQL() (task Task, err error)
 		CreateTask(task *Task) (ID int, err error)
 		UpdateTask(ID int, task *Task) (err error)
@@ -53,6 +54,14 @@ func (u *taskService) GetTaskList(offset, limit int, search Task) (list []Task, 
 		return list, count, err
 	}
 	return list, count, nil
+}
+
+func (u *taskService) WaitTaskList(from string) (list []Task, err error) {
+	err = u.db.Raw("select * from task where `from` = ? and release_state in (?)", from, []int{2, 3}).Scan(&list).Error //排序
+	if err != nil {
+		return list, err
+	}
+	return list, nil
 }
 
 func (u *taskService) GetTaskInfoBySQL() (task Task, err error) {

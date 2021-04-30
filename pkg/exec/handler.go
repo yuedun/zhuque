@@ -75,7 +75,6 @@ func Server(c *gin.Context) {
 		panic(errors.New("用户名无效！"))
 	}
 	restart, ok := c.GetPostForm("restart")
-	// 判断发布类型，pm2还是scp
 	projectServer := project.NewService(db.DB)
 	projectObj := project.Project{
 		Name: projectName,
@@ -89,6 +88,7 @@ func Server(c *gin.Context) {
 	execService := NewService(db.DB)
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
+	// 判断发布类型，pm2还是scp
 	// scp发布类型
 	if project.DeployType == "scp" {
 		// 1.创建发布单
@@ -155,6 +155,154 @@ func Server(c *gin.Context) {
 			resData = fmt.Sprint(taskID)
 		}
 	}
+	c.JSON(200, gin.H{
+		"code":    resCode, //code=1是直接发布，code=2是审核发布
+		"message": err,
+		"data":    resData,
+	})
+}
+
+// 创建发布单-pm2发布模式
+func CreateTaskForPM2(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	//cmd的值是项目名
+	projectName, ok := c.GetPostForm("cmd")
+	if !ok || projectName == "" {
+		panic(errors.New("命令无效！"))
+	}
+	userID, ok := c.GetPostForm("userID")
+	if !ok || userID == "" {
+		panic(errors.New("用户ID无效！"))
+	}
+	username, ok := c.GetPostForm("username")
+	if !ok || username == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	taskName, ok := c.GetPostForm("taskName")
+	if !ok || taskName == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	restart, ok := c.GetPostForm("restart")
+
+	taskServer := task.NewService(db.DB)
+	execService := NewService(db.DB)
+
+	resCode := 1 // code=1是直接发布，code=2是审核发布
+	resData := ""
+
+	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+	if restart == "on" {
+		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
+		userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list", projectName)
+	}
+	log.Println("用户输入命令：", userCmd)
+
+	// 1.创建发布单
+	task := task.Task{
+		TaskName:     taskName,
+		Project:      projectName,
+		UserID:       userID,
+		ReleaseState: 2, //待发布
+		Username:     username,
+		Cmd:          userCmd,
+		From:         "single",
+	}
+	taskID, err := taskServer.CreateTask(&task)
+	if err != nil {
+		panic(err)
+	}
+	if util.Conf.Env == "prod" {
+		// 生产n分钟后发布
+		execService.SendMessage(task)
+		resCode = 2
+		resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
+	} else {
+		// 测服直接发布 resCode=1，前端调用发布接口
+
+		// resData, err = taskServer.ReleaseTask(taskID)
+		resData = fmt.Sprint(taskID)
+	}
+
+	c.JSON(200, gin.H{
+		"code":    resCode, //code=1是直接发布，code=2是审核发布
+		"message": err,
+		"data":    resData,
+	})
+}
+
+// 创建发布单-scp发布模式
+func CreateTaskForSCP(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	//cmd的值是项目名
+	projectName, ok := c.GetPostForm("cmd")
+	if !ok || projectName == "" {
+		panic(errors.New("命令无效！"))
+	}
+	userID, ok := c.GetPostForm("userID")
+	if !ok || userID == "" {
+		panic(errors.New("用户ID无效！"))
+	}
+	username, ok := c.GetPostForm("username")
+	if !ok || username == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	taskName, ok := c.GetPostForm("taskName")
+	if !ok || taskName == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	restart, ok := c.GetPostForm("restart")
+
+	taskServer := task.NewService(db.DB)
+	execService := NewService(db.DB)
+
+	resCode := 1 // code=1是直接发布，code=2是审核发布
+	resData := ""
+
+	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+	if restart == "on" {
+		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
+		userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list", projectName)
+	}
+	log.Println("用户输入命令：", userCmd)
+
+	// 1.创建发布单
+	task := task.Task{
+		TaskName:     taskName,
+		Project:      projectName,
+		UserID:       userID,
+		ReleaseState: 2, //待发布
+		Username:     username,
+		Cmd:          userCmd,
+		From:         "single",
+	}
+	taskID, err := taskServer.CreateTask(&task)
+	if err != nil {
+		panic(err)
+	}
+	if util.Conf.Env == "prod" {
+		// 生产n分钟后发布
+		execService.SendMessage(task)
+		resCode = 2
+		resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
+	} else {
+		// 测服直接发布 resCode=1，前端调用发布接口
+
+		// resData, err = taskServer.ReleaseTask(taskID)
+		resData = fmt.Sprint(taskID)
+	}
+
 	c.JSON(200, gin.H{
 		"code":    resCode, //code=1是直接发布，code=2是审核发布
 		"message": err,

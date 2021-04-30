@@ -24,7 +24,7 @@ type DeployConfig struct {
 	PreDeployLocal string   `json:"pre-deploy-local"`
 	PostDeploy     string   `json:"post-deploy"`
 	PreSetup       string   `json:"pre-setup"`
-	Build          string   `json:"build"`
+	Build          string   `json:"build"`     // 构建命令
 	RsyncArgs      string   `json:"rsyncArgs"` // rsync参数
 }
 
