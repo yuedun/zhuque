@@ -153,8 +153,8 @@
                             body.find('select[name=env]').val(data.env);
                             body.find('input[name=namespace]').val(data.namespace);
                             body.find('textarea[name=config]').val(data.config);
-                            body.find('input:radio[value=pm2]').prop('checked', true);
-                            form.render()
+                            body.find('.dtype input:radio[value='+data.deployType+']').prop('checked', 'checked');
+                            form.render("radio")
                         }
                     });
                     $(window).on("resize", function () {

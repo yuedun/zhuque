@@ -55,11 +55,10 @@
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
             <legend>任务配置</legend>
         </fieldset>
-        <div id="pm2config">
-            <div class="layui-form-item">
-                <label class="layui-form-label">配置文件</label>
-                <div class="layui-input-block">
-                    <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
+        <div class="layui-form-item">
+            <label class="layui-form-label">配置文件</label>
+            <div class="layui-input-block">
+                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
     module.exports = {
         apps : [{
             script: 'index.js',
@@ -79,64 +78,6 @@
             }
         }
     };</textarea>
-                </div>
-            </div>
-        </div>
-        <div id="scpconfig" class="layuimini-form" style="display: none;">
-            <div class="layui-form-item">
-                <label class="layui-form-label">用户名</label>
-                <div class="layui-input-block">
-                    <input type="text" name="user" placeholder="请输入ssh用户名" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">host</label>
-                <div class="layui-input-block">
-                    <input type="text" name="host" placeholder="请输入ssh主机名，多个主机用,分割" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">ref</label>
-                <div class="layui-input-block">
-                    <input type="text" name="ref" placeholder="请输入分支" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">repo</label>
-                <div class="layui-input-block">
-                    <input type="text" name="repo" placeholder="请输入git仓库" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">path</label>
-                <div class="layui-input-block">
-                    <input type="text" name="path" placeholder="请输入部署路径" value="" class="layui-input">
-                    <tip>目标服务器部署路径</tip>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">pre-deploy-local</label>
-                <div class="layui-input-block">
-                    <input type="text" name="preDeployLocal" placeholder="请输入发布机执行操作" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">post-deploy</label>
-                <div class="layui-input-block">
-                    <input type="text" name="postDeploy" placeholder="请输入发布命令" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">build</label>
-                <div class="layui-input-block">
-                    <input type="text" name="build" placeholder="请输入构建命令" value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">rsync</label>
-                <div class="layui-input-block">
-                    <input type="text" name="rsyncArgs" placeholder="请输入rsync参数" value="" class="layui-input">
-                </div>
             </div>
         </div>
         <div class="layui-form-item">
@@ -175,17 +116,6 @@
                         return false;
                     }
                 });
-            })
-            // 监听radio选择事件
-            form.on('radio(deployType)', function (data) {
-                console.log(data);
-                if (data.value == "scp") {
-                    $('#pm2config').hide();
-                    $('#scpconfig').show();
-                } else {
-                    $('#scpconfig').hide();
-                    $('#pm2config').show();
-                }
             })
             // 监听取消
             $('#cancleBtn').on("click", function () {

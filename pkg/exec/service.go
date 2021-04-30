@@ -47,18 +47,10 @@ func NewService(db *gorm.DB) ExecService {
 
 // DeployControl 发布流程控制
 func (u *execService) DeployControl(projectObj project.Project, taskID int) (string, error) {
-	var config map[string]interface{}
-	err := json.Unmarshal([]byte(projectObj.Config), &config)
+	var deployConfig project.DeployConfig
+	err := json.Unmarshal([]byte(projectObj.Config), &deployConfig)
 	if err != nil {
 		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
-		return "", err
-	}
-	enviroment := config["deploy"].(map[string]interface{})
-	envJSON, err := json.Marshal(enviroment[projectObj.Env])
-	var deployConfig project.DeployConfig
-	err = json.Unmarshal(envJSON, &deployConfig)
-	if err != nil {
-		log.Println("项目配置解析失败，请检查配置json是否正确2:", err)
 		return "", err
 	}
 	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {

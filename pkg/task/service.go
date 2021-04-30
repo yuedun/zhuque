@@ -57,7 +57,7 @@ func (u *taskService) GetTaskList(offset, limit int, search Task) (list []Task, 
 }
 
 func (u *taskService) WaitTaskList(from string) (list []Task, err error) {
-	err = u.db.Raw("select * from task where `from` = ? and release_state in (?)", from, []int{2, 3}).Scan(&list).Error //排序
+	err = u.db.Raw("select * from task where `from` = ? and release_state in (?) order by id desc;", from, []int{2, 3}).Scan(&list).Error //排序
 	if err != nil {
 		return list, err
 	}
