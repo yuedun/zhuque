@@ -157,34 +157,7 @@
                 var data = obj.data;
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
-                        var index2 = layer.load(0, { offset: '30%' });
-                        $('.time-use').show();
-                        var timeCount = 1;
-                        var t2 = setInterval(function () {
-                            timeCount++
-                            $('.time-use').text(timeCount + 's')
-                        }, 1000)
-                        $.post('/exec/release-v2/' + obj.data.id, function (res) {
-                            layer.close(index2);//关闭加载状态
-                            clearInterval(t2);
-                            layer.open({
-                                type: 1
-                                , title: '发布结果' //不显示标题栏
-                                , closeBtn: 1
-                                , area: '800px;'
-                                , shade: 0.8
-                                , id: 'LAY_layuipro' //设定一个id，防止重复弹出
-                                , btn: ['关闭']
-                                , btnAlign: 'c'
-                                , moveType: 1 //拖拽模式，0或者1
-                                , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
-                            });
-                            table.reload('currentTableId');
-                        }).fail(function (err) {
-                            clearInterval(t2);
-                            layer.close(index2);//关闭加载状态
-                            layer.msg(err.responseJSON.message, { icon: 5 });
-                        })
+                        relase(obj.data.id);
                         layer.close(index);
                     });
                 } else if (obj.event === 'approve') {
@@ -270,15 +243,9 @@
                 };
             });
 
+            var t2 = null;//轮训对象
             //监听提交
             form.on('submit(release)', function (data) {
-                var index = layer.load(0, { offset: '30%' });
-                $('.time-use').show();
-                var timeCount = 1;
-                var t = setInterval(function () {
-                    timeCount++
-                    $('.time-use').text(timeCount + 's')
-                }, 1000)
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
                 var projects = transfer.getData('projects'); //获取右侧数据
@@ -287,39 +254,65 @@
                     cmds.push(item.value);
                 });
                 data.field.projects = cmds;
-                console.log(data.field)
-                $.post('/exec/server-v2', data.field, function (res) {
-                    layer.close(index);//关闭加载状态
-                    clearInterval(t);
+                $.post('/exec/create-task-for-pm2-v2', data.field, function (res) {
                     // code=1是直接发布，code=2是审核发布
                     if (res.code == 1) {
-                        layer.open({
-                            type: 1
-                            , title: '发布结果' //不显示标题栏
-                            , closeBtn: 1
-                            , area: '800px;'
-                            , shade: 0.8
-                            , id: 'LAY_layuipro' //设定一个id，防止重复弹出
-                            , btn: ['关闭']
-                            , btnAlign: 'c'
-                            , moveType: 1 //拖拽模式，0或者1
-                            , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
-                        });
+                        table.reload('currentTableId');
+                        relase(res.data)
                     } else {
-                        clearInterval(t);
                         layer.msg(res.data, { icon: 6 });
-                        // 轮训刷新
-                        var t2 = setInterval(function () {
-                            table.reload('currentTableId');
-                        }, 5000);
+                        // 轮询刷新，已经存在则不再添加
+                        if (!t2) {
+                            t2 = setInterval(function () {
+                                table.reload('currentTableId');
+                            }, 5000);
+                        }
                     }
                 }).fail(function (err) {
-                    clearTimeout(t);
+                    clearInterval(t2);
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
                 return false;
             });
+            // 发布函数
+            function relase(taskId) {
+                // loading状态
+                var index = layer.load(0, { offset: '30%' });
+                // 计时
+                $('.time-use').show();
+                var timeCount = 1;
+                var t = setInterval(function () {
+                    timeCount++
+                    $('.time-use').text(timeCount + 's')
+                }, 1000);
+
+                // 用于刷新显示发布状态
+                setTimeout(function () {
+                    table.reload('currentTableId');
+                }, 1000)
+                $.post('/exec/release-v2/' + taskId, function (res) {
+                    layer.close(index);//关闭加载状态
+                    clearInterval(t);
+                    layer.open({
+                        type: 1
+                        , title: '发布结果' //不显示标题栏
+                        , closeBtn: 1
+                        , area: '800px;'
+                        , shade: 0.8
+                        , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        , btn: ['关闭']
+                        , btnAlign: 'c'
+                        , moveType: 1 //拖拽模式，0或者1
+                        , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
+                    });
+                    table.reload('currentTableId');
+                }).fail(function (err) {
+                    clearInterval(t);
+                    layer.close(index);//关闭加载状态
+                    layer.msg(err.responseJSON.message, { icon: 5 });
+                })
+            }
         });
     </script>
 

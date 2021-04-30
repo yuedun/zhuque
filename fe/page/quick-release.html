@@ -237,11 +237,11 @@
                 };
             });
 
+            var t2 = null;//轮训对象
             //监听提交发布-立即提交
             form.on('submit(release)', function (data) {
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
-                var t2 = null;//轮训对象
                 $.post('/exec/create-task-for-pm2', data.field, function (res) {
                     // code=1是直接发布，code=2是审核发布
                     if (res.code == 1) {
