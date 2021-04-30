@@ -28,7 +28,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">选择服务</label>
                     <div class="layui-input-inline">
-                        <select name="cmd" lay-verify="required" lay-search="" id="proList">
+                        <select name="project" lay-verify="required" lay-search="" id="proList">
                             <option value="">直接选择或搜索选择</option>
                         </select>
                     </div>
@@ -92,7 +92,7 @@
                             const element = res.data[value];
                             var opt = "<optgroup label='" + value + "'>" + value;
                             element.forEach(item => {
-                                opt += "<option value='" + item.name + "'>" + item.name + "</option>";
+                                opt += "<option a='sdgdghre' value='" + item.name + "|" + item.deployType + "'>" + item.name + "</option>";
                             });
                             opt += "</optgroup>";
                             $("#proList").append(opt);
@@ -118,9 +118,9 @@
                     { type: "checkbox" },
                     { field: 'id', title: 'ID', sort: true },
                     { field: 'taskName', title: '上线单' },
-                    { field: 'project', title: '项目', sort: true },
+                    { field: 'project', title: '项目' },
                     { field: 'username', title: '用户名' },
-                    { field: 'env', title: '环境', sort: true },
+                    { field: 'deployType', title: '发布方式' },
                     {
                         field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.updatedAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
                     },
@@ -151,7 +151,7 @@
                 var data = obj.data;
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
-                        relase(obj.data.id);
+                        relase(obj.data.id, obj.data.deployType);
                         layer.close(index);
                     });
                 } else if (obj.event === 'approve') {
@@ -242,11 +242,19 @@
             form.on('submit(release)', function (data) {
                 data.field.username = sessionStorage.getItem('username');
                 data.field.userID = sessionStorage.getItem('userID');
-                $.post('/exec/create-task-for-pm2', data.field, function (res) {
+                // namelist不支持多余数据，比如data-deployType，只能将数据和project放在一起，用|来分割一下
+                var projectName = data.field.project.split("|")[0];
+                var dptype = data.field.project.split("|")[1];
+                data.field.project = projectName;
+                var url = '/exec/create-task-for-pm2';
+                if (dptype == "scp") {
+                    url = '/exec/create-task-for-scp';
+                }
+                $.post(url, data.field, function (res) {
                     // code=1是直接发布，code=2是审核发布
                     if (res.code == 1) {
                         table.reload('currentTableId');
-                        relase(res.data)
+                        relase(res.data, dptype);
                     } else {
                         layer.msg(res.data, { icon: 6 });
                         // 轮询刷新，已经存在则不再添加
@@ -257,14 +265,13 @@
                         }
                     }
                 }).fail(function (err) {
-                    clearInterval(t);
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
                 return false;
             });
             // 发布函数
-            function relase(taskId) {
+            function relase(taskId, deployType) {
                 // loading状态
                 var index = layer.load(0, { offset: '30%' });
                 // 计时
@@ -279,7 +286,11 @@
                 setTimeout(function () {
                     table.reload('currentTableId');
                 }, 1000)
-                $.post('/exec/release/' + taskId, function (res) {
+                var url = '/exec/release/' + taskId;
+                if (deployType == 'scp') {
+                    url = '/exec/release-for-scp/' + taskId;
+                }
+                $.post(url, function (res) {
                     layer.close(index);//关闭加载状态
                     clearInterval(t);
                     layer.open({

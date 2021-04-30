@@ -20,7 +20,7 @@ import (
 
 type (
 	ExecService interface {
-		DeployControl(projectID, taskID int) (string, error)
+		DeployControl(project project.Project, taskID int) (string, error)
 		CmdSync(userCmd string) ([]byte, error)
 		CloneRepo(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		InstallDep(deployConfig project.DeployConfig, projectName string) ([]byte, error)
@@ -46,24 +46,11 @@ func NewService(db *gorm.DB) ExecService {
 }
 
 // DeployControl 发布流程控制
-func (u *execService) DeployControl(projectID, taskID int) (string, error) {
-	projectObj := project.Project{
-		ID: projectID,
-	}
-	projectService := project.NewService(db.DB)
-	projectResult, _ := projectService.GetProjectInfo(projectObj)
-	var config map[string]interface{}
-	err := json.Unmarshal([]byte(projectResult.Config), &config)
+func (u *execService) DeployControl(projectObj project.Project, taskID int) (string, error) {
+	var deployConfig project.DeployConfig
+	err := json.Unmarshal([]byte(projectObj.Config), &deployConfig)
 	if err != nil {
 		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
-		return "", err
-	}
-	enviroment := config["deploy"].(map[string]interface{})
-	envJSON, err := json.Marshal(enviroment[projectResult.Env])
-	var deployConfig project.DeployConfig
-	err = json.Unmarshal(envJSON, &deployConfig)
-	if err != nil {
-		log.Println("项目配置解析失败，请检查配置json是否正确2:", err)
 		return "", err
 	}
 	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {
@@ -74,9 +61,9 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 	var output []byte
 
 	// 克隆代码
-	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectResult.Name)); exists == false {
+	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectObj.Name)); exists == false {
 		// 分支，gitrepo，
-		output, err = u.CloneRepo(deployConfig, projectResult.Name)
+		output, err = u.CloneRepo(deployConfig, projectObj.Name)
 		if err != nil {
 			return "", err
 		}
@@ -86,14 +73,14 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 	}
 
 	// 拉新代码
-	output, err = u.GitPull(deployConfig, projectResult.Name)
+	output, err = u.GitPull(deployConfig, projectObj.Name)
 	if err != nil {
 		return "", err
 	}
 	buffer.Write(output)
 
 	// 装依赖
-	output, err = u.InstallDep(deployConfig, projectResult.Name)
+	output, err = u.InstallDep(deployConfig, projectObj.Name)
 	if err != nil {
 		return "", err
 	}
@@ -101,7 +88,7 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 
 	// 编译
 	if deployConfig.Build != "" {
-		output, err = u.Build(deployConfig, projectResult.Name)
+		output, err = u.Build(deployConfig, projectObj.Name)
 		if err != nil {
 			return "", err
 		}
@@ -109,7 +96,7 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 	}
 
 	// 同步代码到远程服务器 发生错误停止往下执行
-	output, err = u.SyncCode(deployConfig, projectResult.Name)
+	output, err = u.SyncCode(deployConfig, projectObj.Name)
 	if err != nil {
 		return "", err
 	}
@@ -117,7 +104,7 @@ func (u *execService) DeployControl(projectID, taskID int) (string, error) {
 
 	// 同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
-		output, err = u.PostDeploy(deployConfig, projectResult.Name)
+		output, err = u.PostDeploy(deployConfig, projectObj.Name)
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
 			return "", err
