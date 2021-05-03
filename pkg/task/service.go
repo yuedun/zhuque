@@ -109,7 +109,7 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	// 执行单个shell命令时, 直接运行即可
 	// 从数据库中取出project和cmd组合。
 	log.Println("执行命令", task.Cmd)
-	if err = u.db.Model(&task).UpdateColumn("releaseState", 3).Error; err != nil {
+	if err = u.db.Model(&task).UpdateColumn("releaseState", Releaseing).Error; err != nil {
 		return "更新数据失败", err
 	}
 	cmd = exec.Command("bash", "-c", task.Cmd)
@@ -117,14 +117,14 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 		log.Println("输出错误：", err)
 		log.Println("输出错误2：", string(cmdOut))
 		//保存失败发布记录
-		if err = u.db.Model(&task).UpdateColumn("releaseState", 0).Error; err != nil {
+		if err = u.db.Model(&task).UpdateColumn("releaseState", Fail).Error; err != nil {
 			return "更新数据失败", err
 		}
 		return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), err
 	}
 	// 默认输出有一个换行
 	log.Println(">>>>>", string(cmdOut))
-	if err = u.db.Model(&task).UpdateColumn("releaseState", 1).Error; err != nil {
+	if err = u.db.Model(&task).UpdateColumn("releaseState", Success).Error; err != nil {
 		return "", err
 	}
 	return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), nil
@@ -137,7 +137,7 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err = u.db.Model(&task).UpdateColumn("releaseState", 3).Error; err != nil {
+	if err = u.db.Model(&task).UpdateColumn("releaseState", Releaseing).Error; err != nil {
 		return "更新数据失败", err
 	}
 	projectList := strings.Split(task.Project, ",")
@@ -164,7 +164,7 @@ Loop:
 		}
 	}
 	log.Println("end for")
-	if err = u.db.Model(&task).UpdateColumn("releaseState", 1).Error; err != nil {
+	if err = u.db.Model(&task).UpdateColumn("releaseState", Success).Error; err != nil {
 		return "更新数据库失败", err
 	}
 	return resultAll, nil
