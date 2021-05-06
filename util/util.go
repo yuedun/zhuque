@@ -54,7 +54,7 @@ func GetConf(filename string) (*Config, error) {
 		c.JWTSecret = "JWTSecret"
 	}
 	if c.APPDir == "" {
-		c.APPDir = "../apps"
+		c.APPDir = "../deploy-apps"
 	}
 	if c.Dialects == "" {
 		c.Dialects = "sqlite3"
