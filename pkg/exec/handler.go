@@ -330,16 +330,11 @@ func ReleaseForSCP(c *gin.Context) {
 	output, err := execService.DeployControl(project, taskID)
 	if err != nil {
 		task.ReleaseState = 0 //失败
-		taskServer.UpdateTask(taskID, &task)
-		output = err.Error()
 	} else {
-		task.ReleaseState = 1
-		taskServer.UpdateTask(taskID, &task)
+		task.ReleaseState = 1 //成功
 	}
+	taskServer.UpdateTask(taskID, &task)
 	resData = strings.ReplaceAll(string(output), "\n", "<br>")
-	if err != nil {
-		panic(err)
-	}
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    resData,
