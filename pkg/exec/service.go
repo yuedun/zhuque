@@ -60,10 +60,12 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 	var buffer bytes.Buffer
 	var output []byte
 
-	// 克隆代码
-	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectObj.Name)); exists == false {
+	// 1.克隆代码
+	projectDirName := fmt.Sprintf("%d-%s", projectObj.ID, projectObj.Name)
+	log.Println("克隆项目名：", projectDirName)
+	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectDirName)); exists == false {
 		// 分支，gitrepo，
-		output, err = u.CloneRepo(deployConfig, projectObj.Name)
+		output, err = u.CloneRepo(deployConfig, projectDirName)
 		if err != nil {
 			return "", err
 		}
@@ -72,39 +74,39 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		buffer.Write([]byte("项目已存在，跳过克隆代码。\n"))
 	}
 
-	// 拉新代码
-	output, err = u.GitPull(deployConfig, projectObj.Name)
+	// 1.1拉新代码
+	output, err = u.GitPull(deployConfig, projectDirName)
 	if err != nil {
 		return "", err
 	}
 	buffer.Write(output)
 
-	// 装依赖
-	output, err = u.InstallDep(deployConfig, projectObj.Name)
+	// 2.装依赖
+	output, err = u.InstallDep(deployConfig, projectDirName)
 	if err != nil {
 		return "", err
 	}
 	buffer.Write(output)
 
-	// 编译
+	// 3.编译
 	if deployConfig.Build != "" {
-		output, err = u.Build(deployConfig, projectObj.Name)
+		output, err = u.Build(deployConfig, projectDirName)
 		if err != nil {
 			return "", err
 		}
 		buffer.Write(output)
 	}
 
-	// 同步代码到远程服务器 发生错误停止往下执行
-	output, err = u.SyncCode(deployConfig, projectObj.Name)
+	// 4.同步代码到远程服务器 发生错误停止往下执行
+	output, err = u.SyncCode(deployConfig, projectDirName)
 	if err != nil {
 		return "", err
 	}
 	buffer.Write(output)
 
-	// 同步代码到远程应用服务器后执行命令，如重启
+	// 5.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
-		output, err = u.PostDeploy(deployConfig, projectObj.Name)
+		output, err = u.PostDeploy(deployConfig, projectDirName)
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
 			return "", err
