@@ -149,7 +149,8 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	projectLen := len(projectList)
 	ch := make(chan CmdResult, projectLen)
 	for _, projectName := range projectList {
-		log.Println("projectName", projectName)
+		log.Println("projectName:", projectName)
+		log.Println("task.Cmd:", task.Cmd)
 		go excuteCmd(projectName, task.Cmd, ch)
 	}
 	resultAll := ""
