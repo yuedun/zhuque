@@ -15,15 +15,14 @@ type Project struct {
 }
 
 type DeployConfig struct {
-	APPName        string   `json:"appName"` // 用于clone代码指定项目名
 	User           string   `json:"user"`
 	Host           []string `json:"host"`
 	Ref            string   `json:"ref"`
 	Repo           string   `json:"repo"`
 	Path           string   `json:"path"`
-	PreDeployLocal string   `json:"pre-deploy-local"`
-	PostDeploy     string   `json:"post-deploy"`
-	PreSetup       string   `json:"pre-setup"`
+	PreDeployLocal string   `json:"preDeployLocal"`
+	PostDeploy     string   `json:"postDeploy"`
+	PreSetup       string   `json:"preSetup"`
 	Build          string   `json:"build"`     // 构建命令
 	RsyncArgs      string   `json:"rsyncArgs"` // rsync参数
 }

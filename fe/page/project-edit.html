@@ -47,10 +47,12 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <!-- 不可更改 -->
             <label class="layui-form-label">发布方式</label>
-            <div class="layui-input-block">
-                <input type="radio" name="deployType" value="pm2" title="pm2发布">
-                <input type="radio" name="deployType" value="scp" title="scp发布">
+            <div class="layui-input-block dtype">
+                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType" checked>
+                <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType">
+                <tip>项目部署成功后不能修改，修改会导致不能发布</tip>
             </div>
         </div>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
@@ -59,26 +61,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">配置文件</label>
             <div class="layui-input-block">
-                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
-module.exports = {
-    apps : [{
-        script: 'index.js',
-        watch: '.'
-    }],
-    
-    deploy : {
-        production : {
-            user : 'SSH_USERNAME',
-            host : 'SSH_HOSTMACHINE',
-            ref  : 'origin/master',
-            repo : 'GIT_REPOSITORY',
-            path : 'DESTINATION_PATH',
-            'pre-deploy-local': '',
-            'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-            'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
-        }
-    }
-};</textarea>
+                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20"></textarea>
             </div>
         </div>
         <div class="layui-form-item">

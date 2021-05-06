@@ -57,7 +57,7 @@ func (u *taskService) GetTaskList(offset, limit int, search Task) (list []Task, 
 }
 
 func (u *taskService) WaitTaskList(from string) (list []Task, err error) {
-	err = u.db.Raw("select * from task where `from` = ? and release_state in (?)", from, []int{2, 3}).Scan(&list).Error //排序
+	err = u.db.Raw("select * from task where `from` = ? and release_state in (?) order by id desc;", from, []int{2, 3}).Scan(&list).Error //排序
 	if err != nil {
 		return list, err
 	}
@@ -130,6 +130,11 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	return strings.ReplaceAll(string(cmdOut), "\n", "<br>"), nil
 }
 
+type CmdResult struct {
+	Status  int
+	Content string
+}
+
 func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	var err error
 	search := Task{ID: ID}
@@ -142,19 +147,21 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	}
 	projectList := strings.Split(task.Project, ",")
 	projectLen := len(projectList)
-	ch := make(chan string, projectLen)
+	ch := make(chan CmdResult, projectLen)
 	for _, projectName := range projectList {
-		log.Println("projectName", projectName)
+		log.Println("projectName:", projectName)
+		log.Println("task.Cmd:", task.Cmd)
 		go excuteCmd(projectName, task.Cmd, ch)
 	}
 	resultAll := ""
 	i := 0
+	result := CmdResult{}
 Loop:
 	for {
 		select {
-		case result := <-ch:
+		case result = <-ch:
 			i++
-			resultAll += result
+			resultAll += result.Content
 			log.Println("projectLen------------------------------", i)
 		case <-time.After(time.Second * 300):
 			log.Println("timeout!!")
@@ -164,7 +171,7 @@ Loop:
 		}
 	}
 	log.Println("end for")
-	if err = u.db.Model(&task).UpdateColumn("releaseState", Success).Error; err != nil {
+	if err = u.db.Model(&task).UpdateColumn("releaseState", result.Status).Error; err != nil {
 		return "更新数据库失败", err
 	}
 	return resultAll, nil
@@ -172,7 +179,11 @@ Loop:
 
 // excuteCmd 用于异步并行执行
 // @projectName 项目名 @cmd 执行命令 @result 命令执行结果
-func excuteCmd(projectName string, taskCmd string, result chan string) {
+func excuteCmd(projectName string, taskCmd string, result chan CmdResult) {
+	cmdResult := CmdResult{
+		Status:  Success,
+		Content: "",
+	}
 	var cmdOut []byte
 	var cmd *exec.Cmd
 	var err error
@@ -182,8 +193,10 @@ func excuteCmd(projectName string, taskCmd string, result chan string) {
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println(projectName+"输出错误：", err)
 		log.Println(projectName+"输出错误2：", string(cmdOut))
+		cmdResult.Status = Fail
 	}
-	result <- strings.ReplaceAll(string(cmdOut), "\n", "<br>") //写入命令执行结果
+	cmdResult.Content = strings.ReplaceAll(string(cmdOut), "\n", "<br>") //写入命令执行结果
+	result <- cmdResult
 }
 
 func (u *taskService) Approve(params map[string]interface{}) (task Task, err error) {
