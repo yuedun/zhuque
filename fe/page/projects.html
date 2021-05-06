@@ -147,14 +147,15 @@
                         content: '../page/project-edit.html',
                         success: function (layero, index) {
                             var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
+                            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象
                             //获取子页面的元素，进行数据渲染
                             body.find("input[name=id]").val(data.id);
                             body.find("input[name=name]").val(data.name);
                             body.find('select[name=env]').val(data.env);
                             body.find('input[name=namespace]').val(data.namespace);
                             body.find('textarea[name=config]').val(data.config);
-                            body.find('.dtype input:radio[value='+data.deployType+']').prop('checked', 'checked');
-                            form.render("radio")
+                            body.find('.dtype input:radio[value='+data.deployType+']').prop('checked', true);
+                            iframeWin.layui.form.render('radio');
                         }
                     });
                     $(window).on("resize", function () {
@@ -184,6 +185,7 @@
                         content: '../page/project-view.html',
                         success: function (layero, index) {
                             var body = layer.getChildFrame('body', index);//少了这个是不能从父页面向子页面传值的
+                            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象
                             //获取子页面的元素，进行数据渲染
                             body.contents().find("input[name=id]").val(data.id);
                             body.contents().find("input[name=name]").val(data.name);
@@ -191,8 +193,7 @@
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);
                             body.contents().find('input[name="deployType"][value="' + data.deployType + '"]').prop("checked", true);
-                            form.render('radio')
-                            console.log(">>>>>>>set view");
+                            iframeWin.layui.form.render('radio');
                         }
                     });
                     $(window).on("resize", function () {
