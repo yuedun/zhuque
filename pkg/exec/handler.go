@@ -94,7 +94,7 @@ func CreateTaskForPM2(c *gin.Context) {
 		TaskName:     taskName,
 		Project:      projectName,
 		UserID:       userID,
-		ReleaseState: 2, //待发布
+		ReleaseState: task.Ready, //待发布
 		Username:     username,
 		Cmd:          userCmd,
 		From:         "single",
@@ -161,7 +161,7 @@ func CreateTaskForSCP(c *gin.Context) {
 		TaskName:     taskName,
 		Project:      projectName,
 		UserID:       userID,
-		ReleaseState: 2, //待发布
+		ReleaseState: task.Ready, //待发布
 		Username:     username,
 		From:         "single",
 		DeployType:   "scp",
@@ -234,7 +234,7 @@ func CreateTaskForPM2V2(c *gin.Context) {
 		Project:      strings.Join(projects, ","),
 		UserID:       userID,
 		Username:     username,
-		ReleaseState: 2,
+		ReleaseState: task.Ready,
 		Cmd:          userCmd,
 		From:         "multi",
 	}

@@ -15,6 +15,9 @@
 [后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
 # 本地开发
+
+## 依赖项
+项目使用了sqlite3，需要安装gcc，参考地址：[gcc安装](https://www.jianshu.com/p/dc0fc5d8c900)
 ## 首次运行
 1. 复制`conf-sample.yaml`文件为`conf.yaml`文件。
 2. 配置`env`变量为`debug`。

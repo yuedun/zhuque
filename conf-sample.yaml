@@ -2,11 +2,9 @@ testUser: test #默认测试用户
 port: 8090 #服务端口，默认8090
 dialects: sqlite3 # 默认sqlite3，可以设置mysql，
 dbpath: ../zhuque.db # sqlite数据库文件位置 dialects为mysql时值为root:root@/zhuque?charset=utf8&parseTime=True&loc=Local
-env: prod # 执行环境 debug test prod
+env: debug # 执行环境 debug test prod
 dingTalk: https://oapi.dingtalk.com/robot/send?access_token=xxx # 钉钉webhook
 
-emailService: http://xxx
-token: xx
 delayDeploy: 5 # 默认5分钟后可自行发布，不需要审核
 
 mailHost: smtp.163.com # 邮件服务器地址
@@ -14,4 +12,5 @@ mailPort: 465 # 邮件端口
 mailUser: xxx@163.com # 邮件发送账户
 mailPWD: xxx # 邮件授权密码     
 mailTo: xxx@126.com # 邮件发送地址,多个用;分割
+
 appDir: ../apps # 要发布的应用目录
