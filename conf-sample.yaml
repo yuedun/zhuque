@@ -14,3 +14,4 @@ mailPWD: xxx # 邮件授权密码
 mailTo: xxx@126.com # 邮件发送地址,多个用;分割
 
 appDir: ../apps # 要发布的应用目录
+hostName: http://localhost:8090 # 服务域名

@@ -151,7 +151,7 @@
                 var data = obj.data;
                 if (obj.event === 'release') {
                     layer.confirm('确定发布么？', function (index) {
-                        relase(obj.data.id, obj.data.deployType);
+                        relase(data.id, data.deployType);
                         layer.close(index);
                     });
                 } else if (obj.event === 'approve') {

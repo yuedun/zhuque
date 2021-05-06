@@ -73,6 +73,7 @@ func Register(router *gin.Engine) {
 		execRouter.POST("/create-task-for-pm2", exec.CreateTaskForPM2)
 		execRouter.POST("/create-task-for-scp", exec.CreateTaskForSCP)
 		execRouter.POST("/create-task-for-pm2-v2", exec.CreateTaskForPM2V2)
+		execRouter.POST("/create-task-for-scp-v2", exec.CreateTaskForSCPV2)
 		execRouter.POST("/release/:id", exec.Release)               //pm2
 		execRouter.POST("/release-for-scp/:id", exec.ReleaseForSCP) //scp
 		execRouter.POST("/release-v2/:id", exec.ReleaseV2)
