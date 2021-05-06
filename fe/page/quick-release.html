@@ -92,7 +92,7 @@
                             const element = res.data[value];
                             var opt = "<optgroup label='" + value + "'>" + value;
                             element.forEach(item => {
-                                opt += "<option a='sdgdghre' value='" + item.name + "|" + item.deployType + "'>" + item.name + "</option>";
+                                opt += "<option value='" + item.name + "|" + item.deployType + "'>" + item.name + "</option>";
                             });
                             opt += "</optgroup>";
                             $("#proList").append(opt);

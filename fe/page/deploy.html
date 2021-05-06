@@ -91,6 +91,8 @@
                                 html = '<span class="layui-badge layui-bg-green">成功</span>';
                             } else if (d.releaseState == 0) {
                                 html = '<span class="layui-badge">失败</span>';
+                            } else if (d.releaseState == 3) {
+                                html = '<span class="layui-badge layui-bg-blue">发布中</span>';
                             } else {
                                 html = '<span class="layui-badge layui-bg-blue">待发布</span>';
                             }
