@@ -8,7 +8,7 @@ type Project struct {
 	Status     int       `json:"status" gorm:"default:1;comment:'1正常，0删除'"`
 	Env        string    `json:"env"`
 	Namespace  string    `json:"namespace"`
-	Config     string    `json:"config;comment:'项目配置'"`                       //发布配置
+	Config     string    `json:"config" gorm:"comment:'项目配置'"`                //发布配置
 	DeployType string    `json:"deployType" grom:"comment:'发布机制，值：pm2 ,scp'"` // 发布机制，值：pm2 ,scp
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
