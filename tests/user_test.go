@@ -6,6 +6,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/user"
+	"github.com/yuedun/zhuque/util"
 )
 
 //！！！！重要作用，用于初始化数据库
@@ -29,6 +30,10 @@ func TestGetUser(t *testing.T) {
 		t.Error(err)
 	}
 	t.Log(user)
+}
+func TestMD5(t *testing.T) {
+	p := util.GetMD5("test")
+	t.Log(p)
 }
 
 func TestCreateUser(t *testing.T) {

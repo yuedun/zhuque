@@ -30,7 +30,7 @@ CREATE TABLE `permission` (
   `menu_type` int(11) DEFAULT NULL,
   `parent_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of permission
@@ -73,20 +73,17 @@ CREATE TABLE `project` (
   `status` int(11) DEFAULT '1',
   `env` varchar(255) DEFAULT NULL,
   `namespace` varchar(255) DEFAULT NULL,
-  `config` text,
-  `deploy_mechanism` varchar(255) DEFAULT NULL,
+  `config` text DEFAULT '',
+  `deploy_type` varchar(5) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of project
 -- ----------------------------
-INSERT INTO `project` VALUES ('25', 'zhuque', null, 'fat', '官网', 'module.exports = {\r\n    apps : [{\r\n        script: \'index.js\',\r\n        watch: \'.\'\r\n    }],\r\n    \r\n    deploy : {\r\n        production : {\r\n            user : \'admin\',\r\n            host : \'192.168.1.2\',\r\n            ref  : \'origin/master\',\r\n            repo : \'GIT_REPOSITORY\',\r\n            path : \'DESTINATION_PATH\',\r\n            \'pre-deploy-local\': \'\',\r\n            \'post-deploy\' : \'npm install && pm2 reload ecosystem.config.js --env production\',\r\n            \'pre-setup\': \'npm config set registry https://registry.npm.taobao.org\'\r\n        }\r\n    }\r\n};', null, '2020-08-18 14:46:37', '2020-11-17 15:43:22');
-INSERT INTO `project` VALUES ('26', 'peilian-1', null, 'fat', '官网', 'module.exports = {\r\n    apps :[{\r\n    cwd: \'/data/www/peilian/current/dest/yog\',\r\n    name: \'peilian\',\r\n    script: \'www.js\',\r\n    merge_logs: \'true\',\r\n    log_date_format: \'HH:mm:ss\',\r\n    instances: \'max\',\r\n    max_memory_restart: \'1024M\',\r\n    exec_mode: \'cluster\',\r\n    out_file: \'/opt/logs/10557/applog/app_out.log\',\r\n    error_file: \'/opt/logs/10557/applog/error.log\',\r\n    log_type: \'json\'\r\n  }],\r\n    \r\n    deploy : {\r\n        production : {\r\n            user : \'admin\',\r\n            host : \'10.111.233.103\',\r\n            ref  : \'origin/release\',\r\n            repo : \'git@test.com.git\',\r\n            path : \'/data/www/peilian\',\r\n            \'pre-deploy-local\': \'\',\r\n            \'post-deploy\' : \'ls\',\r\n            \'pre-setup\': \'\'\r\n        }\r\n    }\r\n};', null, '2020-08-18 19:18:49', '2020-09-11 19:09:44');
-INSERT INTO `project` VALUES ('27', 'vx-1', null, 'fat', '微信', '{\r\n  \"apps\" : [{\r\n    \"script\": \"index.js\",\r\n    \"watch\": \".\"\r\n  }],\r\n  \r\n  \"deploy\" : {\r\n    \"production\" : {\r\n      \"user\" : \"root\",\r\n      \"host\" : [\"212.83.163.1\", \"212.83.163.2\", \"212.83.163.3\"],\r\n      \"ref\"  : \"master\",\r\n      \"repo\" : \"git@github.com:yuedun/test-deploy.git\",\r\n      \"path\" : \"/var/www/production\",\r\n      \"pre-setup\" : \"echo \'commands or local script path to be run on the host before the setup process starts\'\",\r\n      \"post-setup\": \"echo \'commands or a script path to be run on the host after cloning the repo\'\",\r\n      \"post-deploy\" : \"pm2 startOrRestart ecosystem.json --env production\",\r\n      \"pre-deploy-local\" : \"echo \'This is a local executed command\",\r\n      \"rsyncArgs\":\"--exclude node_module\"\r\n      }\r\n  }\r\n}', 'scp', '2020-09-11 12:51:30', '2021-01-27 15:13:55');
-INSERT INTO `project` VALUES ('28', 'vx-2', null, 'fat', '微信', '', null, '2020-09-11 12:51:42', '2020-09-11 12:51:42');
+INSERT INTO `project` VALUES ('1', 'test-project', 1, 'fat', '测试项目', '', 'scp', '2020-09-11 12:51:42', '2020-09-11 12:51:42');
 
 -- ----------------------------
 -- Table structure for `role`
@@ -98,7 +95,7 @@ CREATE TABLE `role` (
   `name` varchar(255) DEFAULT NULL,
   `permissions` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of role
@@ -123,10 +120,11 @@ CREATE TABLE `task` (
   `cmd` varchar(255) DEFAULT NULL,
   `approve_msg` varchar(255) DEFAULT NULL,
   `from` varchar(255) DEFAULT NULL,
+  `deploy_type` varchar(5) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of task
@@ -146,12 +144,12 @@ CREATE TABLE `user` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('5', 'test', 'c94f9f9e492daf39dda248950c6fc13e', 'test@163.com', '1', '1', '2020-08-21 15:51:24', '2021-01-23 17:35:09');
+INSERT INTO `user` VALUES ('1', 'test', 'c94f9f9e492daf39dda248950c6fc13e', 'test@163.com', '1', '1', '2020-08-21 15:51:24', '2021-01-23 17:35:09');
 -- ----------------------------
 -- Table structure for `user_project`
 -- ----------------------------
@@ -162,14 +160,10 @@ CREATE TABLE `user_project` (
   `project_id` int(11) DEFAULT NULL,
   `create_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of user_project
 -- ----------------------------
-INSERT INTO `user_project` VALUES ('1', '0', '0', '5');
-INSERT INTO `user_project` VALUES ('2', '0', '0', '5');
-INSERT INTO `user_project` VALUES ('3', '5', '25', '5');
-INSERT INTO `user_project` VALUES ('4', '5', '26', '5');
-INSERT INTO `user_project` VALUES ('5', '5', '27', '5');
-INSERT INTO `user_project` VALUES ('14', '7', '25', '5');
+INSERT INTO `user_project` VALUES ('1', '1', '1', '1');
+

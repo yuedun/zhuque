@@ -28,7 +28,6 @@ type Config struct {
 	MailUser    string `yaml:"mailUser"`    // 邮件发送账户
 	MailPWD     string `yaml:"mailPWD"`     // 邮件授权密码
 	MailTo      string `yaml:"mailTo"`      // 邮件发送地址
-	TestUser    string `yaml:"testUser"`    // 测试登录用户
 	DelayDeploy int    `yaml:"delayDeploy"` // 延时发布时间，单位秒。默认5分钟
 	JWTSecret   string `yaml:"JWTSecret"`   // jwt安全密匙
 	HostName    string `yaml:"hostName"`    //服务地址
