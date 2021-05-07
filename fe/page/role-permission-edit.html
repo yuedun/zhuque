@@ -49,7 +49,7 @@
 
             //初始化数据
             (function init() {
-                var roleid = $('input[name=roleID]').val();
+                var roleid = sessionStorage.getItem("roleId");
                 //1.获取所有权限，2.获取该角色权限，3.渲染
                 $.ajax({
                     type: 'GET',

@@ -87,7 +87,7 @@
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 });
 
-                var userID = $("input[name=userID]").val();
+                var userID =  sessionStorage.getItem("userId");;
                 table.render({
                     id: "table_user_project",
                     elem: '#currentTableId',

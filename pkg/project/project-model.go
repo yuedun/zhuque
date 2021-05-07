@@ -5,7 +5,7 @@ import "time"
 type Project struct {
 	ID         int       `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
 	Name       string    `json:"name" gorm:"type:varchar(20);unique_index"`
-	Status     int       `json:"status" gorm:"default:1;comment:'1正常，0删除'"`
+	Status     int       `json:"status" gorm:"default:1;not null;comment:'1正常，0删除'"`
 	Env        string    `json:"env"`
 	Namespace  string    `json:"namespace"`
 	Config     string    `json:"config" gorm:"comment:'项目配置'"`                //发布配置

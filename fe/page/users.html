@@ -177,6 +177,7 @@
                         });
                     });
                 } else if (obj.event === 'project') {
+                    sessionStorage.setItem("userId", data.id);
                     var index = layer.open({
                         title: '分配项目',
                         type: 2,

@@ -1,8 +1,6 @@
 package project
 
 import (
-	"log"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -84,7 +82,6 @@ func (u *projectService) GetProjectInfoBySQL() (project Project, err error) {
 
 func (u *projectService) CreateProject(project *Project) (err error) {
 	err = u.mysql.Create(project).Error
-	log.Println(project)
 	if err != nil {
 		return err
 	}
@@ -100,7 +97,7 @@ func (u *projectService) UpdateProject(projectID int, project *Project) (err err
 }
 
 func (u *projectService) DeleteProject(projectID int) (err error) {
-	u.mysql.Where("id = ?", projectID).Delete(Project{})
+	u.mysql.Model(&Project{ID: projectID}).UpdateColumn("status", 0)
 	if err != nil {
 		return err
 	}

@@ -186,6 +186,7 @@ func CreateProject(c *gin.Context) {
 	}
 	projectService := NewService(db.DB)
 	project.CreatedAt = time.Now()
+	project.Status = 1
 	err := projectService.CreateProject(&project)
 	if err != nil {
 		panic(err)
