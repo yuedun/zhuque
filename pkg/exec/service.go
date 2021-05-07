@@ -23,13 +23,11 @@ type (
 		DeployControl(project project.Project, taskID int) (string, error)
 		CmdSync(userCmd string) ([]byte, error)
 		CloneRepo(deployConfig project.DeployConfig, projectName string) ([]byte, error)
-		InstallDep(deployConfig project.DeployConfig, projectName string) ([]byte, error)
-		PreSetup() ([]byte, error)
-		PostSetup() ([]byte, error)
-		PreDeployLocal() ([]byte, error)
 		GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error)
+		PreBuild(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		Build(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, error)
+		PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		PostDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		SendMessage(task task.Task)
 	}
@@ -48,66 +46,87 @@ func NewService(db *gorm.DB) ExecService {
 // DeployControl 发布流程控制
 func (u *execService) DeployControl(projectObj project.Project, taskID int) (string, error) {
 	var deployConfig project.DeployConfig
+	var buffer bytes.Buffer
+	var output []byte
 	err := json.Unmarshal([]byte(projectObj.Config), &deployConfig)
 	if err != nil {
 		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
-		return "", err
+		buffer.Write([]byte(err.Error()))
+		return string(buffer.Bytes()), err
 	}
 	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {
 		log.Println("请检查配置是否完整")
-		return "", errors.New("<p style='color:red;'>请检查配置是否完整</p>")
+		buffer.Write([]byte("<p style='color:red;'>请检查配置是否完整</p>"))
+		return string(buffer.Bytes()), errors.New("<p style='color:red;'>请检查配置是否完整</p>")
 	}
-	var buffer bytes.Buffer
-	var output []byte
 
-	// 克隆代码
-	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectObj.Name)); exists == false {
+	// 1.克隆代码
+	projectDirName := fmt.Sprintf("%d-%s", projectObj.ID, projectObj.Name)
+	log.Println("克隆项目名：", projectDirName)
+	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectDirName)); exists == false {
 		// 分支，gitrepo，
-		output, err = u.CloneRepo(deployConfig, projectObj.Name)
+		output, err = u.CloneRepo(deployConfig, projectDirName)
 		if err != nil {
-			return "", err
+			buffer.Write([]byte(err.Error()))
+			return string(buffer.Bytes()), err
 		}
 		buffer.Write(output)
 	} else {
 		buffer.Write([]byte("项目已存在，跳过克隆代码。\n"))
 	}
 
-	// 拉新代码
-	output, err = u.GitPull(deployConfig, projectObj.Name)
+	// 1.1拉新代码
+	output, err = u.GitPull(deployConfig, projectDirName)
 	if err != nil {
-		return "", err
+		buffer.Write([]byte(err.Error()))
+		return string(buffer.Bytes()), err
 	}
 	buffer.Write(output)
 
-	// 装依赖
-	output, err = u.InstallDep(deployConfig, projectObj.Name)
-	if err != nil {
-		return "", err
-	}
-	buffer.Write(output)
-
-	// 编译
-	if deployConfig.Build != "" {
-		output, err = u.Build(deployConfig, projectObj.Name)
+	// 2.编译前置
+	if deployConfig.PreBuild != "" {
+		output, err = u.PreBuild(deployConfig, projectDirName)
 		if err != nil {
-			return "", err
+			buffer.Write([]byte(err.Error()))
+			return string(buffer.Bytes()), err
+		}
+		buffer.Write(output)
+	}
+	// 3.编译
+	if deployConfig.Build != "" {
+		output, err = u.Build(deployConfig, projectDirName)
+		if err != nil {
+			buffer.Write([]byte(err.Error()))
+			return string(buffer.Bytes()), err
 		}
 		buffer.Write(output)
 	}
 
-	// 同步代码到远程服务器 发生错误停止往下执行
-	output, err = u.SyncCode(deployConfig, projectObj.Name)
+	// 4.同步代码到远程服务器 发生错误停止往下执行
+	output, err = u.SyncCode(deployConfig, projectDirName)
 	if err != nil {
-		return "", err
+		buffer.Write([]byte(err.Error()))
+		return string(buffer.Bytes()), err
 	}
 	buffer.Write(output)
 
-	// 同步代码到远程应用服务器后执行命令，如重启
+	// 5.重启服务前置
+	if deployConfig.PreDeploy != "" {
+		output, err = u.PreDeploy(deployConfig, projectDirName)
+		if err != nil {
+			buffer.Write([]byte(err.Error()))
+			return string(buffer.Bytes()), err
+		}
+		buffer.Write(output)
+	}
+
+	// 6.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
-		output, err = u.PostDeploy(deployConfig, projectObj.Name)
+		output, err = u.PostDeploy(deployConfig, projectDirName)
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
-			return "", err
+			buffer.Write([]byte(err.Error()))
+			return string(buffer.Bytes()), err
 		}
 		buffer.Write(output)
 	}
@@ -143,34 +162,7 @@ func (u *execService) CloneRepo(deployConfig project.DeployConfig, projectName s
 	return cmdOut, nil
 }
 
-// InstallDep 安装依赖
-func (u *execService) InstallDep(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
-	cmd := fmt.Sprintf("cd %s ; npm i", path.Join(util.Conf.APPDir, projectName))
-	log.Println("第二步：安装依赖：", cmd)
-	cmdOut, err := u.CmdSync(cmd)
-	if err != nil {
-		log.Println("第二步：安装依赖执行失败：", err)
-		return nil, err
-	}
-	return cmdOut, nil
-}
-
-// PreSetup 1
-func (u *execService) PreSetup() ([]byte, error) {
-	return nil, nil
-}
-
-// PostSetup 2
-func (u *execService) PostSetup() ([]byte, error) {
-	return nil, nil
-}
-
-// PreDeployLocal 3
-func (u *execService) PreDeployLocal() ([]byte, error) {
-	return nil, nil
-}
-
-// GitPull 3
+// GitPull
 func (u *execService) GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	gitpull := fmt.Sprintf("cd %s; git pull origin %s; git log --oneline -1", path.Join(util.Conf.APPDir, projectName), deployConfig.Ref)
 	cmdOut, err := u.CmdSync(gitpull)
@@ -181,18 +173,29 @@ func (u *execService) GitPull(deployConfig project.DeployConfig, projectName str
 	return cmdOut, nil
 }
 
-// Build 3
-func (u *execService) Build(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
-	build := fmt.Sprintf("cd %s; %s", path.Join(util.Conf.APPDir, projectName), deployConfig.Build)
+// PreBuild
+func (u *execService) PreBuild(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
+	build := fmt.Sprintf("cd %s; %s", path.Join(util.Conf.APPDir, projectName), deployConfig.PreBuild)
 	cmdOut, err := u.CmdSync(build)
 	if err != nil {
-		log.Println("拉取代码失败：", err)
+		log.Println("编译前置操作失败：", err)
 		return nil, err
 	}
 	return cmdOut, nil
 }
 
-// SyncCode 4 同步代码
+// Build
+func (u *execService) Build(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
+	build := fmt.Sprintf("cd %s; %s", path.Join(util.Conf.APPDir, projectName), deployConfig.Build)
+	cmdOut, err := u.CmdSync(build)
+	if err != nil {
+		log.Println("编译操作失败：", err)
+		return nil, err
+	}
+	return cmdOut, nil
+}
+
+// SyncCode 同步代码
 func (u *execService) SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
@@ -203,10 +206,10 @@ func (u *execService) SyncCode(deployConfig project.DeployConfig, projectName st
 			remotePath := fmt.Sprintf("%s@%s:%s", deployConfig.User, host, deployConfig.Path)
 			// rsync参数，宿主机项目，目标机地址
 			cmd3 := fmt.Sprintf("rsync -av %s %s %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
-			log.Println("第三步：同步代码：", cmd3)
+			log.Println("同步代码：", cmd3)
 			cmdput, err := u.CmdSync(cmd3)
 			if err != nil {
-				log.Println("第三步：同步代码执行失败：", err)
+				log.Println("同步代码执行失败：", err)
 				errCh <- err
 				return
 			}
@@ -235,7 +238,18 @@ L:
 	return buffer.Bytes(), outErr
 }
 
-// PostDeploy 5 远程应用服务器上发布 用户自定义命令：比如重启服务
+// PreDeploy
+func (u *execService) PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
+	build := fmt.Sprintf("cd %s; %s", path.Join(util.Conf.APPDir, projectName), deployConfig.PreDeploy)
+	cmdOut, err := u.CmdSync(build)
+	if err != nil {
+		log.Println("应用服务器重启前置：", err)
+		return nil, err
+	}
+	return cmdOut, nil
+}
+
+// PostDeploy 远程应用服务器上发布 用户自定义命令：比如重启服务
 // 利用ssh在远程服务器上执行
 func (u *execService) PostDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	hostLen := len(deployConfig.Host)

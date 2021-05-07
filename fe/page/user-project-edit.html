@@ -66,8 +66,8 @@
         layui.use(['form', 'table'], function () {
             var form = layui.form,
                 layer = layui.layer,
-                table = layui.table
-            $ = layui.$;
+                table = layui.table,
+                $ = layui.$;
 
             !function init(params) {
                 $.get('/project/name-list-all', function (res) {

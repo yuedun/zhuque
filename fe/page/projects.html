@@ -154,7 +154,7 @@
                             body.find('select[name=env]').val(data.env);
                             body.find('input[name=namespace]').val(data.namespace);
                             body.find('textarea[name=config]').val(data.config);
-                            body.find('.dtype input:radio[value='+data.deployType+']').prop('checked', true);
+                            body.find('input:radio[value='+data.deployType+']').prop('checked', true);
                             iframeWin.layui.form.render('radio');
                         }
                     });
