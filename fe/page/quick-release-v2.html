@@ -261,7 +261,7 @@
                         relase(res.data, dptype)
                     } else {
                         layer.msg(res.data, { icon: 6 });
-                        // 轮询刷新，已经存在则不再添加
+                        // 轮询刷新，已经存在则不再添加，用于刷新是否有发布单可以发布
                         if (!t2) {
                             t2 = setInterval(function () {
                                 table.reload('currentTableId');
