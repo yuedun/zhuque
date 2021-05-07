@@ -56,12 +56,12 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 	}
 	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {
 		log.Println("请检查配置是否完整")
-		buffer.Write([]byte("<p style='color:red;'>请检查配置是否完整</p>"))
-		return string(buffer.Bytes()), errors.New("<p style='color:red;'>请检查配置是否完整</p>")
+		buffer.Write([]byte("请检查配置是否完整"))
+		return string(buffer.Bytes()), errors.New("请检查配置是否完整")
 	}
 
 	// 1.克隆代码
-	projectDirName := fmt.Sprintf("%d-%s", projectObj.ID, projectObj.Name)
+	projectDirName := fmt.Sprintf("%s", projectObj.Name)
 	log.Println("克隆项目名：", projectDirName)
 	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectDirName)); exists == false {
 		// 分支，gitrepo，
