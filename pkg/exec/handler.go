@@ -310,6 +310,7 @@ func ReleaseForSCP(c *gin.Context) {
 			})
 		}
 	}()
+	resCode := 0
 	resData := ""
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskServer := task.NewService(db.DB)
@@ -329,18 +330,15 @@ func ReleaseForSCP(c *gin.Context) {
 	}
 	output, err := execService.DeployControl(project, taskID)
 	if err != nil {
+		resCode = 1
 		task.ReleaseState = 0 //失败
-		taskServer.UpdateTask(taskID, &task)
-		output = err.Error()
 	} else {
-		task.ReleaseState = 1
-		taskServer.UpdateTask(taskID, &task)
+		task.ReleaseState = 1 //成功
 	}
+	taskServer.UpdateTask(taskID, &task)
 	resData = strings.ReplaceAll(string(output), "\n", "<br>")
-	if err != nil {
-		panic(err)
-	}
 	c.JSON(200, gin.H{
+		"code":    resCode,
 		"message": err,
 		"data":    resData,
 	})

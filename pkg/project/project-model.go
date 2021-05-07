@@ -15,16 +15,16 @@ type Project struct {
 }
 
 type DeployConfig struct {
-	User           string   `json:"user"`
-	Host           []string `json:"host"`
-	Ref            string   `json:"ref"`
-	Repo           string   `json:"repo"`
-	Path           string   `json:"path"`
-	PreDeployLocal string   `json:"preDeployLocal"`
-	PostDeploy     string   `json:"postDeploy"`
-	PreSetup       string   `json:"preSetup"`
-	Build          string   `json:"build"`     // 构建命令
-	RsyncArgs      string   `json:"rsyncArgs"` // rsync参数
+	User       string   `json:"user"`
+	Host       []string `json:"host"`
+	Ref        string   `json:"ref"`
+	Repo       string   `json:"repo"`
+	Path       string   `json:"path"`
+	PreBuild   string   `json:"preBuild"`   //构建前执行的命令：装依赖，设置环境变量等
+	Build      string   `json:"build"`      // 构建命令
+	PreDeploy  string   `json:"preDeploy"`  //应用服务器重启前执行的命令：设置环境变量等
+	PostDeploy string   `json:"postDeploy"` //应用服务器重启
+	RsyncArgs  string   `json:"rsyncArgs"`  // rsync参数
 }
 
 // 设置User的表名为`user`
