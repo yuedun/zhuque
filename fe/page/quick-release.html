@@ -22,7 +22,7 @@
                     <label class="layui-form-label required">发布单</label>
                     <div class="layui-input-inline" style="width: 476px;">
                         <input type="text" name="taskName" lay-verify="required" lay-reqtext="发布单不能为空"
-                            placeholder="请输入发布单" value="" class="layui-input">
+                            placeholder="请输入发布内容" value="" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -293,6 +293,10 @@
                 $.post(url, function (res) {
                     layer.close(index);//关闭加载状态
                     clearInterval(t);
+                    var backgroundColor = "#393D49";//lightcoral
+                    if (res.code == 1) {
+                        backgroundColor = "lightcoral";
+                    }
                     layer.open({
                         type: 1
                         , title: '发布结果' //不显示标题栏
@@ -303,7 +307,7 @@
                         , btn: ['关闭']
                         , btnAlign: 'c'
                         , moveType: 1 //拖拽模式，0或者1
-                        , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
+                        , content: '<div style="padding: 30px; line-height: 22px; background-color: ' + backgroundColor + '; color: #fff; font-weight: 300;">' + res.data + '</div>'
                     });
                     table.reload('currentTableId');
                 }).fail(function (err) {
