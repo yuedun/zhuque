@@ -20,7 +20,7 @@ import (
 
 type (
 	ExecService interface {
-		DeployControl(project project.Project, taskID int) (string, error)
+		DeployControl(project project.Project, taskID int) ([]byte, error)
 		CmdSync(userCmd string) ([]byte, error)
 		CloneRepo(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error)
@@ -44,7 +44,7 @@ func NewService(db *gorm.DB) ExecService {
 }
 
 // DeployControl 发布流程控制
-func (u *execService) DeployControl(projectObj project.Project, taskID int) (string, error) {
+func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]byte, error) {
 	var deployConfig project.DeployConfig
 	var buffer bytes.Buffer
 	var output []byte
@@ -52,12 +52,12 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 	if err != nil {
 		log.Println("项目配置解析失败，请检查配置json是否正确1:", err)
 		buffer.Write([]byte(err.Error()))
-		return string(buffer.Bytes()), err
+		return buffer.Bytes(), err
 	}
 	if deployConfig.User == "" || len(deployConfig.Host) == 0 || deployConfig.Ref == "" || deployConfig.Repo == "" || deployConfig.Path == "" {
 		log.Println("请检查配置是否完整")
 		buffer.Write([]byte("请检查配置是否完整"))
-		return string(buffer.Bytes()), errors.New("请检查配置是否完整")
+		return buffer.Bytes(), errors.New("请检查配置是否完整")
 	}
 
 	// 1.克隆代码
@@ -68,7 +68,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		output, err = u.CloneRepo(deployConfig, projectDirName)
 		if err != nil {
 			buffer.Write([]byte(err.Error()))
-			return string(buffer.Bytes()), err
+			return buffer.Bytes(), err
 		}
 		buffer.Write(output)
 	} else {
@@ -79,7 +79,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 	output, err = u.GitPull(deployConfig, projectDirName)
 	if err != nil {
 		buffer.Write([]byte(err.Error()))
-		return string(buffer.Bytes()), err
+		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
 
@@ -88,7 +88,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		output, err = u.PreBuild(deployConfig, projectDirName)
 		if err != nil {
 			buffer.Write([]byte(err.Error()))
-			return string(buffer.Bytes()), err
+			return buffer.Bytes(), err
 		}
 		buffer.Write(output)
 	}
@@ -97,7 +97,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		output, err = u.Build(deployConfig, projectDirName)
 		if err != nil {
 			buffer.Write([]byte(err.Error()))
-			return string(buffer.Bytes()), err
+			return buffer.Bytes(), err
 		}
 		buffer.Write(output)
 	}
@@ -106,7 +106,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 	output, err = u.SyncCode(deployConfig, projectDirName)
 	if err != nil {
 		buffer.Write([]byte(err.Error()))
-		return string(buffer.Bytes()), err
+		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
 
@@ -115,7 +115,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		output, err = u.PreDeploy(deployConfig, projectDirName)
 		if err != nil {
 			buffer.Write([]byte(err.Error()))
-			return string(buffer.Bytes()), err
+			return buffer.Bytes(), err
 		}
 		buffer.Write(output)
 	}
@@ -126,11 +126,11 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) (str
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
 			buffer.Write([]byte(err.Error()))
-			return string(buffer.Bytes()), err
+			return buffer.Bytes(), err
 		}
 		buffer.Write(output)
 	}
-	return string(buffer.Bytes()), nil
+	return buffer.Bytes(), nil
 }
 
 // CmdSync 同步执行命令

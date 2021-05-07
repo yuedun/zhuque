@@ -3,13 +3,13 @@ package project
 import "time"
 
 type Project struct {
-	ID         int       `json:"id"`
-	Name       string    `json:"name"`
-	Status     int       `json:"status" gorm:"default:1"`
+	ID         int       `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
+	Name       string    `json:"name" gorm:"type:varchar(20);unique_index"`
+	Status     int       `json:"status" gorm:"default:1;comment:'1正常，0删除'"`
 	Env        string    `json:"env"`
 	Namespace  string    `json:"namespace"`
-	Config     string    `json:"config"`     // pm2发布配置
-	DeployType string    `json:"deployType"` // 发布机制，值：pm2 ,scp
+	Config     string    `json:"config;comment:'项目配置'"`                       //发布配置
+	DeployType string    `json:"deployType" grom:"comment:'发布机制，值：pm2 ,scp'"` // 发布机制，值：pm2 ,scp
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }

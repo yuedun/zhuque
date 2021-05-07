@@ -1,7 +1,7 @@
 package user
 
 type UserProject struct {
-	ID         int `json:"id"`
+	ID         int `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
 	UserID     int `json:"userID"`
 	ProjectID  int `json:"projectID"`
 	CreateUser int `json:"createUser"`

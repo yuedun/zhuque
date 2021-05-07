@@ -93,14 +93,7 @@ func Jwt() *jwt.GinJWTMiddleware {
 			}
 			user, err := userService.GetLoginUserInfo(userObj)
 			if err != nil {
-				log.Println("登录查询数据", err, util.Conf.TestUser)
-				if username == util.Conf.TestUser && password == util.Conf.TestUser {
-					return &LoginUser{
-						UserID:    0,
-						UserName:  username,
-						LoginTime: time.Now(),
-					}, nil
-				}
+				log.Println("登录查询数据", err)
 				return nil, jwt.ErrFailedAuthentication
 			}
 
