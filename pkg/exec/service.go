@@ -62,6 +62,9 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 
 	// 1.克隆代码
 	projectDirName := fmt.Sprintf("%s", projectObj.Name)
+	if projectObj.Clone != "" {
+		projectDirName = fmt.Sprintf("%s-%s", projectObj.Name, projectObj.Clone)
+	}
 	log.Println("克隆项目名：", projectDirName)
 	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectDirName)); exists == false {
 		// 分支，gitrepo，
@@ -110,9 +113,9 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 	}
 	buffer.Write(output)
 
-	// 5.重启服务前置
+	// 5.应用服务器重启服务前置
 	if deployConfig.PreDeploy != "" {
-		output, err = u.PreDeploy(deployConfig, projectDirName)
+		output, err = u.PreDeploy(deployConfig, projectObj.Name)
 		if err != nil {
 			buffer.Write([]byte(err.Error()))
 			return buffer.Bytes(), err
@@ -122,7 +125,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 
 	// 6.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
-		output, err = u.PostDeploy(deployConfig, projectDirName)
+		output, err = u.PostDeploy(deployConfig, projectObj.Name)
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
 			buffer.Write([]byte(err.Error()))
@@ -238,15 +241,17 @@ L:
 	return buffer.Bytes(), outErr
 }
 
-// PreDeploy
+// PreDeploy TODO
 func (u *execService) PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
-	build := fmt.Sprintf("cd %s; %s", path.Join(util.Conf.APPDir, projectName), deployConfig.PreDeploy)
-	cmdOut, err := u.CmdSync(build)
-	if err != nil {
-		log.Println("应用服务器重启前置：", err)
-		return nil, err
-	}
-	return cmdOut, nil
+	// 项目目录，命令
+	// build := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, "host", path.Join(util.Conf.APPDir, projectName), deployConfig.PreDeploy)
+	// cmdOut, err := u.CmdSync(build)
+	// if err != nil {
+	// 	log.Println("应用服务器重启前置：", err)
+	// 	return nil, err
+	// }
+	// return cmdOut, nil
+	return nil, nil
 }
 
 // PostDeploy 远程应用服务器上发布 用户自定义命令：比如重启服务
@@ -257,7 +262,7 @@ func (u *execService) PostDeploy(deployConfig project.DeployConfig, projectName 
 	// errch := make(chan error) //不需要缓冲，只要接收到一个错误就退出
 	for _, host := range deployConfig.Host {
 		go func(host string, ch chan []byte) {
-			// 用户名@IP 命令
+			// 用户名，IP，项目目录， 命令
 			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, host, path.Join(deployConfig.Path, projectName), deployConfig.PostDeploy)
 			cmdput, err := u.CmdSync(ssh)
 			if err != nil {
