@@ -27,8 +27,8 @@ type (
 		PreBuild(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		Build(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		SyncCode(deployConfig project.DeployConfig, projectName string) ([]byte, error)
-		PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error)
-		PostDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error)
+		// PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error)
+		PostDeploy(deployConfig project.DeployConfig) ([]byte, error)
 		SendMessage(task task.Task)
 	}
 )
@@ -62,9 +62,9 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 
 	// 1.克隆代码
 	projectDirName := fmt.Sprintf("%s", projectObj.Name)
-	if projectObj.Clone != "" {
-		projectDirName = fmt.Sprintf("%s-%s", projectObj.Name, projectObj.Clone)
-	}
+	// if projectObj.Clone != "" {
+	// 	projectDirName = fmt.Sprintf("%s-%s", projectObj.Name, projectObj.Clone)
+	// }
 	log.Println("克隆项目名：", projectDirName)
 	if exists := util.PathExists(path.Join(util.Conf.APPDir, projectDirName)); exists == false {
 		// 分支，gitrepo，
@@ -113,19 +113,9 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 	}
 	buffer.Write(output)
 
-	// 5.应用服务器重启服务前置
-	if deployConfig.PreDeploy != "" {
-		output, err = u.PreDeploy(deployConfig, projectObj.Name)
-		if err != nil {
-			buffer.Write([]byte(err.Error()))
-			return buffer.Bytes(), err
-		}
-		buffer.Write(output)
-	}
-
-	// 6.同步代码到远程应用服务器后执行命令，如重启
+	// 5.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
-		output, err = u.PostDeploy(deployConfig, projectObj.Name)
+		output, err = u.PostDeploy(deployConfig)
 		if err != nil {
 			log.Println("远程命令执行异常：", err)
 			buffer.Write([]byte(err.Error()))
@@ -241,29 +231,17 @@ L:
 	return buffer.Bytes(), outErr
 }
 
-// PreDeploy TODO
-func (u *execService) PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
-	// 项目目录，命令
-	// build := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, "host", deployConfig.Path, deployConfig.PreDeploy)
-	// cmdOut, err := u.CmdSync(build)
-	// if err != nil {
-	// 	log.Println("应用服务器重启前置：", err)
-	// 	return nil, err
-	// }
-	// return cmdOut, nil
-	return nil, nil
-}
-
 // PostDeploy 远程应用服务器上发布 用户自定义命令：比如重启服务
 // 利用ssh在远程服务器上执行
-func (u *execService) PostDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
+func (u *execService) PostDeploy(deployConfig project.DeployConfig) ([]byte, error) {
 	hostLen := len(deployConfig.Host)
 	ch := make(chan []byte, hostLen)
 	// errch := make(chan error) //不需要缓冲，只要接收到一个错误就退出
 	for _, host := range deployConfig.Host {
 		go func(host string, ch chan []byte) {
-			// 用户名，IP，项目目录， 命令
-			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, host, deployConfig.Path, deployConfig.PostDeploy)
+			// ssh user@remoteNode "cd /home ; ls"
+			// 用户名，IP，项目目录，前置命令， 命令
+			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s; %s\"", deployConfig.User, host, deployConfig.Path, deployConfig.PreDeploy, deployConfig.PostDeploy)
 			cmdput, err := u.CmdSync(ssh)
 			if err != nil {
 				log.Println("postDeploy过程 远程命令执行失败：", err)
