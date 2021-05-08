@@ -8,6 +8,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/yuedun/zhuque/db"
@@ -240,8 +241,14 @@ func (u *execService) PostDeploy(deployConfig project.DeployConfig) ([]byte, err
 	for _, host := range deployConfig.Host {
 		go func(host string, ch chan []byte) {
 			// ssh user@remoteNode "cd /home ; ls"
-			// 用户名，IP，项目目录，前置命令， 命令
-			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s; %s\"", deployConfig.User, host, deployConfig.Path, deployConfig.PreDeploy, deployConfig.PostDeploy)
+			// 用户名，IP，项目目录， 命令
+			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, host, deployConfig.Path, deployConfig.PostDeploy)
+			if deployConfig.PreDeploy != "" {
+				// 用户名，IP，项目目录，前置命令， 命令
+				po := strings.Index(deployConfig.PreDeploy, ";")
+				preDeploy := deployConfig.PreDeploy[:po]
+				ssh = fmt.Sprintf("ssh %s@%s \"cd %s; %s; %s\"", deployConfig.User, host, deployConfig.Path, preDeploy, deployConfig.PostDeploy)
+			}
 			cmdput, err := u.CmdSync(ssh)
 			if err != nil {
 				log.Println("postDeploy过程 远程命令执行失败：", err)
