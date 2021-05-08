@@ -164,7 +164,7 @@ func (u *execService) CloneRepo(deployConfig project.DeployConfig, projectName s
 
 // GitPull
 func (u *execService) GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
-	gitpull := fmt.Sprintf("cd %s; git pull origin %s; git log --oneline -1", path.Join(util.Conf.APPDir, projectName), deployConfig.Ref)
+	gitpull := fmt.Sprintf("cd %s; git pull origin %s; git log --oneline -2", path.Join(util.Conf.APPDir, projectName), deployConfig.Ref)
 	cmdOut, err := u.CmdSync(gitpull)
 	if err != nil {
 		log.Println("拉取代码失败：", err)
@@ -204,8 +204,8 @@ func (u *execService) SyncCode(deployConfig project.DeployConfig, projectName st
 		go func(host string, ch chan []byte, errCh chan error) {
 			// 用户名@IP:远程目录
 			remotePath := fmt.Sprintf("%s@%s:%s", deployConfig.User, host, deployConfig.Path)
-			// rsync参数，宿主机项目，目标机地址
-			cmd3 := fmt.Sprintf("rsync -av %s %s %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
+			// rsync参数，宿主机项目，目标目录
+			cmd3 := fmt.Sprintf("rsync -av %s %s/ %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
 			log.Println("同步代码：", cmd3)
 			cmdput, err := u.CmdSync(cmd3)
 			if err != nil {

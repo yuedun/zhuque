@@ -26,6 +26,7 @@ func init() {
 	Conf, err = util.GetConf("./conf.yaml")
 	util.Conf = Conf
 	if err != nil {
+		log.Println("failed to open conf.yaml")
 		panic(err)
 	}
 	db.DB, err = gorm.Open(Conf.Dialects, Conf.Dbpath)

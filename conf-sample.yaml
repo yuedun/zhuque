@@ -10,7 +10,6 @@ mailHost: smtp.163.com # 邮件服务器地址
 mailPort: 465 # 邮件端口
 mailUser: xxx@163.com # 邮件发送账户
 mailPWD: xxx # 邮件授权密码     
-mailTo: xxx@126.com # 邮件发送地址,多个用;分割
 
-appDir: ../apps # 要发布的应用目录
+appDir: ../deploy_apps # 要发布的应用目录
 hostName: http://localhost:8090 # 服务域名
