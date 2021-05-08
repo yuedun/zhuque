@@ -51,7 +51,7 @@ func TestDingTalk2(t *testing.T) {
 func TestEmail(t *testing.T) {
 	Conf, _ := util.GetConf("../conf.yaml")
 	util.Conf = Conf
-	mailTo := strings.Split(Conf.MailTo, ";")
+	mailTo := strings.Split("aa@163.com;bb@163.com", ";")
 	t.Log("mailTo", mailTo)
 	messageService := message.NewMessage()
 	err := messageService.SendEmail("朱雀", "测试", mailTo)

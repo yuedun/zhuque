@@ -30,7 +30,7 @@ type Config struct {
 	MailTo      string `yaml:"mailTo"`      // 邮件发送地址
 	DelayDeploy int    `yaml:"delayDeploy"` // 延时发布时间，单位秒。默认5分钟
 	JWTSecret   string `yaml:"JWTSecret"`   // jwt安全密匙
-	HostName    string `yaml:"hostName"`    //服务地址
+	HostName    string `yaml:"hostName"`    // 服务地址，用于重置密码邮件中的链接
 	APPDir      string `yaml:"appDir"`      // 要发布的应用存储目录
 }
 
@@ -57,6 +57,9 @@ func GetConf(filename string) (*Config, error) {
 	}
 	if c.Dialects == "" {
 		c.Dialects = "sqlite3"
+	}
+	if c.Env == "" {
+		c.Env = "prod"
 	}
 	return c, nil
 }

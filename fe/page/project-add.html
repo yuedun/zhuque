@@ -41,9 +41,15 @@
             <div class="layui-inline">
                 <label class="layui-form-label">空间</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input" placeholder="项目分组">
                 </div>
             </div>
+            <!-- <div class="layui-inline">
+                <label class="layui-form-label">子环境</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="clone" autocomplete="off" class="layui-input" placeholder="可选，字母或数字">
+                </div>
+            </div> -->
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">发布方式</label>
@@ -55,29 +61,59 @@
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
             <legend>任务配置</legend>
         </fieldset>
-        <div class="layui-form-item">
-            <label class="layui-form-label">配置文件</label>
-            <div class="layui-input-block">
-                <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
-    module.exports = {
-        apps : [{
-            script: 'index.js',
-            watch: '.'
-        }],
-        
-        deploy : {
-            production : {
-                user : 'SSH_USERNAME',
-                host : 'SSH_HOSTMACHINE',
-                ref  : 'origin/master',
-                repo : 'GIT_REPOSITORY',
-                path : 'DESTINATION_PATH',
-                'pre-deploy-local': '',
-                'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-                'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
-            }
-        }
-    };</textarea>
+        <div class="layui-row">
+            <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">配置文件</label>
+                    <div class="layui-input-block">
+                        <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
+            module.exports = {
+                apps : [{
+                    script: 'index.js',
+                    watch: '.'
+                }],
+                
+                deploy : {
+                    production : {
+                        user : 'SSH_USERNAME',
+                        host : 'SSH_HOSTMACHINE',
+                        ref  : 'origin/master',
+                        repo : 'GIT_REPOSITORY',
+                        path : 'DESTINATION_PATH',
+                        'pre-deploy-local': '',
+                        'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
+                        'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
+                    }
+                }
+            };</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">pm2配置说明</div>
+                    <div class="layui-card-body">
+                        <p><a href="https://pm2.keymetrics.io/docs/usage/deployment/" style="color: #01AAED;">见官方文档</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="layui-card">
+                    <div class="layui-card-header">scp配置说明</div>
+                    <div class="layui-card-body">
+                        <ul>
+                            <li>user：用户名</li>
+                            <li>host[]：主机地址</li>
+                            <li>ref：分支</li>
+                            <li>repo：仓库地址</li>
+                            <li>path：项目部署路径，需要包含项目目录</li>
+                            <li>preBuild：编译前置</li>
+                            <li>build：编译命令</li>
+                            <li>preDeploy：发布前置</li>
+                            <li>postDeploy：发布命令</li>
+                            <li>rsyncArgs：rsync参数</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="layui-form-item">

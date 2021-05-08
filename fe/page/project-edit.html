@@ -45,6 +45,12 @@
                     <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
             </div>
+            <!-- <div class="layui-inline">
+                <label class="layui-form-label">子环境</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="clone" autocomplete="off" class="layui-input" placeholder="可选，字母或数字">
+                </div>
+            </div> -->
         </div>
         <div class="layui-form-item">
             <!-- 不可更改 -->
@@ -82,7 +88,7 @@
                             <li>host[]：主机地址</li>
                             <li>ref：分支</li>
                             <li>repo：仓库地址</li>
-                            <li>path：项目部署路径</li>
+                            <li>path：项目部署路径，需要包含项目目录</li>
                             <li>preBuild：编译前置</li>
                             <li>build：编译命令</li>
                             <li>preDeploy：发布前置</li>
