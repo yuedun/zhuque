@@ -74,6 +74,13 @@ func TestFile(t *testing.T) {
 	}
 }
 
+func TestSubstr(t *testing.T) {
+	str := "删掉了改好aaa中文;b中文二bb;"
+	po := strings.LastIndexAny(str, ";")
+	ss := str[:po]
+	t.Log(po, ss)
+}
+
 func TestChan(t *testing.T) {
 	ch := make(chan []byte, 3)
 	// errch := make(chan error, 3)
