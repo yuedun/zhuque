@@ -244,7 +244,7 @@ L:
 // PreDeploy TODO
 func (u *execService) PreDeploy(deployConfig project.DeployConfig, projectName string) ([]byte, error) {
 	// 项目目录，命令
-	// build := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, "host", path.Join(util.Conf.APPDir, projectName), deployConfig.PreDeploy)
+	// build := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, "host", deployConfig.Path, deployConfig.PreDeploy)
 	// cmdOut, err := u.CmdSync(build)
 	// if err != nil {
 	// 	log.Println("应用服务器重启前置：", err)
@@ -263,7 +263,7 @@ func (u *execService) PostDeploy(deployConfig project.DeployConfig, projectName 
 	for _, host := range deployConfig.Host {
 		go func(host string, ch chan []byte) {
 			// 用户名，IP，项目目录， 命令
-			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, host, path.Join(deployConfig.Path, projectName), deployConfig.PostDeploy)
+			ssh := fmt.Sprintf("ssh %s@%s \"cd %s; %s\"", deployConfig.User, host, deployConfig.Path, deployConfig.PostDeploy)
 			cmdput, err := u.CmdSync(ssh)
 			if err != nil {
 				log.Println("postDeploy过程 远程命令执行失败：", err)
