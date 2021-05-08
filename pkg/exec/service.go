@@ -198,7 +198,7 @@ func (u *execService) SyncCode(deployConfig project.DeployConfig, projectName st
 			// 用户名@IP:远程目录
 			remotePath := fmt.Sprintf("%s@%s:%s", deployConfig.User, host, deployConfig.Path)
 			// rsync参数，宿主机项目，目标目录
-			cmd3 := fmt.Sprintf("rsync -av %s %s/ %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
+			cmd3 := fmt.Sprintf("rsync -a %s %s/ %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
 			log.Println("同步代码：", cmd3)
 			cmdput, err := u.CmdSync(cmd3)
 			if err != nil {
