@@ -117,7 +117,6 @@ CREATE TABLE `task` (
   `status` int(11) DEFAULT NULL,
   `release_state` int(11) DEFAULT NULL,
   `now_release` tinyint(1) DEFAULT '0',
-  `cmd` varchar(255) DEFAULT NULL,
   `approve_msg` varchar(255) DEFAULT NULL,
   `from` varchar(255) DEFAULT NULL,
   `deploy_type` varchar(5) DEFAULT NULL,

@@ -97,7 +97,6 @@ func NameListV2(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	log.Println(list)
 	// 穿梭框数据
 	var nameList []map[string]string
 	for _, val := range list {
