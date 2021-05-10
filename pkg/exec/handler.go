@@ -74,7 +74,6 @@ func CreateTaskForPM2(c *gin.Context) {
 	if !ok || taskName == "" {
 		panic(errors.New("用户名无效！"))
 	}
-	// restart, ok := c.GetPostForm("restart")
 
 	taskServer := task.NewService(db.DB)
 	execService := NewService(db.DB)
@@ -82,6 +81,7 @@ func CreateTaskForPM2(c *gin.Context) {
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
 
+	// restart, ok := c.GetPostForm("restart")
 	// userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
 	// if restart == "on" {
 	// 	// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
@@ -168,13 +168,12 @@ func CreateTaskForPM2V2(c *gin.Context) {
 	if !ok || taskName == "" {
 		panic(errors.New("用户名无效！"))
 	}
-	restart, ok := c.GetPostForm("restart")
-	userCmd := "pm2 deploy projects/%s/ecosystem.config.js production --force"
-	if restart == "on" {
-		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
-		userCmd = "pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list"
-	}
-	log.Println("用户输入命令：", userCmd)
+	// restart, ok := c.GetPostForm("restart")
+	// userCmd := "pm2 deploy projects/%s/ecosystem.config.js production --force"
+	// if restart == "on" {
+	// 	// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
+	// 	userCmd = "pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list"
+	// }
 
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
@@ -187,9 +186,9 @@ func CreateTaskForPM2V2(c *gin.Context) {
 		UserID:       userID,
 		Username:     username,
 		ReleaseState: task.Ready,
-		Cmd:          userCmd,
-		From:         "multi",
-		DeployType:   "pm2",
+		// Cmd:          userCmd,
+		From:       "multi",
+		DeployType: "pm2",
 	}
 	taskID, err := taskServer.CreateTask(&task)
 	if err != nil {
