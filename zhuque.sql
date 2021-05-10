@@ -73,7 +73,7 @@ CREATE TABLE `project` (
   `status` int(11) DEFAULT '1',
   `env` varchar(255) DEFAULT NULL,
   `namespace` varchar(255) DEFAULT NULL,
-  `config` text DEFAULT '',
+  `config` text,
   `deploy_type` varchar(5) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'test', 'c94f9f9e492daf39dda248950c6fc13e', 'test@163.com', '1', '1', '2020-08-21 15:51:24', '2021-01-23 17:35:09');
+INSERT INTO `user` VALUES ('1', 'test', 'test@163.com', '098f6bcd4621d373cade4e832627b4f6', '1', '1', '2020-08-21 15:51:24', '2021-01-23 17:35:09');
 -- ----------------------------
 -- Table structure for `user_project`
 -- ----------------------------

@@ -19,7 +19,7 @@ var Conf *Config
 //profile variables
 type Config struct {
 	Port        string `yaml:"port"`        // 服务端口
-	Dialects    string `yaml:"dialects"`    //使用的数据库类型：mysql,sqlite3
+	Dialects    string `yaml:"dialects"`    // 使用的数据库类型：mysql,sqlite3
 	Dbpath      string `yaml:"dbpath"`      // sqlite数据库文件位置或mysql连接地址
 	Env         string `yaml:"env"`         // 执行环境
 	DingTalk    string `yaml:"dingTalk"`    // 钉钉webhook
@@ -27,7 +27,6 @@ type Config struct {
 	MailPort    int    `yaml:"mailPort"`    // 邮件端口
 	MailUser    string `yaml:"mailUser"`    // 邮件发送账户
 	MailPWD     string `yaml:"mailPWD"`     // 邮件授权密码
-	MailTo      string `yaml:"mailTo"`      // 邮件发送地址
 	DelayDeploy int    `yaml:"delayDeploy"` // 延时发布时间，单位秒。默认5分钟
 	JWTSecret   string `yaml:"JWTSecret"`   // jwt安全密匙
 	HostName    string `yaml:"hostName"`    // 服务地址，用于重置密码邮件中的链接
