@@ -74,7 +74,7 @@ func CreateTaskForPM2(c *gin.Context) {
 	if !ok || taskName == "" {
 		panic(errors.New("用户名无效！"))
 	}
-	restart, ok := c.GetPostForm("restart")
+	// restart, ok := c.GetPostForm("restart")
 
 	taskServer := task.NewService(db.DB)
 	execService := NewService(db.DB)
@@ -82,12 +82,11 @@ func CreateTaskForPM2(c *gin.Context) {
 	resCode := 1 // code=1是直接发布，code=2是审核发布
 	resData := ""
 
-	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
-	if restart == "on" {
-		// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
-		userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list", projectName)
-	}
-	log.Println("用户输入命令：", userCmd)
+	// userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+	// if restart == "on" {
+	// 	// 由于pm2的项目名和管理的项目名不能完全保持一致，所以如果一个pm2下跑多个服务都只能重启，但是reload可以实现不停服重启
+	// 	userCmd = fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production exec 'git pull && pm2 reload ecosystem.config.js' --force && pm2 list", projectName)
+	// }
 
 	// 1.创建发布单
 	task := task.Task{
@@ -96,9 +95,9 @@ func CreateTaskForPM2(c *gin.Context) {
 		UserID:       userID,
 		ReleaseState: task.Ready, //待发布
 		Username:     username,
-		Cmd:          userCmd,
-		From:         "single",
-		DeployType:   "pm2",
+		// Cmd:          userCmd,
+		From:       "single",
+		DeployType: "pm2",
 	}
 	taskID, err := taskServer.CreateTask(&task)
 	if err != nil {
@@ -121,8 +120,8 @@ func CreateTaskForPM2(c *gin.Context) {
 	})
 }
 
-// 创建发布单-scp发布模式
-func CreateTaskForSCP(c *gin.Context) {
+// Release 发布操作，提交后的延时发布
+func Release(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -130,61 +129,15 @@ func CreateTaskForSCP(c *gin.Context) {
 			})
 		}
 	}()
-	//cmd的值是项目名
-	projectName, ok := c.GetPostForm("project")
-	if !ok || projectName == "" {
-		panic(errors.New("项目名无效！"))
-	}
-	userID, ok := c.GetPostForm("userID")
-	if !ok || userID == "" {
-		panic(errors.New("用户ID无效！"))
-	}
-	username, ok := c.GetPostForm("username")
-	if !ok || username == "" {
-		panic(errors.New("用户名无效！"))
-	}
-	taskName, ok := c.GetPostForm("taskName")
-	if !ok || taskName == "" {
-		panic(errors.New("用户名无效！"))
-	}
-	// restart, ok := c.GetPostForm("restart")
-
+	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskServer := task.NewService(db.DB)
-	execService := NewService(db.DB)
-
-	resCode := 1 // code=1是直接发布，code=2是审核发布
-	resData := ""
-
-	// scp发布类型
-	// 1.创建发布单
-	task := task.Task{
-		TaskName:     taskName,
-		Project:      projectName,
-		UserID:       userID,
-		ReleaseState: task.Ready, //待发布
-		Username:     username,
-		From:         "single",
-		DeployType:   "scp",
-	}
-	taskID, err := taskServer.CreateTask(&task)
+	cmdOut, err := taskServer.ReleaseTask(taskID)
 	if err != nil {
 		panic(err)
 	}
-	// 如果是测服直接发布
-	if util.Conf.Env == "prod" {
-		execService.SendMessage(task)
-		resCode = 2
-		resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
-	} else {
-		// 测服直接发布 resCode=1，前端调用发布接口
-		resCode = 1
-		resData = fmt.Sprint(taskID)
-	}
-
 	c.JSON(200, gin.H{
-		"code":    resCode, //code=1是直接发布，code=2是审核发布
 		"message": err,
-		"data":    resData,
+		"data":    cmdOut,
 	})
 }
 
@@ -280,8 +233,8 @@ func CreateTaskForPM2V2(c *gin.Context) {
 	})
 }
 
-// Release 发布操作，提交后的延时发布
-func Release(c *gin.Context) {
+// ReleaseV2 发布操作，提交后的延时发布
+func ReleaseV2(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -291,13 +244,80 @@ func Release(c *gin.Context) {
 	}()
 	taskID, _ := strconv.Atoi(c.Param("id"))
 	taskServer := task.NewService(db.DB)
-	cmdOut, err := taskServer.ReleaseTask(taskID)
+	cmdOut, err := taskServer.ReleaseTaskV2(taskID)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(200, gin.H{
 		"message": err,
 		"data":    cmdOut,
+	})
+}
+
+// 创建发布单-scp发布模式
+func CreateTaskForSCP(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.(error).Error(),
+			})
+		}
+	}()
+	//cmd的值是项目名
+	projectName, ok := c.GetPostForm("project")
+	if !ok || projectName == "" {
+		panic(errors.New("项目名无效！"))
+	}
+	userID, ok := c.GetPostForm("userID")
+	if !ok || userID == "" {
+		panic(errors.New("用户ID无效！"))
+	}
+	username, ok := c.GetPostForm("username")
+	if !ok || username == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	taskName, ok := c.GetPostForm("taskName")
+	if !ok || taskName == "" {
+		panic(errors.New("用户名无效！"))
+	}
+	// restart, ok := c.GetPostForm("restart")
+
+	taskServer := task.NewService(db.DB)
+	execService := NewService(db.DB)
+
+	resCode := 1 // code=1是直接发布，code=2是审核发布
+	resData := ""
+
+	// scp发布类型
+	// 1.创建发布单
+	task := task.Task{
+		TaskName:     taskName,
+		Project:      projectName,
+		UserID:       userID,
+		ReleaseState: task.Ready, //待发布
+		Username:     username,
+		From:         "single",
+		DeployType:   "scp",
+	}
+	taskID, err := taskServer.CreateTask(&task)
+	if err != nil {
+		panic(err)
+	}
+	// 如果是测服直接发布
+	if util.Conf.Env == "prod" {
+		execService.SendMessage(task)
+		resCode = 2
+		resData = fmt.Sprintf("%d分钟后可发布", util.Conf.DelayDeploy)
+	} else {
+		// 测服直接发布 resCode=1，前端调用发布接口
+		resCode = 1
+		resData = fmt.Sprint(taskID)
+	}
+
+	c.JSON(200, gin.H{
+		"code":    resCode, //code=1是直接发布，code=2是审核发布
+		"message": err,
+		"data":    resData,
 	})
 }
 
@@ -341,26 +361,5 @@ func ReleaseForSCP(c *gin.Context) {
 		"code":    resCode,
 		"message": err,
 		"data":    resData,
-	})
-}
-
-// ReleaseV2 发布操作，提交后的延时发布
-func ReleaseV2(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.(error).Error(),
-			})
-		}
-	}()
-	taskID, _ := strconv.Atoi(c.Param("id"))
-	taskServer := task.NewService(db.DB)
-	cmdOut, err := taskServer.ReleaseTaskV2(taskID)
-	if err != nil {
-		panic(err)
-	}
-	c.JSON(200, gin.H{
-		"message": err,
-		"data":    cmdOut,
 	})
 }

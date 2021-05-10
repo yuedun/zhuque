@@ -108,11 +108,12 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	// 从数据库中取出project和cmd组合。
-	log.Println("执行命令", task.Cmd)
+	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", task.Project)
+	log.Println("执行命令", userCmd)
 	if err = u.db.Model(&task).UpdateColumn("releaseState", Releaseing).Error; err != nil {
 		return "更新数据失败", err
 	}
-	cmd = exec.Command("bash", "-c", task.Cmd)
+	cmd = exec.Command("bash", "-c", userCmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
 		log.Println("输出错误2：", string(cmdOut))
