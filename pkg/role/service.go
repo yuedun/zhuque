@@ -41,7 +41,7 @@ func (u *roleService) GetRoleInfo(search Role) (role Role, err error) {
 }
 
 func (u *roleService) GetRoleList(page, limit int, search Role) (list []Role, count int, err error) {
-	err = u.db.Model("role").Order("role_num asc").Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+	err = u.db.Where(search).Order("role_num asc").Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return list, count, err
 	}

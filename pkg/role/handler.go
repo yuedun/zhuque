@@ -21,8 +21,10 @@ func List(c *gin.Context) {
 	// userId, _ := strconv.Atoi(c.Query("userId"))
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	roleName := c.Query("searchParams[roleName]")
 	offset := (page - 1) * limit
 	var role Role
+	role.Name = roleName
 	serverService := NewService(db.DB)
 	list, count, err := serverService.GetRoleList(offset, limit, role)
 	if err != nil {
