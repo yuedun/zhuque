@@ -4,9 +4,12 @@
 理论上朱雀发布系统可以发布其他语言应用程序，但其与nodejs更加相得益彰。
 原因是朱雀发布系统依赖于PM2，PM2大家都知道，与nodejs几乎是绝配，所以有nodejs的地方很大可能有PM2，所以使用朱雀发布系统就显得更加简单了，无需专门安装PM2。
 
+（推荐）同时也支持scp（rsync）发布模式。优点是一键部署发布，使用简单。
+
+
 数据库使用sqlite，无需单独安装和配置。
 
-# 使用框架文档
+## 使用框架文档
 [前端框架](http://layuimini.99php.cn/docs/index.html)
 [前端框架](http://layuimini.99php.cn/onepage/v2/index.html)
 [前端框架](https://www.layui.com/doc/)
@@ -14,30 +17,29 @@
 [后端框架gorm](http://gorm.book.jasperxu.com/)
 [后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
-# 本地开发
+## 本地开发
 
-## 依赖项
+### 依赖项
 项目使用了sqlite3，需要安装gcc，参考地址：[gcc安装](https://www.jianshu.com/p/dc0fc5d8c900)
-## 首次运行
+### 首次运行
 1. 复制`conf-sample.yaml`文件为`conf.yaml`文件。
 2. 配置`env`变量为`debug`。
-3. 修改`\zhuque\pkg\user\handler.go`,`Init`函数的返回数据`menuInfo`为注释代码，因为第一次运行系统没有系统数据，需要模拟数据。
-4. 使用`test`账号，密码test登录系统，增加角色数据，用户数据，分配权限。然后可以使用新用户登录。
+3. 初始化数据库，见`zhuque.sql`。
+4. 使用`test`账号，密码`test`登录系统。
 
-
-## 分支管理
+### 分支管理
 develop 本地开发分支
 release 测试环境使用
 master 生产环境使用
 
-## 部署流程
+### 部署流程
 1. 在服务器指定位置下载源码。
 2. 安装go环境。go可以交叉编译，但是由于sqlite的缘故，windows环境下并不能顺利的编译linux版本，所以最好还是在linux环境下编译。
 3. 配置`conf.yaml`文件，参照`conf-sample.yaml`文件。
 4. 项目目录中编译`go build`，第一次会安装依赖会慢一些。
 5. `./zhuque`启动服务。
 
-## 权限架构
+### 权限架构
 该系统权限使用了基于角色的访问控制方法（RBAC）。是目前公认的解决大型企业的统一资源访问控制的有效方法。 其显著的两大特征是：1.减小授权管理的复杂性，降低管理开销。2.灵活地支持企业的安全策略，并对企业的变化有很大的伸缩性。
 
 参考文档：
@@ -52,13 +54,7 @@ master 生产环境使用
 
 [deploy](https://github.com/Unitech/PM2/blob/0.14.7/ADVANCED_README.md#deployment-options)
 
-## [Getting started](#getting-started)
-
-PM2 embeds a simple and powerful deployment system with revision tracing.
-
-Please read the [Considerations to use PM2 deploy](#considerations).
-
-## [简单部署](#simple-deploy)
+### [简单部署](#simple-deploy)
 
 你只需要在ecosystem.json文件中添加**deploy**属性。 下面是是部署一个应用的最低要求:
 
@@ -99,7 +95,7 @@ $ pm2 deploy production revert 1
 $ pm2 deploy production exec "pm2 reload all"
 ```
 
-## [Complete tutorial](#complete-tutorial)
+### [Complete tutorial](#complete-tutorial)
 
 1- 生成一个样本ecosystem.json列出进程和部署环境的文件。
 
@@ -203,181 +199,10 @@ If you encounter any errors, please refer to the troubleshooting section below.
 
 Now your code will be populated, installed and started with PM2.
 
-## [Deployment options](#deployment-options)
-
-Display deploy help via `pm2 deploy help`:
-
-```
-pm2 deploy <configuration_file> <environment> <command>
-
-  Commands:
-    setup                run remote setup commands
-    update               update deploy to the latest release
-    revert [n]           revert to [n]th last deployment or 1
-    curr[ent]            output current release commit
-    prev[ious]           output previous release commit
-    exec|run <cmd>       execute the given <cmd>
-    list                 list previous deploy commits
-    [ref]                deploy to [ref], the "ref" setting, or latest tag
-```
-
-## [Use different set of env variables](#use-different-set-of-env-variables)
-
-In the `post-deploy` attribute, you may have noticed the command `pm2 startOrRestart ecosystem.json --env production`. The `--env <environment_name>` allows to inject different sets of environment variables.
-
-Read more [here](http://pm2.keymetrics.io/docs/usage/application-declaration/#switching-to-different-environments).
-
-## [Related Commands](#related-commands)
-
-```
-pm2 startOrRestart all.json            # Invoke restart on all apps in JSON
-pm2 startOrReload all.json             # Invoke reload
-```
-
-## [Multi host deployment](#multi-host-deployment)
-
-To deploy to multiple hosts in the same time, you just have to declare each host in an array under the attribute `host`.
-```
-{
-  [...]
-  "deploy" : {
-    "production" : {
-      "user" : "node",
-      // Multi host in a js array
-      "host" : ["212.83.163.1", "212.83.163.2", "212.83.163.3"],
-      "ref"  : "origin/master",
-      "repo" : "git@github.com:repo.git",
-      "path" : "/var/www/production",
-      "pre-setup" : "echo 'commands or local script path to be run on the host before the setup process starts'",
-      "post-setup": "echo 'commands or a script path to be run on the host after cloning the repo'",
-      "post-deploy" : "pm2 startOrRestart ecosystem.json --env production",
-      "pre-deploy-local" : "echo 'This is a local executed command'"
-    }
-  [...]
-}
-```
-
-## [Using SSH keys](#using-ssh-keys)
-
-You just have to add the “key” attribute with path to the public key, see below example :
-```
-    "production" : {
-      "key"  : "/path/to/some.pem", // path to the public key to authenticate
-      "user" : "node",              // user used to authenticate
-      "host" : "212.83.163.1",      // where to connect
-      "ref"  : "origin/master",
-      "repo" : "git@github.com:repo.git",
-      "path" : "/var/www/production",
-      "post-deploy" : "pm2 startOrRestart ecosystem.json --env production"
-    },
-```
-## [Force deployment](#force-deployment)
-
-You may get this message:
-
-```
---> Deploying to dev environment
---> on host 192.168.1.XX
-
-  push your changes before deploying
-
-Deploy failed
-```
-That means that you have changes in your local system that aren’t pushed inside your git repository, and since the deploy script get the update via `git pull` they will not be on your server. If you want to deploy without pushing any data, you can append the `--force` option:
-
-`pm2 deploy ecosystem.json production --force`
-
-## [Considerations](#considerations)
-
-*   You can use the option `--force` to skip local change detection
-*   You might want to commit your node_modules folder ([#622](https://github.com/Unitech/pm2/issues/622)) or add the `npm install` command to the `post-deploy` section: `"post-deploy" : "npm install && pm2 startOrRestart ecosystem.json --env production"`
-*   Verify that your remote server has the permission to git clone the repository
-*   You can declare specific environment variables depending on the environment you want to deploy the code to. For instance to declare variables for the production environment, add “env_production”: {} and declare the variables.
-*   By default, PM2 will use `ecosystem.json`. So you can skip the <configuration_file> options if this is the case</configuration_file>
-*   You can embed the “apps” &amp; “deploy” section in the package.json
-*   It deploys your code via ssh, you don’t need any dependencies
-*   Processes are initialized / started automatically depending on the application name in `ecosystem.json`
-*   PM2-deploy repository can be found here: [pm2-deploy](https://github.com/Unitech/pm2-deploy)
-*   **WINDOWS** : see point below (at the end)
-
-## [Troubleshooting](#troubleshooting)
-
-##### SSH clone errors
-
-In most cases, these errors will be caused by `pm2` not having the correct keys to clone your repository. You need to verify at every step that the keys are available.
-
-**Step 1**
-If you are certain your keys are correctly working, first try running `git clone your_repo.git` on the target server. If it succeeds, move onto the next steps. If it failed, make sure your keys are stored both on the server and on your git account.
-
-**Step 2**
-By default `ssh-copy-id` copies the default identiy, usually named `id_rsa`. If that is not the appropriate key:
-
-`ssh-copy-id -i path/to/my/key your_username@server.com`
-
-This adds your public key to the `~/.ssh/authorized_keys` file.
-
-**Step 3**
-If you get the following error:
-```
---> Deploying to production environment
---> on host mysite.com
-  ○ hook pre-setup
-  ○ running setup
-  ○ cloning git@github.com:user/repo.git
-Cloning into '/var/www/app/source'...
-Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights and that the repository exists.
-
-**Failed to clone**
-
-Deploy failed
-```
-
-…you may want to create a ssh config file. This is a sure way to ensure that the correct ssh keys are used for any given repository you’re trying to clone. See [this example](https://gist.github.com/Protosac/c3fb459b1a942f161f23556f61a67d66):
-
-```
-# ~/.ssh/config
-Host alias
-    HostName myserver.com
-    User username
-    IdentityFile ~/.ssh/mykey
-# Usage: `ssh alias`
-# Alternative: `ssh -i ~/.ssh/mykey username@myserver.com`
-
-Host deployment
-    HostName github.com
-    User username
-    IdentityFile ~/.ssh/github_rsa
-# Usage:
-# git@deployment:username/anyrepo.git
-# This is for cloning any repo that uses that IdentityFile. This is a good way to make sure that your remote cloning commands use the appropriate key
-```
-
-## [Windows Consideration](#windows-consideration)
-
-To run the deploy script under Windows, you need to use a unix shell like bash, so we recommend to install either [Git bash](https://git-scm.com/download/win), [Babun](http://babun.github.io/) or  [Cygwin](https://cygwin.com/install.html)
-
-## [Contributing](#contributing)
-
-The module is [https://github.com/Unitech/pm2-deploy](https://github.com/Unitech/pm2-deploy)
-Feel free to PR for any changes or fix.
-
-## 生态系统文件参考
+### 生态系统文件参考
 
 生态系统文件的目的是收集应用所有的配置选项和环境变量。
 
-它是一个`javascript`文件，`exports`一个包含所有配置选项的`object`。这个`object`有两个属性：
-- `apps`, `Array` 一组应用的配置
-- `deploy`, `Object ` 部署配置选项
-
-```javascript
-module.exports = {
-  apps: [{}, {}],
-  deploy: {}
-}
-```
 ### 应用选项
 
 属性`apps`是包含了一组`Object`的数组。
@@ -433,22 +258,6 @@ module.exports = {
 
 ### 部署选项
 
-属性`deploy`是一个`Object`，每个对象属性定义了一个环境的部署配置选项。
-
-结构：
-```javascript
-module.exports = {
-  apps: [{}, {}],
-  deploy: {
-    production: {},
-    staging: {},
-    development: {}
-  }
-}
-```
-
-环境的部署配置选项：
-
 选项名称|描述|类型|默认
 ---|---|---|---
 `key`|`SSH`密钥的路径|`String`|`$HOME/.ssh`
@@ -463,15 +272,44 @@ module.exports = {
 `pre-deploy-local`|3.post-deploy前在宿主机上执行的命令|`String`|
 `post-deploy`|4.部署后执行|`String`|
 
-# SCP发布
+## SCP发布
 scp发布是较为常用的发布方式，但朱雀使用的是rsync发布，主要是利用其增量同步功能，加速代码同步。
 
-## 发布流程
+### 发布流程
 推荐的做法是在发布机上拉代码，编译。
 同步代码到远程应用服务器，重启。
 也就是说远程应用服务只需重启即可，不需要做编译操作，在发布机上编译即可。
 
-scp发布模式的配置文件和pm2一样，主要用到的三个参数是：
-- build 编译命令，可选。如：npm run build
-- rsyncArgs rsync参数，可选。如：--exclude node_modules
-- post-deploy 在应用服务器上执行的命令，如：重启服务 pm2 restart app.js
+### 配置说明
+```js
+{
+      "user": "root",
+      "host": ["10.11.12.13"],
+      "ref":"master",
+      "repo": "git@github.com/yuedun/zhuque.git",
+      "path": "/data/www/zhuque",
+      "preBuild" : "",
+      "build":"go build",
+      "preDeploy" : "echo '发布前置';",
+      "postDeploy" : "pm2 restart zheque;pm2 ls",
+      "rsyncArgs":"-u --delete --exclude '.git' --exclude '.env'"
+}
+```
+
+
+- user：用户名
+- host[]：主机地址
+- ref：分支
+- repo：仓库地址
+- path：项目部署路径，需要包含项目目录
+- preBuild：编译前置，在发布机上编译代码设置的环境变量，比如前端项目设置不同的环境变量使用不同的接口地址。
+- build：编译命令，例如：npm run build
+- preDeploy：发布前置，应用服务重启前设置环境变量等操作。
+- postDeploy：发布命令，例如：pm2 reload zhuque
+- rsyncArgs：rsync参数
+
+常用rsync参数：
+- --exclude 排除不进行同步的文件，比如--exclude="*.iso"
+- --delete参数删除只存在于目标目录、不存在于源目标的文件，即保证目标目录是源目标的镜像。
+如果想要排除指定的文件，即不删除某个文件，可以使用exclude指定，例如：--exclude '.env'，会删除其他文件而不会删除.env文件。
+

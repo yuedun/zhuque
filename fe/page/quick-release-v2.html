@@ -32,14 +32,14 @@
                     </div>
                 </div>
 
-                <div class="layui-form-item">
+                <!-- <div class="layui-form-item">
                     <label class="layui-form-label">只需重启</label>
                     <div class="layui-input-inline">
                         <input type="checkbox" name="restart" lay-skin="switch" lay-filter="switchTest"
                             lay-text="ON|OFF">
                     </div>
                     <div class="layui-form-mid layui-word-aux">直接拉代码重启</div>
-                </div>
+                </div> -->
 
                 <div class="layui-form-item">
                     <div class="layui-input-block">
@@ -57,7 +57,7 @@
 
             {{#  
                 var releaseDate = function(){
-                    return (moment(d.updatedAt).add(5, 'm') < moment())|| d.nowRelease;
+                    return (moment(d.updatedAt).add(5, 'm') < moment()) || d.nowRelease;
                 }; 
                 var approve = function(){
                     return (sessionStorage.getItem('role') == 1 || sessionStorage.getItem('role') == 2);
@@ -258,7 +258,7 @@
                     // code=1是直接发布，code=2是审核发布
                     if (res.code == 1) {
                         table.reload('currentTableId');
-                        relase(res.data, dptype)
+                        relase(res.data);
                     } else {
                         layer.msg(res.data, { icon: 6 });
                         // 轮询刷新，已经存在则不再添加，用于刷新是否有发布单可以发布

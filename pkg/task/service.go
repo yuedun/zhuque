@@ -108,11 +108,12 @@ func (u *taskService) ReleaseTask(ID int) (string, error) {
 	var cmd *exec.Cmd
 	// 执行单个shell命令时, 直接运行即可
 	// 从数据库中取出project和cmd组合。
-	log.Println("执行命令", task.Cmd)
+	userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", task.Project)
+	log.Println("执行命令", userCmd)
 	if err = u.db.Model(&task).UpdateColumn("releaseState", Releaseing).Error; err != nil {
 		return "更新数据失败", err
 	}
-	cmd = exec.Command("bash", "-c", task.Cmd)
+	cmd = exec.Command("bash", "-c", userCmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
 		log.Println("输出错误：", err)
 		log.Println("输出错误2：", string(cmdOut))
@@ -148,10 +149,10 @@ func (u *taskService) ReleaseTaskV2(ID int) (string, error) {
 	projectList := strings.Split(task.Project, ",")
 	projectLen := len(projectList)
 	ch := make(chan CmdResult, projectLen)
-	for _, projectName := range projectList {
-		log.Println("projectName:", projectName)
-		log.Println("task.Cmd:", task.Cmd)
-		go excuteCmd(projectName, task.Cmd, ch)
+	for i, projectName := range projectList {
+		userCmd := fmt.Sprintf("pm2 deploy projects/%s/ecosystem.config.js production --force", projectName)
+		log.Println("执行命令", i, userCmd)
+		go excuteCmd(userCmd, ch)
 	}
 	resultAll := ""
 	i := 0
@@ -178,8 +179,8 @@ Loop:
 }
 
 // excuteCmd 用于异步并行执行
-// @projectName 项目名 @cmd 执行命令 @result 命令执行结果
-func excuteCmd(projectName string, taskCmd string, result chan CmdResult) {
+// @taskCmd 执行命令 @result 命令执行结果
+func excuteCmd(taskCmd string, result chan CmdResult) {
 	cmdResult := CmdResult{
 		Status:  Success,
 		Content: "",
@@ -187,23 +188,23 @@ func excuteCmd(projectName string, taskCmd string, result chan CmdResult) {
 	var cmdOut []byte
 	var cmd *exec.Cmd
 	var err error
-	taskCmd = fmt.Sprintf(taskCmd, projectName)
-	log.Println("执行命令", taskCmd)
+	log.Println("输入命令：", taskCmd)
 	cmd = exec.Command("bash", "-c", taskCmd)
 	if cmdOut, err = cmd.CombinedOutput(); err != nil {
-		log.Println(projectName+"输出错误：", err)
-		log.Println(projectName+"输出错误2：", string(cmdOut))
+		log.Println("输出错误：", err)
+		log.Println("输出错误2：", string(cmdOut))
 		cmdResult.Status = Fail
 	}
 	cmdResult.Content = strings.ReplaceAll(string(cmdOut), "\n", "<br>") //写入命令执行结果
 	result <- cmdResult
 }
 
+// .NowRelease
 func (u *taskService) Approve(params map[string]interface{}) (task Task, err error) {
 	id64 := params["id"].(float64)
 	id := int(id64)
 	task.ID = id
-	err = u.db.Model(&Task{ID: id}).UpdateColumns(params).Find(&task).Error
+	err = u.db.Model(&task).UpdateColumns(params).Find(&task).Error
 	if err != nil {
 		return task, err
 	}
