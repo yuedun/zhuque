@@ -147,11 +147,12 @@
                         content: '../page/user-edit.html',
                         success: function (layero, index) {
                             var body = layer.getChildFrame('body', index); //获取弹出层 body对象，从表格到弹出层传递数据
+                            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象
                             body.find("input[name=id]").val(data.id);
                             body.find("input[name=username]").val(data.username);
                             body.find("input[name=email]").val(data.email);
                             body.find("select[name=roleNum]").val(data.roleNum);
-                            form.render('select');
+                            iframeWin.layui.form.render('select');
                         },
                     });
                     $(window).on("resize", function () {

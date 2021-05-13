@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ x"$1" = x ]; then
+    echo "请输入分支参数"
+    exit 1
+fi
+
 rm zhuque
 echo "上传文件......"
 rz
