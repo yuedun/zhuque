@@ -245,7 +245,10 @@ func (u *execService) PostDeploy(deployConfig project.DeployConfig) ([]byte, err
 			if deployConfig.PreDeploy != "" {
 				// 用户名，IP，项目目录，前置命令， 命令
 				po := strings.Index(deployConfig.PreDeploy, ";")
-				preDeploy := deployConfig.PreDeploy[:po]
+				preDeploy := deployConfig.PreDeploy
+				if po > -1 {
+					preDeploy = deployConfig.PreDeploy[:po]
+				}
 				ssh = fmt.Sprintf("ssh %s@%s \"cd %s; %s; %s\"", deployConfig.User, host, deployConfig.Path, preDeploy, deployConfig.PostDeploy)
 			}
 			cmdput, err := u.CmdSync(ssh)

@@ -75,8 +75,9 @@ func TestFile(t *testing.T) {
 }
 
 func TestSubstr(t *testing.T) {
-	str := "删掉了改好aaa中文;b中文二bb;"
+	str := "删掉了改好aaa中文b中文二bb;"
 	po := strings.LastIndexAny(str, ";")
+	t.Log(po)
 	ss := str[:po]
 	t.Log(po, ss)
 }
