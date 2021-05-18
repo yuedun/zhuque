@@ -102,10 +102,10 @@ func NameListV2(c *gin.Context) {
 	for _, val := range list {
 		m := make(map[string]string)
 		m["title"] = "[" + val.Namespace + "]" + val.Name
-		// if val.Clone != "" {
-		// 	m["title"] = "[" + val.Namespace + "]" + val.Name + "-" + val.Clone
-		// }
 		m["value"] = val.Name
+		if val.DeployType == "scp" {
+			m["value"] = val.Name + "|" + val.DeployType
+		}
 		nameList = append(nameList, m)
 	}
 
