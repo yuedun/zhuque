@@ -1,5 +1,24 @@
-# 朱雀-nodejs发布系统
+# 朱雀发布系统
 
+<!-- TOC -->
+- [朱雀发布系统](#朱雀发布系统)
+    - [介绍](#介绍)
+    - [使用框架文档](#使用框架文档)
+    - [本地开发](#本地开发)
+        - [依赖项](#依赖项)
+        - [首次运行](#首次运行)
+    - [部署到服务器](#部署到服务器)
+        - [部署流程](#部署流程)
+        - [系统要求](#系统要求)
+        - [权限架构](#权限架构)
+        - [简单部署](#简单部署)
+        - [Complete tutorial](#complete-tutorial)
+        - [生态系统文件参考](#生态系统文件参考)
+        - [部署选项](#部署选项)
+    - [SCP发布](#scp发布)
+        - [发布流程](#发布流程)
+        - [配置说明](#配置说明)
+<!-- /TOC -->
 ## 介绍
 朱雀发布系统是专门为nodejs发布而开发的系统，使用go语言开发，前端使用了layui mini框架，简单易上手。
 朱雀发布系统前后端分离，但又是一体的，无需部署两套服务。
@@ -63,7 +82,7 @@
 
 [deploy](https://github.com/Unitech/PM2/blob/0.14.7/ADVANCED_README.md#deployment-options)
 
-### [简单部署](#simple-deploy)
+### 简单部署
 
 你只需要在ecosystem.json文件中添加**deploy**属性。 下面是是部署一个应用的最低要求:
 
@@ -104,7 +123,7 @@ $ pm2 deploy production revert 1
 $ pm2 deploy production exec "pm2 reload all"
 ```
 
-### [Complete tutorial](#complete-tutorial)
+### Complete tutorial
 
 1- 生成一个样本ecosystem.json列出进程和部署环境的文件。
 

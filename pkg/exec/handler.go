@@ -339,9 +339,15 @@ func ReleaseForSCP(c *gin.Context) {
 	taskObj := task.Task{
 		ID: taskID,
 	}
-	task, err := taskServer.GetTaskInfo(taskObj)
+	taskRecord, err := taskServer.GetTaskInfo(taskObj)
+	if err != nil {
+		panic(err)
+	}
+	taskRecord.ReleaseState = task.Releaseing
+	taskServer.UpdateTask(taskID, &taskRecord)
+
 	projectObj := project.Project{
-		Name: task.Project,
+		Name: taskRecord.Project,
 	}
 	project, err := projectServer.GetProjectInfo(projectObj)
 	if err != nil {
@@ -350,11 +356,11 @@ func ReleaseForSCP(c *gin.Context) {
 	output, err := execService.DeployControl(project, taskID)
 	if err != nil {
 		resCode = 1
-		task.ReleaseState = 0 //失败
+		taskRecord.ReleaseState = task.Fail //失败
 	} else {
-		task.ReleaseState = 1 //成功
+		taskRecord.ReleaseState = task.Success //成功
 	}
-	taskServer.UpdateTask(taskID, &task)
+	taskServer.UpdateTask(taskID, &taskRecord)
 	resData = strings.ReplaceAll(string(output), "\n", "<br>")
 	c.JSON(200, gin.H{
 		"code":    resCode,

@@ -250,9 +250,17 @@
                 data.field.userID = sessionStorage.getItem('userID');
                 var projects = transfer.getData('projects'); //获取右侧数据
                 var cmds = [];
+                var stop;//用来阻断程序执行
                 projects.forEach(item => {
+                    if (item.value.indexOf("|") > -1) {
+                        layer.msg("请使用“快捷发布”发布" + item.title, { icon: 5 });
+                        stop = true;
+                    }
                     cmds.push(item.value);
                 });
+                if (stop) {
+                    return false;
+                }
                 data.field.projects = cmds;
                 $.post('/exec/create-task-for-pm2-v2', data.field, function (res) {
                     // code=1是直接发布，code=2是审核发布
@@ -270,7 +278,6 @@
                     }
                 }).fail(function (err) {
                     clearInterval(t2);
-                    layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
                 return false;

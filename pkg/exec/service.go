@@ -200,7 +200,6 @@ func (u *execService) SyncCode(deployConfig project.DeployConfig, projectName st
 			remotePath := fmt.Sprintf("%s@%s:%s", deployConfig.User, host, deployConfig.Path)
 			// rsync参数，宿主机项目，目标目录
 			cmd3 := fmt.Sprintf("rsync -a %s %s/ %s", deployConfig.RsyncArgs, path.Join(util.Conf.APPDir, projectName), remotePath)
-			log.Println("同步代码：", cmd3)
 			cmdput, err := u.CmdSync(cmd3)
 			if err != nil {
 				log.Println("同步代码执行失败：", err)
@@ -246,7 +245,10 @@ func (u *execService) PostDeploy(deployConfig project.DeployConfig) ([]byte, err
 			if deployConfig.PreDeploy != "" {
 				// 用户名，IP，项目目录，前置命令， 命令
 				po := strings.Index(deployConfig.PreDeploy, ";")
-				preDeploy := deployConfig.PreDeploy[:po]
+				preDeploy := deployConfig.PreDeploy
+				if po > -1 {
+					preDeploy = deployConfig.PreDeploy[:po]
+				}
 				ssh = fmt.Sprintf("ssh %s@%s \"cd %s; %s; %s\"", deployConfig.User, host, deployConfig.Path, preDeploy, deployConfig.PostDeploy)
 			}
 			cmdput, err := u.CmdSync(ssh)
