@@ -154,7 +154,7 @@
                     });
                     return false;
                 } else if (obj.event === 'delete') {
-                    layer.confirm('真的删除行么', function (index) {
+                    layer.confirm('确定删除[' + data.name + ']吗？', function (index) {
                         $.ajax({
                             url: '/role/del/' + data.id,
                             type: 'DELETE',

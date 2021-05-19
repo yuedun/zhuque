@@ -44,18 +44,12 @@
                     <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input" placeholder="项目分组">
                 </div>
             </div>
-            <!-- <div class="layui-inline">
-                <label class="layui-form-label">子环境</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="clone" autocomplete="off" class="layui-input" placeholder="可选，字母或数字">
-                </div>
-            </div> -->
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">发布方式</label>
             <div class="layui-input-block">
-                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType" checked>
-                <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType">
+                <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType" checked>
+                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType">
             </div>
         </div>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
@@ -67,25 +61,19 @@
                     <label class="layui-form-label">配置文件</label>
                     <div class="layui-input-block">
                         <textarea name="config" placeholder="请输入内容" class="layui-textarea" rows="20">
-            module.exports = {
-                apps : [{
-                    script: 'index.js',
-                    watch: '.'
-                }],
-                
-                deploy : {
-                    production : {
-                        user : 'SSH_USERNAME',
-                        host : 'SSH_HOSTMACHINE',
-                        ref  : 'origin/master',
-                        repo : 'GIT_REPOSITORY',
-                        path : 'DESTINATION_PATH',
-                        'pre-deploy-local': '',
-                        'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-                        'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
-                    }
-                }
-            };</textarea>
+{
+    "user" : "root",
+    "host" : ["200.100.100.1", "200.100.100.2", "200.100.100.3"],
+    "ref"  : "master",
+    "repo" : "git@github.com:yuedun/zhuque.git",
+    "path" : "/var/www/production/zhuque",
+    "preBuild" : "echo '编译前安装依赖，设置环境变量'",
+    "build":"go build",
+    "preDeploy" : "export ENV=production",
+    "postDeploy" : "pm2 restart zhuque",
+    "rsyncArgs":"--exclude '.git'"
+}
+                        </textarea>
                     </div>
                 </div>
             </div>
@@ -150,9 +138,51 @@
                         });
 
                         return false;
+                    },
+                    error: function (err) {
+                        layer.msg(err.responseJSON.message, { icon: 5, offset: "20%" });
                     }
                 });
             })
+            // 监听radio选择事件
+            form.on('radio(deployType)', function (data) {
+                console.log(data);
+                if (data.value == "scp") {
+                    $('textarea[name=config]').text(`{
+    "user" : "root",
+    "host" : ["200.100.100.1", "200.100.100.2", "200.100.100.3"],
+    "ref"  : "master",
+    "repo" : "git@github.com:yuedun/zhuque.git",
+    "path" : "/var/www/production/zhuque",
+    "preBuild" : "echo '编译前安装依赖，设置环境变量'",
+    "build":"go build",
+    "preDeploy" : "export ENV=production",
+    "postDeploy" : "pm2 restart zhuque",
+    "rsyncArgs":"--exclude '.git'"
+}`);
+                } else {
+                    $('textarea[name=config]').text(`module.exports = {
+    apps : [{
+        script: 'index.js',
+        watch: '.'
+    }],
+    
+    deploy : {
+        production : {
+            user : 'SSH_USERNAME',
+            host : 'SSH_HOSTMACHINE',
+            ref  : 'origin/master',
+            repo : 'GIT_REPOSITORY',
+            path : 'DESTINATION_PATH',
+            'pre-deploy-local': '',
+            'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
+            'pre-setup': 'npm config set registry https://registry.npm.taobao.org'
+        }
+    }
+};`);
+                }
+            });
+
             // 监听取消
             $('#cancleBtn').on("click", function () {
                 var iframeIndex = parent.layer.getFrameIndex(window.name);

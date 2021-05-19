@@ -87,7 +87,7 @@
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 });
 
-                var userID =  sessionStorage.getItem("userId");;
+                var userID = sessionStorage.getItem("userId");;
                 table.render({
                     id: "table_user_project",
                     elem: '#currentTableId',
@@ -145,7 +145,7 @@
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
                 if (obj.event === 'delete') {
-                    layer.confirm('真的删除行么', function (index) {
+                    layer.confirm('确定删除[' + data.name + ']吗？', function (index) {
                         $.ajax({
                             url: '/user/user-project/del/' + data.id,
                             type: 'delete',

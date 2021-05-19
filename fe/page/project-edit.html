@@ -45,19 +45,13 @@
                     <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
             </div>
-            <!-- <div class="layui-inline">
-                <label class="layui-form-label">子环境</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="clone" autocomplete="off" class="layui-input" placeholder="可选，字母或数字">
-                </div>
-            </div> -->
         </div>
         <div class="layui-form-item">
             <!-- 不可更改 -->
             <label class="layui-form-label">发布方式</label>
             <div class="layui-input-block">
-                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType">
                 <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType">
+                <input type="radio" name="deployType" value="pm2" title="pm2发布" lay-filter="deployType">
                 <tip>项目部署成功后不能修改，修改会导致不能发布</tip>
             </div>
         </div>
@@ -136,6 +130,9 @@
 
                         return false;
                     },
+                    error: function (err) {
+                        layer.msg(err.responseJSON.message, { icon: 5, offset: "20%" });
+                    }
                 });
             });
             // 监听取消
