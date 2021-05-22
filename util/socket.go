@@ -24,8 +24,8 @@ func SocketEvent(router *gin.Engine) {
 	server.OnEvent("/", "msg", func(s socketio.Conn, msg string) string {
 		log.Println(">>>>>>>>>接收到msg消息：", msg)
 		s.SetContext(msg)
-		s.Emit("msg", "这是服务端发送的消息："+msg) //接收到消息发送消息事件
-		return "recv " + msg             // 接收到消息直接返回
+		s.Emit("msg", "socket连接服务器成功！") //接收到消息发送消息事件
+		return "recv " + msg            // 接收到消息直接返回
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {

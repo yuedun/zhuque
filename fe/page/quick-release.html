@@ -11,7 +11,13 @@
     <link rel="stylesheet" href="../css/public.css" media="all">
     <style>
         #waterfall-data {
-            background-color:darkgrey;
+            padding: 30px;
+            line-height: 22px;
+            background-color: #393D49;
+            color: #fff;
+            font-weight: 300;
+            height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -68,33 +74,22 @@
             <div class="layui-row">
                 <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
                     <div id="waterfall-step">
-                        <div id="recive"></div>
+                        <ul class="layui-timeline">
+                            <!-- <li class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+                                <div class="layui-timeline-content layui-text">
+                                    <h3 class="layui-timeline-title">8月18日</h3>
+                                    <p>
+                                        <i class="layui-icon"></i>layui 2.0 的一切准备工作似乎都已到位。发布之弦，一触即发。
+                                    </p>
+                                </div>
+                            </li> -->
+                        </ul>
                     </div>
                 </div>
                 <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
                     <div id="waterfall-data">
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
-                        <p>sdlghreogoeu</p>
+
                     </div>
                 </div>
             </div>
@@ -132,6 +127,7 @@
                 , table = layui.table
                 , $ = layui.jquery;
 
+            socketInit($);
             !function init(params) {
                 $.get('/project/name-list', function (res) {
                     for (const value in res.data) {
@@ -340,18 +336,19 @@
                     if (res.code == 1) {
                         backgroundColor = "lightcoral";
                     }
-                    layer.open({
-                        type: 1
-                        , title: '发布结果' //不显示标题栏
-                        , closeBtn: 1
-                        , area: '800px;'
-                        , shade: 0.8
-                        , id: 'LAY_layuipro' //设定一个id，防止重复弹出
-                        , btn: ['关闭']
-                        , btnAlign: 'c'
-                        , moveType: 1 //拖拽模式，0或者1
-                        , content: '<div style="padding: 30px; line-height: 22px; background-color: ' + backgroundColor + '; color: #fff; font-weight: 300;">' + res.data + '</div>'
-                    });
+                    $('#waterfall-data').html(res.data);
+                    // layer.open({
+                    //     type: 1
+                    //     , title: '发布结果' //不显示标题栏
+                    //     , closeBtn: 1
+                    //     , area: '800px;'
+                    //     , shade: 0.8
+                    //     , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    //     , btn: ['关闭']
+                    //     , btnAlign: 'c'
+                    //     , moveType: 1 //拖拽模式，0或者1
+                    //     , content: '<div style="padding: 30px; line-height: 22px; background-color: ' + backgroundColor + '; color: #fff; font-weight: 300;">' + res.data + '</div>'
+                    // });
                     table.reload('currentTableId');
                 }).fail(function (err) {
                     clearInterval(t);
