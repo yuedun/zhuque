@@ -26,7 +26,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">项目名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" placeholder="项目名称">
                 </div>
             </div>
             <div class="layui-inline">
@@ -42,12 +42,11 @@
             <div class="layui-inline">
                 <label class="layui-form-label">空间</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="namespace" lay-verify="required" autocomplete="off" class="layui-input" placeholder="项目分组">
                 </div>
             </div>
         </div>
         <div class="layui-form-item">
-            <!-- 不可更改 -->
             <label class="layui-form-label">发布方式</label>
             <div class="layui-input-block">
                 <input type="radio" name="deployType" value="scp" title="scp发布" lay-filter="deployType">

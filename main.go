@@ -54,6 +54,7 @@ func main() {
 		c.Redirect(http.StatusPermanentRedirect, "/fe")
 	})
 
+	util.SocketEvent(r)
 	router.Register(r)
 	port := Conf.Port
 	if port == "" {

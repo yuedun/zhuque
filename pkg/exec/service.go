@@ -78,6 +78,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 	} else {
 		buffer.Write([]byte("项目已存在，跳过克隆代码。\n"))
 	}
+	util.SocketCon.Emit("msg", string(buffer.Bytes()))
 
 	// 1.1拉新代码
 	output, err = u.GitPull(deployConfig, projectDirName)
@@ -86,6 +87,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
+	util.SocketCon.Emit("msg", "完成克隆代码")
 
 	// 2.编译
 	if deployConfig.Build != "" {
@@ -96,6 +98,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		}
 		buffer.Write(output)
 	}
+	util.SocketCon.Emit("msg", "完成编译")
 
 	// 3.同步代码到远程服务器 发生错误停止往下执行
 	output, err = u.SyncCode(deployConfig, projectDirName)
@@ -104,6 +107,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
+	util.SocketCon.Emit("msg", "完成同步代码")
 
 	// 4.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
@@ -115,6 +119,7 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		}
 		buffer.Write(output)
 	}
+	util.SocketCon.Emit("msg", "完成发布")
 	return buffer.Bytes(), nil
 }
 

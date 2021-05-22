@@ -6,6 +6,7 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
+	github.com/googollee/go-socket.io v1.5.1 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
