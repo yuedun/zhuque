@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/yuedun/zhuque/db"
@@ -21,7 +22,7 @@ import (
 
 type (
 	ExecService interface {
-		DeployControl(project project.Project, taskID int) ([]byte, error)
+		DeployControl(project project.Project, taskID int, uid string) ([]byte, error)
 		CmdSync(userCmd string) ([]byte, error)
 		CloneRepo(deployConfig project.DeployConfig, projectName string) ([]byte, error)
 		GitPull(deployConfig project.DeployConfig, projectName string) ([]byte, error)
@@ -45,7 +46,7 @@ func NewService(db *gorm.DB) ExecService {
 }
 
 // DeployControl 发布流程控制
-func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]byte, error) {
+func (u *execService) DeployControl(projectObj project.Project, taskID int, uid string) ([]byte, error) {
 	var deployConfig project.DeployConfig
 	var buffer bytes.Buffer
 	var output []byte
@@ -78,7 +79,11 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 	} else {
 		buffer.Write([]byte("项目已存在，跳过克隆代码。\n"))
 	}
-	util.SocketCon.Emit("msg", string(buffer.Bytes()))
+
+	if v, ok := util.SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", util.SocketData{Time: time, Msg: "克隆代码"})
+	}
 
 	// 1.1拉新代码
 	output, err = u.GitPull(deployConfig, projectDirName)
@@ -87,7 +92,10 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
-	util.SocketCon.Emit("msg", "完成克隆代码")
+	if v, ok := util.SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", util.SocketData{Time: time, Msg: "完成克隆代码"})
+	}
 
 	// 2.编译
 	if deployConfig.Build != "" {
@@ -98,7 +106,10 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		}
 		buffer.Write(output)
 	}
-	util.SocketCon.Emit("msg", "完成编译")
+	if v, ok := util.SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", util.SocketData{Time: time, Msg: "完成编译"})
+	}
 
 	// 3.同步代码到远程服务器 发生错误停止往下执行
 	output, err = u.SyncCode(deployConfig, projectDirName)
@@ -107,7 +118,10 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		return buffer.Bytes(), err
 	}
 	buffer.Write(output)
-	util.SocketCon.Emit("msg", "完成同步代码")
+	if v, ok := util.SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", util.SocketData{Time: time, Msg: "完成同步代码"})
+	}
 
 	// 4.同步代码到远程应用服务器后执行命令，如重启
 	if deployConfig.PostDeploy != "" {
@@ -119,7 +133,10 @@ func (u *execService) DeployControl(projectObj project.Project, taskID int) ([]b
 		}
 		buffer.Write(output)
 	}
-	util.SocketCon.Emit("msg", "完成发布")
+	if v, ok := util.SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", util.SocketData{Time: time, Msg: "完成发布"})
+	}
 	return buffer.Bytes(), nil
 }
 

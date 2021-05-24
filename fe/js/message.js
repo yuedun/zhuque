@@ -10,20 +10,19 @@ function socketInit($) {
     })
     // 接收消息
     socket.on('msg', function (data) {
-        console.log(">>>>>>>>>>接收", data);
-        var time = new Date();
+        console.log(">>>>>>>>>>接收", JSON.stringify(data));
         var htmldata = `
         <li class="layui-timeline-item">
             <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
             <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">${time}</h3>
+                <h3 class="layui-timeline-title">${data.Time}</h3>
                 <p>
-                    <i class="layui-icon"></i>${data}
+                    <i class="layui-icon"></i>${data.Msg}
                 </p>
             </div>
         </li>
         `
-        $("#waterfall-step ul").append(htmldata);
+        $("#waterfall-step ul").prepend(htmldata);
     });
 
 }
