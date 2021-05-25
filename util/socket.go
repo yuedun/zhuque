@@ -10,8 +10,6 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
-var SocketCon socketio.Conn
-
 var SocketConMap = make(map[string]socketio.Conn)
 
 // https://github.com/googollee/go-socket.io/blob/master/_examples/gin-gonic/main.go
@@ -20,9 +18,8 @@ func SocketEvent(router *gin.Engine) {
 
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
-		userID := getCookieByName("userID", getCookies(s.RemoteHeader().Get("Cookie")))
+		userID := NewCookie(s.RemoteHeader().Get("Cookie")).getCookieByName("userID")
 		fmt.Println("connected:", s.ID(), userID)
-		// SocketCon = s
 		SocketConMap[userID] = s
 		return nil
 	})
@@ -50,20 +47,23 @@ func SocketEvent(router *gin.Engine) {
 
 }
 
-func getCookies(rawCookies string) []*http.Cookie {
-	// rawCookies := "cookie1=value1;cookie2=value2"
+type myCookie struct {
+	cookies []*http.Cookie
+}
 
+// 将字符串cookie转换为数组cookie
+func NewCookie(rawCookies string) myCookie {
 	header := http.Header{}
 	header.Add("Cookie", rawCookies)
 	request := http.Request{Header: header}
 
-	// fmt.Println(request.Cookies()) // [cookie1=value1 cookie2=value2]
-	return request.Cookies()
+	return myCookie{cookies: request.Cookies()}
 }
 
-func getCookieByName(key string, cookies []*http.Cookie) string {
+// 获取指定key的cookie值
+func (c myCookie) getCookieByName(key string) string {
 	val := ""
-	for _, v := range cookies {
+	for _, v := range c.cookies {
 		if v.Name == key {
 			val = v.Value
 			break
@@ -73,6 +73,14 @@ func getCookieByName(key string, cookies []*http.Cookie) string {
 }
 
 type SocketData struct {
-	Time string
-	Msg  string
+	Time   string
+	Msg    string
+	Status int
+}
+
+func SendSocketMsg(uid, msg string) {
+	if v, ok := SocketConMap[uid]; ok {
+		time := time.Now().Format("15:04:05.000")
+		v.Emit("msg", SocketData{Time: time, Msg: msg})
+	}
 }
