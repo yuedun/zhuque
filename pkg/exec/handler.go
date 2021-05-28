@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/yuedun/zhuque/db"
 	"github.com/yuedun/zhuque/pkg/message"
@@ -324,6 +325,7 @@ func CreateTaskForSCP(c *gin.Context) {
 func ReleaseForSCP(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
+			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.(error).Error(),
 			})
@@ -353,7 +355,10 @@ func ReleaseForSCP(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	output, err := execService.DeployControl(project, taskID)
+	claims := jwt.ExtractClaims(c)
+	userID64 := claims["user_id"].(float64)
+	userID := int(userID64)
+	output, err := execService.DeployControl(project, taskID, strconv.Itoa(userID))
 	if err != nil {
 		resCode = 1
 		taskRecord.ReleaseState = task.Fail //失败

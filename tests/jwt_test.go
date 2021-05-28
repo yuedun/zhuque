@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/yuedun/zhuque/util"
@@ -10,15 +9,15 @@ import (
 func TestJWT(t *testing.T) {
 	token, err := util.CreateToken("yuedun", "sec")
 	if err != nil {
-		fmt.Println(">>>>>>>>err", err)
+		t.Log(">>>>>>>>err", err)
 	}
-	fmt.Println(token)
+	t.Log(token)
 }
 
 func TestJWT2string(t *testing.T) {
-	tokenstring, err := util.ParseToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDY0NDU5NzcsInVpZCI6Inl1ZWR1biJ9.sTFWe9ZLprCLS5luOm43o-Xh65lE-vujTyXXhcSP7ic", "sec")
+	tokenstring, err := util.ParseToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI2OTAyNTQsIm9yaWdfaWF0IjoxNjIxODI2MjU0LCJ1c2VyX2lkIjo1LCJ1c2VybmFtZSI6ImhhbGUuaHVvIn0.DWfif4lIYMIErHVd1GtihuIZOgycuR6SU8A_rNxNUp4", "JWTSecret")
 	if err != nil {
-		fmt.Println(">>>>>>>>err", err)
+		t.Log(">>>>>>>>err", err)
 	}
-	fmt.Println(tokenstring)
+	t.Log(tokenstring)
 }
