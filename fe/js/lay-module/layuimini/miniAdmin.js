@@ -110,6 +110,7 @@ layui.define(["jquery", "miniMenu", "element", "miniTab", "miniTheme"], function
         storeUerInfo: function (data) {
             sessionStorage.setItem('username', data.username);
             sessionStorage.setItem('userID', data.userID);
+            document.cookie = 'userID=' + data.userID+';path=/';
             sessionStorage.setItem('role', data.role);
             $('.username').html(sessionStorage.getItem('username'));
         },
