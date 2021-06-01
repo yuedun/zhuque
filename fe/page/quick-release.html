@@ -20,7 +20,8 @@
             overflow-y: auto;
             word-wrap: break-word;
         }
-        #waterfall-step{
+
+        #waterfall-step {
             height: 400px;
             overflow-y: auto;
         }
@@ -318,7 +319,7 @@
             // 发布函数
             function relase(taskId, deployType) {
                 // loading状态
-                var index = layer.load(0, { offset: '30%' });
+                var index = layer.load(0, { offset: '30%', shade: 0 });
                 // 计时
                 $('.time-use').show();
                 var timeCount = 1;
