@@ -69,7 +69,7 @@ INSERT INTO `permission` VALUES ('27', '发布记录', '13', 'page/deploy.html',
 DROP TABLE IF EXISTS `project`;
 CREATE TABLE `project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `status` int(11) DEFAULT '1',
   `env` varchar(255) DEFAULT NULL,
   `namespace` varchar(255) DEFAULT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE `project` (
   `deploy_type` varchar(5) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  UNIQUE(`name`),
+  UNIQUE KEY `name` (`name`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 

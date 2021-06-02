@@ -57,9 +57,15 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
                     <div class="layui-input-block">
                         <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
                         <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        <button type="button" class="layui-btn layui-btn-primary" lay-submit="" lay-filter="clean">清空日志</button>
                     </div>
                 </div>
             </form>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div id="resdata" style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -85,18 +91,7 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
             form.on('submit(demo1)', function (data) {
                 var index = layer.load();
                 $.post('/exec/send', data.field, function (res) {
-                    layer.open({
-                        type: 1
-                        , title: '发布结果' //不显示标题栏
-                        , closeBtn: 1
-                        , area: '800px;'
-                        , shade: 0.8
-                        , id: 'LAY_layuipro' //设定一个id，防止重复弹出
-                        , btn: ['关闭']
-                        , btnAlign: 'c'
-                        , moveType: 1 //拖拽模式，0或者1
-                        , content: '<div style="padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' + res.data + '</div>'
-                    });
+                    $("#resdata").append(res.data);
                     layer.close(index);
                     try {
                         if (cacheList && cacheList.length > 0) {
@@ -112,6 +107,11 @@ $ pm2 deploy projects/&lt;project_name&gt;/ecosystem.config.js production exec "
                     layer.close(index);
                     layer.msg(err.responseJSON.message, { icon: 5 });
                 })
+                return false;
+            });
+            // 清空日志
+            form.on('submit(clean)', function (data) {
+                $("#resdata").html("");
                 return false;
             });
         });
