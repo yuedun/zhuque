@@ -11,6 +11,7 @@ type Project struct {
 	Namespace  string    `json:"namespace"`
 	Config     string    `json:"config" gorm:"comment:'项目配置'"`                //发布配置
 	DeployType string    `json:"deployType" grom:"comment:'发布机制，值：pm2 ,scp'"` // 发布机制，值：pm2 ,scp
+	DingTalk   string    `json:"dingTalk" gorm:"comment:'钉钉hook地址'"`
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }

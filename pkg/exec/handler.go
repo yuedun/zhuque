@@ -200,7 +200,6 @@ func CreateTaskForPM2V2(c *gin.Context) {
 	if util.Conf.Env == "prod" {
 		// 发送消息通知
 		content := fmt.Sprintf("【朱雀】发布单【%s】将在%d分钟后发布%s。提交人：%s", task.TaskName, util.Conf.DelayDeploy, task.Project, task.Username)
-		log.Printf(content)
 		bodyObj := make(map[string]interface{})
 		bodyObj["msgtype"] = "text"
 		bodyObj["text"] = map[string]interface{}{
