@@ -19,7 +19,7 @@ type Task struct {
 	ID           int    `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
 	TaskName     string `json:"taskName"`
 	Project      string `json:"project"` //要发布的项目名，一次可发布多个
-	UserID       string `json:"userID"`
+	UserID       int    `json:"userID"`
 	User         user.User
 	Username     string       `json:"username"`
 	Status       int          `json:"status" grom:"comment:'数据状态：1有效，0无效'"`

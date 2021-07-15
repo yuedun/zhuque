@@ -247,7 +247,6 @@
             //监听提交
             form.on('submit(release)', function (data) {
                 data.field.username = sessionStorage.getItem('username');
-                data.field.userID = sessionStorage.getItem('userID');
                 var projects = transfer.getData('projects'); //获取右侧数据
                 var cmds = [];
                 var stop;//用来阻断程序执行

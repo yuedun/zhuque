@@ -58,15 +58,14 @@ func CreateTaskForPM2(c *gin.Context) {
 			})
 		}
 	}()
-	//cmd的值是项目名
+	//project的值是项目名
 	projectName, ok := c.GetPostForm("project")
 	if !ok || projectName == "" {
 		panic(errors.New("命令无效！"))
 	}
-	userID, ok := c.GetPostForm("userID")
-	if !ok || userID == "" {
-		panic(errors.New("用户ID无效！"))
-	}
+	uid, _ := c.Get("userid")
+	userID := uid.(int)
+
 	username, ok := c.GetPostForm("username")
 	if !ok || username == "" {
 		panic(errors.New("用户名无效！"))
@@ -96,9 +95,8 @@ func CreateTaskForPM2(c *gin.Context) {
 		UserID:       userID,
 		ReleaseState: task.Ready, //待发布
 		Username:     username,
-		// Cmd:          userCmd,
-		From:       "single",
-		DeployType: "pm2",
+		From:         "single",
+		DeployType:   "pm2",
 	}
 	taskID, err := taskServer.CreateTask(&task)
 	if err != nil {
@@ -157,10 +155,9 @@ func CreateTaskForPM2V2(c *gin.Context) {
 	if !ok {
 		panic(errors.New("命令无效！"))
 	}
-	userID, ok := c.GetPostForm("userID")
-	if !ok || userID == "" {
-		panic(errors.New("用户ID无效！"))
-	}
+	uid, _ := c.Get("userid")
+	userID := uid.(int)
+
 	username, ok := c.GetPostForm("username")
 	if !ok || username == "" {
 		panic(errors.New("用户名无效！"))
@@ -187,9 +184,8 @@ func CreateTaskForPM2V2(c *gin.Context) {
 		UserID:       userID,
 		Username:     username,
 		ReleaseState: task.Ready,
-		// Cmd:          userCmd,
-		From:       "multi",
-		DeployType: "pm2",
+		From:         "multi",
+		DeployType:   "pm2",
 	}
 	taskID, err := taskServer.CreateTask(&task)
 	if err != nil {
@@ -262,15 +258,14 @@ func CreateTaskForSCP(c *gin.Context) {
 			})
 		}
 	}()
-	//cmd的值是项目名
+	//project的值是项目名
 	projectName, ok := c.GetPostForm("project")
 	if !ok || projectName == "" {
 		panic(errors.New("项目名无效！"))
 	}
-	userID, ok := c.GetPostForm("userID")
-	if !ok || userID == "" {
-		panic(errors.New("用户ID无效！"))
-	}
+	uid, _ := c.Get("userid")
+	userID := uid.(int)
+
 	username, ok := c.GetPostForm("username")
 	if !ok || username == "" {
 		panic(errors.New("用户名无效！"))
