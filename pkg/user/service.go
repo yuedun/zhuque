@@ -58,7 +58,7 @@ func (u *userService) GetLoginUserInfo(userObj User) (user UserLoginInfo, err er
 }
 
 func (u *userService) GetUserList(offset, limit int, userObj User) (users []User, count int, err error) {
-	err = u.mysql.Where(userObj).Offset(offset).Limit(limit).Find(&users).Offset(-1).Limit(-1).Count(&count).Error
+	err = u.mysql.Where(userObj).Order("id DESC").Offset(offset).Limit(limit).Find(&users).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return users, count, err
 	}

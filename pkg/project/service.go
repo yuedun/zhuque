@@ -44,7 +44,7 @@ func (u *projectService) GetProjectList(offset, limit int, search Project) (list
 	if search.Name != "" {
 		u.mysql = u.mysql.Where("name LIKE ?", search.Name+"%")
 	}
-	err = u.mysql.Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
+	err = u.mysql.Order("id DESC").Offset(offset).Limit(limit).Find(&list).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return list, count, err
 	}
