@@ -45,7 +45,7 @@ func (u *permissionService) GetPermissionInfo(search Permission) (permission Per
 }
 
 func (u *permissionService) GetPermissionList() (list []Permission, err error) {
-	err = u.db.Model("permission").Order("order_number asc").Find(&list).Error
+	err = u.db.Order("order_number asc").Find(&list).Error
 	if err != nil {
 		return list, err
 	}
@@ -55,7 +55,7 @@ func (u *permissionService) GetPermissionList() (list []Permission, err error) {
 func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, err error) {
 	list := []Permission{}
 	//查询所有父级菜单
-	err = u.db.Model("permission").Where("menu_type = 0 AND parent_id > 0").Find(&list).Error
+	err = u.db.Where("menu_type = 0 AND parent_id > 0").Find(&list).Error
 	for _, pMenu := range list {
 		permis := new(PermissionTree)
 		permis.ID = pMenu.ID
@@ -63,7 +63,7 @@ func (u *permissionService) GetPermissionListForRole() (tree []*PermissionTree, 
 		permis.Field = pMenu.Authority
 		permisChildrenList := []Permission{}
 		//获取子菜单
-		err = u.db.Model("permission").Select("id, title").Where("menu_type = 1 AND parent_id = ?", pMenu.ID).Find(&permisChildrenList).Error
+		err = u.db.Select("id, title").Where("menu_type = 1 AND parent_id = ?", pMenu.ID).Find(&permisChildrenList).Error
 		if err != nil {
 			return nil, err
 		}
@@ -94,14 +94,14 @@ func (u *permissionService) GetPermissionForSide(roleNum int) (menus []Menus, er
 	persArr := strings.Split(roleResult.Permissions, ",")
 	//查询上边侧边
 	var topMenus []Menus
-	err = u.db.Model("permission").Where("parent_id = -1").Find(&topMenus).Error
+	err = u.db.Where("parent_id = -1").Find(&topMenus).Error
 	if err != nil {
 		return menus, err
 	}
 	for _, m := range topMenus {
 		//查询左侧菜单
 		var sideMenus []Permission
-		err = u.db.Model("permission").Where("parent_id = ? AND menu_type = 0 AND id IN (?)", m.ID, persArr).Order("order_number ASC").Find(&sideMenus).Error
+		err = u.db.Where("parent_id = ? AND menu_type = 0 AND id IN (?)", m.ID, persArr).Order("order_number ASC").Find(&sideMenus).Error
 		if err != nil {
 			return menus, err
 		}
@@ -129,7 +129,7 @@ func (u *permissionService) UpdatePermission(ID int, permission *Permission) (er
 		"authority":   permission.Authority,
 		"menuType":    permission.MenuType,
 	}
-	err = u.db.Model(Permission{}).Where("id = ?", ID).Updates(upMap).Error
+	err = u.db.Model(Permission{ID: ID}).Updates(upMap).Error
 	if err != nil {
 		return err
 	}
@@ -147,11 +147,11 @@ func (u *permissionService) DeletePermission(ID int) (err error) {
 // 获取角色拥有的权限
 func (u *permissionService) GetByRole(roleID int) (list []Permission, err error) {
 	role := new(role.Role)
-	err = u.db.Model("role").Where("id = ?", roleID).Find(role).Error
+	err = u.db.Where("id = ?", roleID).Find(role).Error
 	permissions := strings.Split(role.Permissions, ",")
 	for _, pID := range permissions {
 		permis := Permission{}
-		err = u.db.Model("permission").Select("id, title").Where("id = ?", pID).Find(&permis).Error
+		err = u.db.Select("id, title").Where("id = ?", pID).Find(&permis).Error
 		if err != nil {
 			return nil, err
 		}

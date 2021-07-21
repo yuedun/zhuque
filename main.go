@@ -63,3 +63,27 @@ func main() {
 	log.Println("环境变量env:", util.Conf.Env, "http://localhost:"+port)
 	r.Run(":" + port) // listen and serve on 0.0.0.0:8090
 }
+
+// 以下代码为go:embed打包方式，将静态文件一同打包到可执行文件中
+// //go:embed fe/*
+// var f embed.FS
+
+// func main() {
+// 	log.SetFlags(log.Llongfile | log.LstdFlags) //输出行号
+// 	r := gin.Default()
+// 	templ := template.Must(template.New("").ParseFS(f, "fe/index.html"))
+// 	r.SetHTMLTemplate(templ)
+// 	r.StaticFS("/static", http.FS(f))
+// 	r.GET("/", func(c *gin.Context) {
+// 		c.HTML(http.StatusOK, "index.html", gin.H{})
+// 	})
+
+// 	util.SocketEvent(r)
+// 	router.Register(r)
+// 	port := Conf.Port
+// 	if port == "" {
+// 		port = "8090"
+// 	}
+// 	log.Println("环境变量env:", util.Conf.Env, "http://localhost:"+port)
+// 	r.Run(":" + port) // listen and serve on 0.0.0.0:8090
+// }

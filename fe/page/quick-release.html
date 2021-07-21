@@ -52,14 +52,6 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- <div class="layui-form-item">
-                            <label class="layui-form-label">只需重启</label>
-                            <div class="layui-input-inline">
-                                <input type="checkbox" name="restart" lay-skin="switch" lay-filter="switchTest"
-                                    lay-text="ON|OFF">
-                            </div>
-                            <div class="layui-form-mid layui-word-aux">直接拉代码重启</div>
-                        </div> -->
                         <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button class="layui-btn" lay-submit="" lay-filter="release">立即提交</button>
@@ -165,9 +157,9 @@
                     icon: 'layui-icon-refresh-3'
                 }],
                 cols: [[
-                    { field: 'id', title: 'ID', sort: true, width: 60 },
+                    { field: 'id', title: 'ID', sort: true, width: 80 },
                     { field: 'taskName', title: '上线单' },
-                    { field: 'project', title: '项目', width: 80 },
+                    { field: 'project', title: '项目', width: 100 },
                     { field: 'username', title: '用户名', width: 100 },
                     { field: 'deployType', title: '发布方式', width: 100 },
                     {
@@ -287,7 +279,6 @@
             //监听提交发布-立即提交
             form.on('submit(release)', function (data) {
                 data.field.username = sessionStorage.getItem('username');
-                data.field.userID = sessionStorage.getItem('userID');
                 // namelist不支持多余数据，比如data-deployType，只能将数据和project放在一起，用|来分割一下
                 var projectName = data.field.project.split("|")[0];
                 var dptype = data.field.project.split("|")[1];

@@ -14,8 +14,8 @@ import (
 // Register 路由注册
 func Register(router *gin.Engine) {
 	router.Use(middleware.Logger()) //全局中间件
+	// router.Use(middleware.SetUserInfo()) //这个中间件不能加在这，因为获取用户信息的前置是已经设置了用户信息，而设置用户信息是在middleware.Jwt().MiddlewareFunc()中间件中操作的
 	userRouter := router.Group("/user")
-	userRouter.Use(middleware.Logger())
 	//user路由注册,可以给各个group加中间件
 	userRouter.POST("/login", middleware.Jwt().LoginHandler)
 	userRouter.GET("/refresh_token", middleware.Jwt().RefreshHandler) // 刷新token
@@ -38,9 +38,8 @@ func Register(router *gin.Engine) {
 
 	projectRouter := router.Group("/project")
 	//user路由注册,可以给各个group加中间件
-	projectRouter.Use(middleware.Logger())
 	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
-	projectRouter.Use(middleware.SetUserInfo())
+	projectRouter.Use(middleware.SetUserInfo()) // 自动设置登录用的的id
 	{
 		projectRouter.GET("/list", project.List)
 		projectRouter.GET("/name-list", project.NameList)
@@ -54,8 +53,8 @@ func Register(router *gin.Engine) {
 
 	deployRouter := router.Group("/deploy")
 	//user路由注册,可以给各个group加中间件
-	projectRouter.Use(middleware.Logger())
-	projectRouter.Use(middleware.Jwt().MiddlewareFunc())
+	deployRouter.Use(middleware.Jwt().MiddlewareFunc())
+	deployRouter.Use(middleware.SetUserInfo()) // 自动设置登录用的的id
 	{
 		deployRouter.GET("/list", task.List)
 		deployRouter.GET("/wait-list", task.WaitList)
@@ -68,6 +67,7 @@ func Register(router *gin.Engine) {
 	//发送命令路由注册
 	execRouter := router.Group("/exec")
 	execRouter.Use(middleware.Jwt().MiddlewareFunc())
+	execRouter.Use(middleware.SetUserInfo()) // 自动设置登录用的的id
 	{
 		execRouter.POST("/send", exec.Send)
 		//单任务
@@ -86,6 +86,7 @@ func Register(router *gin.Engine) {
 	//权限管理
 	permissionRouter := router.Group("/permission")
 	permissionRouter.Use(middleware.Jwt().MiddlewareFunc())
+	permissionRouter.Use(middleware.SetUserInfo()) // 自动设置登录用的的id
 	{
 		permissionRouter.GET("/list", permission.List)
 		permissionRouter.GET("/role-permissions/:roleid", permission.RolePermissions)
@@ -96,6 +97,7 @@ func Register(router *gin.Engine) {
 	//角色管理
 	roleRouter := router.Group("/role")
 	roleRouter.Use(middleware.Jwt().MiddlewareFunc())
+	roleRouter.Use(middleware.SetUserInfo()) // 自动设置登录用的的id
 	{
 		roleRouter.GET("/list", role.List)
 		roleRouter.POST("/create", role.CreateRole)

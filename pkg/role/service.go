@@ -50,7 +50,7 @@ func (u *roleService) GetRoleList(page, limit int, search Role) (list []Role, co
 
 //获取角色拥有的权限
 func (u *roleService) RolePermissions(roleNum int) (role Role, err error) {
-	err = u.db.Model("role").Select("permissions").Where("role_num = ?", roleNum).Order("role_num asc").Find(&role).Error
+	err = u.db.Select("permissions").Where("role_num = ?", roleNum).Order("role_num asc").Find(&role).Error
 	if err != nil {
 		return role, err
 	}
@@ -67,7 +67,7 @@ func (u *roleService) CreateRole(role *Role) (err error) {
 }
 
 func (u *roleService) UpdateRole(ID int, role *Role) (err error) {
-	err = u.db.Model(role).Where("id= ? ", ID).Updates(role).Error
+	err = u.db.Model(Role{}).Where("id = ?", ID).Updates(role).Error
 	if err != nil {
 		return err
 	}

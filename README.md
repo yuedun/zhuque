@@ -19,6 +19,8 @@
         - [发布流程](#发布流程)
         - [配置说明](#配置说明)
 <!-- /TOC -->
+
+#### [文档](https://yuedun.gitbook.io/zhuque/)
 ## 介绍
 朱雀发布系统是专门为nodejs发布而开发的系统，使用go语言开发，前端使用了layui mini框架，简单易上手。
 朱雀发布系统前后端分离，但又是一体的，无需部署两套服务。
@@ -41,6 +43,8 @@
 [Font Awesome图标库](https://fontawesome.dashgame.com/)
 
 [后端框架gorm](http://gorm.book.jasperxu.com/)
+[后端框架gorm](https://gorm.io/zh_CN/docs/index.html)
+[后端框架gorm](https://v1.gorm.io/zh_CN/docs/index.html)
 
 [后端框架gin](https://github.com/gin-gonic/gin#using-middleware)
 
