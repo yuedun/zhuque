@@ -20,24 +20,26 @@ func Logger() gin.HandlerFunc {
 		t := time.Now()
 		// 请求前
 		s := string([]rune(c.HandlerName())[29:])
-		log.Print("请求前", s)
+		log.Print("请求前 path：", c.FullPath(), s)
 		c.Next()
 		// 请求后
 		latency := time.Since(t)
 		// 获取发送的 status
 		status := c.Writer.Status()
-		log.Printf("耗时：%s %s 状态：%d", c.FullPath(), latency, status)
+		log.Printf("请求后 path： %s 耗时： %s 状态：%d", c.FullPath(), latency, status)
 	}
 }
 
-//GetUser 获取用户信息中间件
+// SetUserInfo 获取用户信息中间件
+// 使用c.Get("userid")获取
 func SetUserInfo() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
-		userID64 := claims["user_id"].(float64)
-		userID := int(userID64)
-		log.Print("登录用户id:", userID)
-		c.Keys["userid"] = userID
+		if userID64, ok := claims["user_id"].(float64); ok {
+			userID := int(userID64)
+			log.Print("登录用户id:", userID)
+			c.Keys["userid"] = userID
+		}
 		c.Next()
 	}
 }

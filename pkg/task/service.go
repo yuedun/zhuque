@@ -16,6 +16,7 @@ type (
 	  面向接口开发的好处是要对下面的函数进行测试时，不需要依赖一个全局的db连接，只需要调用NewService传一个db连接参数即可测试
 	*/
 	TaskService interface {
+		GetTask(search Task) (task Task, err error)
 		GetTaskInfo(search Task) (task Task, err error)
 		GetTaskList(offet, limit int, search Task) (list []Task, count int, err error)
 		WaitTaskList(from string) (list []Task, err error)
@@ -38,6 +39,16 @@ func NewService(db *gorm.DB) TaskService {
 	return &taskService{
 		db: db,
 	}
+}
+
+// 查询任务，关联查出用户
+func (u *taskService) GetTask(search Task) (task Task, err error) {
+	err = u.db.Where(search).First(&task).Error
+	err = u.db.Model(&task).Related(&task.User).Error
+	if err != nil {
+		return task, err
+	}
+	return task, nil
 }
 
 func (u *taskService) GetTaskInfo(search Task) (task Task, err error) {

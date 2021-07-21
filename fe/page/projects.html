@@ -72,7 +72,6 @@
                     { type: "checkbox", width: 50 },
                     { field: 'id', width: 80, title: 'ID', sort: true },
                     { field: 'name', title: '项目名' },
-                    // { field: 'clone', title: '子环境' },
                     { field: 'status', title: '状态', sort: true },
                     { field: 'env', title: '环境' },
                     { field: 'namespace', title: '空间' },
@@ -152,7 +151,7 @@
                             //获取子页面的元素，进行数据渲染
                             body.find("input[name=id]").val(data.id);
                             body.find("input[name=name]").val(data.name);
-                            body.find("input[name=clone]").val(data.clone);
+                            body.find("input[name=dingTalk]").val(data.dingTalk);
                             body.find('select[name=env]').val(data.env);
                             body.find('input[name=namespace]').val(data.namespace);
                             body.find('textarea[name=config]').val(data.config);
@@ -191,7 +190,7 @@
                             //获取子页面的元素，进行数据渲染
                             body.contents().find("input[name=id]").val(data.id);
                             body.contents().find("input[name=name]").val(data.name);
-                            body.contents().find("input[name=clone]").val(data.clone);
+                            body.contents().find("input[name=dingTalk]").val(data.dingTalk);
                             body.contents().find('input[name=env]').val(data.env);
                             body.contents().find('input[name=namespace]').val(data.namespace);
                             body.contents().find('textarea[name=config]').val(data.config);

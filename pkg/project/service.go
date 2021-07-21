@@ -32,12 +32,12 @@ func NewService(mysql *gorm.DB) ProjectService {
 	}
 }
 
-func (u *projectService) GetProjectInfo(search Project) (user Project, err error) {
-	err = u.mysql.Where(search).Find(&user).Error
+func (u *projectService) GetProjectInfo(search Project) (project Project, err error) {
+	err = u.mysql.Where(search).Find(&project).Error
 	if err != nil {
-		return user, err
+		return project, err
 	}
-	return user, nil
+	return project, nil
 }
 
 func (u *projectService) GetProjectList(offset, limit int, search Project) (list []Project, count int, err error) {

@@ -81,6 +81,7 @@ CREATE TABLE `project` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE project ADD COLUMN ding_talk VARCHAR(255) DEFAULT '' COMMENT '钉钉hook地址';
 -- ----------------------------
 -- Records of project
 -- ----------------------------

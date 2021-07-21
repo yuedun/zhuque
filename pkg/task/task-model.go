@@ -1,6 +1,10 @@
 package task
 
-import "time"
+import (
+	"time"
+
+	"github.com/yuedun/zhuque/pkg/user"
+)
 
 type ReleaseState int
 
@@ -12,10 +16,11 @@ const (
 )
 
 type Task struct {
-	ID           int          `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
-	TaskName     string       `json:"taskName"`
-	Project      string       `json:"project"` //要发布的项目名，一次可发布多个
-	UserID       string       `json:"userID"`
+	ID           int    `json:"id" gorm:"AUTO_INCREMENT;primary_key"`
+	TaskName     string `json:"taskName"`
+	Project      string `json:"project"` //要发布的项目名，一次可发布多个
+	UserID       int    `json:"userID"`
+	User         user.User
 	Username     string       `json:"username"`
 	Status       int          `json:"status" grom:"comment:'数据状态：1有效，0无效'"`
 	ReleaseState ReleaseState `json:"releaseState" grom:"comment:' 发布结果：1成功，0失败，2待发布，3发布中'"`
