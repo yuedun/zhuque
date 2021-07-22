@@ -101,12 +101,12 @@
                     cols: [[
                         { type: "checkbox" },
                         { field: 'id', title: 'ID' },
-                        { field: 'name', title: '项目名' },
+                        { field: 'projectName', title: '项目名' },
                         { field: 'namespace', title: '空间' },
                         { field: 'username', title: '用户' },
                         { field: 'createUser', title: '创建者' },
                         {
-                            field: 'updatedAt', title: '更新时间', sort: true, templet: "<div>{{layui.util.toDateString(d.updatedAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
+                            field: 'updatedAt', title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.createdAt, 'yyyy-MM-dd HH:mm:ss')}}</div>"
                         },
                         { title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center" }
                     ]],
