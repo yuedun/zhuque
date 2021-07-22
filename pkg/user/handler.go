@@ -270,6 +270,7 @@ func CreateUserProject(c *gin.Context) {
 	userProject.UserID = userID64
 	userProject.ProjectID = projectID64
 	userProject.CreateUser = createUserID
+	userProject.CreatedAt = time.Now()
 	err := userService.CreateUserProject(&userProject)
 	if err != nil {
 		panic(err)
