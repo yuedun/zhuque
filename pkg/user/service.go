@@ -58,7 +58,7 @@ func (u *userService) GetLoginUserInfo(userObj User) (user UserLoginInfo, err er
 }
 
 func (u *userService) GetUserList(offset, limit int, userObj User) (users []User, count int, err error) {
-	err = u.mysql.Where(userObj).Offset(offset).Limit(limit).Find(&users).Offset(-1).Limit(-1).Count(&count).Error
+	err = u.mysql.Where(userObj).Order("id DESC").Offset(offset).Limit(limit).Find(&users).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		return users, count, err
 	}
@@ -68,7 +68,7 @@ func (u *userService) GetUserList(offset, limit int, userObj User) (users []User
 func (u *userService) GetUserProjects(offset, limit int, userObj User) (userProjects []UserProjectVO, count int, err error) {
 	// 字段别名需要设置成下划线命名法，不能设置为驼峰
 	err = u.mysql.Table("user_project AS up").
-		Select("up.id AS id, p.name AS name, p.namespace AS namespace, u.user_name AS username, u2.user_name AS create_user").
+		Select("up.id AS id, p.name AS project_name, p.namespace AS namespace, u.user_name AS username, u2.user_name AS create_user, up.created_at AS created_at").
 		Joins("INNER JOIN user AS u ON u.id = up.user_id").
 		Joins("INNER JOIN project AS p ON p.id = up.project_id").
 		Joins("INNER JOIN user AS u2 ON up.create_user = u2.id").
@@ -89,11 +89,11 @@ func (u *userService) CreateUser(user *User) (err error) {
 }
 
 // CreateUserProject 先查询是否存在，再创建
-func (u *userService) CreateUserProject(search *UserProject) (err error) {
-	err = u.mysql.Model("user_project").Where("user_id=? and project_id = ?", search.UserID, search.ProjectID).Find(search).Error
+func (u *userService) CreateUserProject(userProjec *UserProject) (err error) {
+	err = u.mysql.Model("user_project").Where("user_id=? and project_id = ?", userProjec.UserID, userProjec.ProjectID).Find(userProjec).Error
 	if err != nil {
 		log.Println(">>>>>>>>>无数据", err)
-		err = u.mysql.Create(search).Error
+		err = u.mysql.Create(userProjec).Error
 		if err != nil {
 			return err
 		}
