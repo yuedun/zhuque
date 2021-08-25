@@ -145,7 +145,7 @@
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
                 if (obj.event === 'delete') {
-                    layer.confirm('确定删除[' + data.name + ']吗？', function (index) {
+                    layer.confirm('确定删除[' + data.namespace + data.projectName + ']吗？', function (index) {
                         $.ajax({
                             url: '/user/user-project/del/' + data.id,
                             type: 'delete',

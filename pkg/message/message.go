@@ -19,7 +19,7 @@ type Message interface {
 }
 
 /*
- * 使用不同的结构体实现接口
+ * 使用不同的结构体实现接口，如果有其他类型的邮件服务，增加结构体实现，而不是修改现有实现
  */
 type message struct{}
 
