@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -44,6 +45,25 @@ func init() {
 	db.DB.LogMode(true)
 	//Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 	//defer Db.Close()
+	initData()
+}
+
+func initData() {
+	users := make([]user.User, 0)
+	if err := db.DB.Model(&user.User{}).Find(&users).Error; err != nil {
+		log.Println(err)
+	} else {
+		log.Println(">>>>>>>>", users)
+		if len(users) == 0 {
+			userService := user.NewService(db.DB)
+			user := user.User{}
+			user.UserName = "test"
+			user.Password = util.GetMD5(user.UserName)
+			user.Status = 1
+			user.CreatedAt = time.Now()
+			userService.CreateUser(&user)
+		}
+	}
 }
 
 func main() {

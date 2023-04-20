@@ -16,6 +16,7 @@
 
 conf.yaml
 zhuque
+zhuque.log
 
 projects/*
 tmp

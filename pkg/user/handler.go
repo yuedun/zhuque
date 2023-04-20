@@ -52,7 +52,7 @@ type loginData struct {
 	Password string `json:"password"`
 }
 
-//GetUserInfo
+// GetUserInfo
 func GetUserInfo(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -81,7 +81,7 @@ func GetUserInfo(c *gin.Context) {
 	})
 }
 
-//CreateUser
+// CreateUser
 func CreateUser(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -108,7 +108,7 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-//UpdateUser post json
+// UpdateUser post json
 func UpdateUser(c *gin.Context) {
 	userService := NewService(db.DB)
 	var user User
@@ -131,7 +131,7 @@ func UpdateUser(c *gin.Context) {
 	}
 }
 
-//DeleteUser
+// DeleteUser
 func DeleteUser(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 	userService := NewService(db.DB)
@@ -309,7 +309,7 @@ func UserProjectList(c *gin.Context) {
 	})
 }
 
-//DeleteUserProject 删除用户项目关系
+// DeleteUserProject 删除用户项目关系
 func DeleteUserProject(c *gin.Context) {
 	upID, _ := strconv.Atoi(c.Param("id"))
 	userService := NewService(db.DB)
@@ -322,7 +322,7 @@ func DeleteUserProject(c *gin.Context) {
 	})
 }
 
-//ChangePassword 修改密码
+// ChangePassword 修改密码
 func ChangePassword(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -356,7 +356,7 @@ func ChangePassword(c *gin.Context) {
 	})
 }
 
-//ForgotPassword 忘记密码，发送带链接邮件
+// ForgotPassword 忘记密码，发送带链接邮件
 func ForgotPassword(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -391,7 +391,7 @@ func ForgotPassword(c *gin.Context) {
 	})
 }
 
-//RestPassword 重置密码
+// RestPassword 重置密码
 func RestPassword(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {

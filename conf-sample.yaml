@@ -13,3 +13,4 @@ mailPWD: xxx # 邮件授权密码
 
 appDir: ../deploy_apps # 要发布的应用目录
 hostName: http://localhost:8090 # 服务域名
+salt: aaaa # 密码加盐

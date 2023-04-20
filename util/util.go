@@ -16,7 +16,7 @@ import (
 // 保存数据变量
 var Conf *Config
 
-//profile variables
+// profile variables
 type Config struct {
 	Port        string `yaml:"port"`        // 服务端口
 	Dialects    string `yaml:"dialects"`    // 使用的数据库类型：mysql,sqlite3
@@ -31,6 +31,7 @@ type Config struct {
 	JWTSecret   string `yaml:"JWTSecret"`   // jwt安全密匙
 	HostName    string `yaml:"hostName"`    // 服务地址，用于重置密码邮件中的链接
 	APPDir      string `yaml:"appDir"`      // 要发布的应用存储目录
+	Salt        string `yaml:"salt"`        // 密码加盐
 }
 
 func GetConf(filename string) (*Config, error) {
@@ -69,6 +70,7 @@ func GetConf(filename string) (*Config, error) {
 func GetMD5(password string) string {
 	Md5Inst := md5.New()
 	Md5Inst.Write([]byte(password))
+	Md5Inst.Write([]byte(Conf.Salt))
 	Result := Md5Inst.Sum(nil)
 	// 以下两种输出结果一样
 	log.Println("hex解码>>>>>>>", hex.EncodeToString(Result))
